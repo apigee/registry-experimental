@@ -1,0 +1,29 @@
+extends: spectral:oas
+functions: [responses]
+rules:
+  operation-tag-defined: off # Disables the operation-tag-defined rule
+  operation-success-response: off # Disables the rule to check whether a 2xx or 3xx response is present
+
+  schemas-must-have-descriptions: # Ensures that every schema has a description field
+    description: Schemas must have a description
+    given: $.components.schemas.[*]~
+    severity: error
+    then:
+      field: description
+      function: truthy
+
+  hyphen-delimited-uris: # Taken from https://github.com/api-stuff/hands-on-with-spectral/blob/master/rulesets/petstore-scenario-4.yaml
+    message: "Words in the path must be lowercase and delimited by a hyphen or concatenated, or be a path parameter"
+    severity: error
+    given: "$.paths[*]~"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(?:\/(?:[a-z]+(?:-[a-z]+|)+|\\{[a-zA-Z]+\\}))+$"
+
+  default-response-fallback: # Ensures that every response object has a 2xx operation set. Taken from https://github.com/api-stuff/hands-on-with-spectral/blob/master/rulesets/functions/responses.js
+    message: "Response object does not have 2xx operation or default set"
+    given: "$.paths.[*].[*].responses"
+    severity: error
+    then:
+      function: responses

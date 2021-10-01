@@ -9,6 +9,12 @@ and development.
 This repository holds experimental code that builds on the Registry API: new
 projects, suspended projects, and work that might be useful in future projects.
 
+### Running the registry-graphql proxy
+
+[cmd/registry-graphql](cmd/registry-graphql) contains a simple proxy that
+provides a read-only GraphQL interface to the Registry API. It can be run with
+a local or remote `registry-server`.
+
 ## License
 
 This software is licensed under the Apache License, Version 2.0. See

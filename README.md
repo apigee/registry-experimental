@@ -1,3 +1,5 @@
+[![Go Actions Status](https://github.com/apigee/registry-experimental/workflows/Go/badge.svg)](https://github.com/apigee/registry-experimental/actions)
+
 # Registry Experiments
 
 The [Apigee Registry API](https://github.com/apigee/registry) allows teams

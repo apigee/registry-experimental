@@ -3,6 +3,8 @@ module github.com/apigee/registry-experimental
 go 1.16
 
 require (
+	cloud.google.com/go v0.84.0 // indirect
+	cloud.google.com/go/pubsub v1.3.1 // indirect
 	github.com/apigee/registry v0.3.1
 	github.com/envoyproxy/go-control-plane v0.9.9-0.20210512163311-63b5d3c536b0
 	github.com/gogo/googleapis v1.4.0

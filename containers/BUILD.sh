@@ -36,7 +36,7 @@ then
 else
   # Otherwise, all containers are built.
   SUFFIX=""
-  CONTAINERS=("authz-server" "registry-bundle")
+  CONTAINERS=("authz-server" "registry-bundle" "worker" "dispatcher")
   PLATFORMS=("linux/amd64,linux/arm64")
 fi
 

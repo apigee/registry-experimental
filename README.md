@@ -2,12 +2,19 @@
 
 # Registry Experiments
 
-The [Apigee Registry API](https://github.com/apigee/registry) allows teams
-to upload and share machine-readable descriptions of APIs that are in use
-and development.
+The [Apigee Registry API](https://github.com/apigee/registry) allows teams to
+upload and share machine-readable descriptions of APIs that are in use and
+development.
 
 This repository holds experimental code that builds on the Registry API: new
 projects, suspended projects, and work that might be useful in future projects.
+
+### registry-experimental
+
+[cmd/registry-experimental](cmd/registry-experimental) contains a command-line
+tool that is structurally identical to the registry tool but containing
+experimental capabilities, some of which might eventually be migrated to the
+registry tool.
 
 ### Running the registry-graphql proxy
 

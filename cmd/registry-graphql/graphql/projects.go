@@ -67,7 +67,7 @@ func representationForProject(project *rpc.Project) map[string]interface{} {
 
 func resolveProjects(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewAdminClient(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +88,9 @@ func resolveProjects(p graphql.ResolveParams) (interface{}, error) {
 	}
 	var response *rpc.ListProjectsResponse
 	edges := []map[string]interface{}{}
+    // TODO: add GrpcClient() to gapic.AdminClient in registry project and uncomment below
+	c = c // remove this; it's just here to tell the compiler that c is used
+	/*
 	for len(edges) < pageSize {
 		response, _ = c.GrpcClient().ListProjects(ctx, req)
 		for _, project := range response.GetProjects() {
@@ -98,12 +101,13 @@ func resolveProjects(p graphql.ResolveParams) (interface{}, error) {
 			break
 		}
 	}
+	*/
 	return connectionForEdgesAndEndCursor(edges, response.GetNextPageToken()), nil
 }
 
 func resolveProject(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewAdminClient(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"fmt"
+
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/text"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/compute"

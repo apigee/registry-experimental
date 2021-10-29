@@ -2,22 +2,3 @@ module github.com/apigee/registry-experimental
 
 go 1.16
 
-require (
-	cloud.google.com/go v0.84.0
-	cloud.google.com/go/pubsub v1.3.1
-	github.com/apex/log v1.9.0
-	github.com/apigee/registry v0.3.1
-	github.com/blevesearch/bleve v1.0.13
-	github.com/envoyproxy/go-control-plane v0.9.9-0.20210512163311-63b5d3c536b0
-	github.com/gogo/googleapis v1.4.0
-	github.com/google/uuid v1.1.2
-	github.com/googleapis/gnostic v0.5.4
-	github.com/graphql-go/graphql v0.7.9
-	github.com/graphql-go/handler v0.2.3
-	github.com/spf13/cobra v1.1.1
-	golang.org/x/net v0.0.0-20210908191846-a5e095526f91
-	google.golang.org/genproto v0.0.0-20210909211513-a8c4777a87af
-	google.golang.org/grpc v1.40.0
-	google.golang.org/protobuf v1.27.1
-	gopkg.in/yaml.v2 v2.4.0
-)

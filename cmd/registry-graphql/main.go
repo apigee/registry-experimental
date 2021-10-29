@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/apigee/registry/cmd/registry-graphql/graphql"
+	"github.com/apigee/registry-experimental/cmd/registry-graphql/graphql"
 	"github.com/graphql-go/handler"
 )
 

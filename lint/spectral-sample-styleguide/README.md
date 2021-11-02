@@ -1,6 +1,6 @@
 ## Summary
 
-The following directory contains a sample Spectral style guide that governs violations on OpenAPI Specs, along witha sample OpenAPI spec which violates multiple rules. This example is used to illustrate the functionality of style guides in the API registry as well as the generation of conformance reports. The test-description of this project teaches how to upload the style guide to the registry, upload the manifest to the registry, compute the conformance report, and the conformance report.
+The following directory contains a sample Spectral style guide that governs violations on OpenAPI Specs, along witha sample OpenAPI spec which violates multiple rules. This example is used to illustrate the functionality of style guides in the API registry as well as the generation of conformance reports. The test description teaches how to upload the style guide to the registry, upload the manifest to the registry, compute the conformance report, and view the conformance report.
 
 ## Test
 

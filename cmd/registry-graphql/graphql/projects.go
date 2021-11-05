@@ -67,7 +67,7 @@ func representationForProject(project *rpc.Project) map[string]interface{} {
 
 func resolveProjects(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewAdminClient(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func resolveProjects(p graphql.ResolveParams) (interface{}, error) {
 
 func resolveProject(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewAdminClient(ctx)
 	if err != nil {
 		return nil, err
 	}

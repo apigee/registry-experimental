@@ -23,13 +23,13 @@ import (
 	"github.com/apigee/registry/cmd/registry/core"
 	"github.com/apigee/registry/connection"
 	"github.com/apigee/registry/rpc"
-	"github.com/apigee/registry/server/names"
+	"github.com/apigee/registry/server/registry/names"
 	"github.com/blevesearch/bleve"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/proto"
 
-	oas2 "github.com/googleapis/gnostic/openapiv2"
-	oas3 "github.com/googleapis/gnostic/openapiv3"
+	oas2 "github.com/google/gnostic/openapiv2"
+	oas3 "github.com/google/gnostic/openapiv3"
 )
 
 var bleveMutex sync.Mutex
@@ -55,8 +55,8 @@ func searchIndexCommand(ctx context.Context) *cobra.Command {
 			defer wait()
 			// Generate tasks.
 			name := args[0]
-			if m := names.SpecRegexp().FindStringSubmatch(name); m != nil {
-				err = core.ListSpecs(ctx, client, m, filter, func(spec *rpc.ApiSpec) {
+			if spec, err := names.ParseSpec(name); err == nil {
+				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) {
 					taskQueue <- &indexSpecTask{
 						client:   client,
 						specName: spec.Name,

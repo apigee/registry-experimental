@@ -18,7 +18,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/apigee/registry/cmd/capabilities/dispatcher-server/dispatcher"
+	"github.com/apigee/registry-experimental/cmd/workers/dispatcher-server/dispatcher"
 )
 
 func main() {

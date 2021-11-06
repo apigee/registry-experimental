@@ -37,10 +37,10 @@ Steps to run this setup:
     - Name : API Registry 
     - Javascript Authorized origins : http://localhost:8888
     - Authorized redirect URIs: http://localhost:8888
-2. Update the `docker-compose.yml` file.
-   
-   Update the `GOOGLE_SIGNIN_CLIENTID` value with the client ID from previous 
-   step.
+
+2. Update the `GOOGLE_SIGNIN_CLIENTID` value, in  `docker-compose.yml` file,
+    with the client ID from previous step.
+
 3. Run the `docker compose up` command to start the server
 
 4. Setup environment variables to use registry tools

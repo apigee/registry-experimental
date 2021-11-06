@@ -8,11 +8,11 @@ with Cloud SQL for PostgreSQL.
 
 Steps to install Apigee Registry & Viewer in your GKE Cluster:
 1. Copy the sample folder and create a new folder
-    ```
+    ```shell
         cp -rf kubenetes/sample kubenetes/registry-demo
     ```
 2. We need a static IP for this demo: 
-    ```
+    ```shell
         gcloud compute addresses create registry-app-static-ip \
         --global \
         --ip-version IPV4 
@@ -50,12 +50,12 @@ Steps to install Apigee Registry & Viewer in your GKE Cluster:
     Replace the `GOOGLE_SIGNIN_CLIENTID` in kubernetes/registry-demo/patch.yaml with the Client ID that was generated.
 
 6. Ensure you are connected to the correct GKE cluster :
-    ```
+    ```shell
         gcloud container clusters get-credentials **cluster-name** --region **region** \
         --project **GCP-Project**
     ```
 7. Run the following command to create the deployment setup:
-    ```
+    ```shell
         kubectl create ns api-registry
         
         kubectl apply -k kubernetes/registry-demo
@@ -64,7 +64,7 @@ Steps to install Apigee Registry & Viewer in your GKE Cluster:
 8. The solution should be ready in about 10-15 minutes. 
    Check the status of the following:
    - Check the status of certs using :
-     ```
+     ```shell
         gcloud compute ssl-certificates list --global
      ```
    - Deploy the ingress rules
@@ -72,11 +72,11 @@ Steps to install Apigee Registry & Viewer in your GKE Cluster:
 
 9. Application is ready when the following curl command returns 200.
    If using sslip.io domain:
-   ```
+   ```shell
         curl -I https://1-2-3-4.sslip.io 
     ```
     If using custom-domain
-   ```
+   ```shell
         curl -I https://registry-app.example.com
     ```
 
@@ -84,7 +84,7 @@ Steps to install Apigee Registry & Viewer in your GKE Cluster:
    or your custom domain
    
 11. To use the registry tools run the following commands: 
-    ```
+    ```shell
         export APG_REGISTRY_ADDRESS=$(kubectl get svc -n api-registry registry-server-external-lb  -o jsonpath="{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}")
         export APG_ADMIN_ADDRESS=$APG_REGISTRY_ADDRESS
         export APG_ADMIN_INSECURE=1
@@ -92,8 +92,15 @@ Steps to install Apigee Registry & Viewer in your GKE Cluster:
     ```
 
 12. Now you can interact with the registry tools using
-    ```
+    ```shell
         apg admin create-project --project_id=project1
         apg registry create-api --api_id=api1 --parent=projects/project1/locations/global
         apg registry list-apis --parent=projects/project1/locations/global --json
+    ```
+
+13. Run the following command to wipe out this setup
+    ```shell
+        kubectl delete -k kubernetes/registry-demo
+        kubectl delete ns api-registry
+        gcloud compute addresses delete registry-app-static-ip --global --quiet
     ```

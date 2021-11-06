@@ -1,0 +1,31 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+resources:
+- 00-registry-db.yaml
+- 01-registry-server.yaml
+- 02-registry-envoy.yaml
+- 03-registry-app.yaml
+- 04-registry-ingress.yaml
+
+namespace: api-registry
+
+configMapGenerator:
+- name: registry-config
+  literals:
+  - POSTGRES_DB="apigee_registry"
+  - POSTGRES_USER="dbuser"
+  - POSTGRES_PASSWORD="passw0rd"
+  - REGISTRY_DATABASE_CONFIG="host=registry-database-svc.api-registry.svc.cluster.local port=5432 user=dbuser dbname=apigee_registry password=passw0rd sslmode=disable"
+  - GOOGLE_SIGNIN_CLIENTID="testvalue"

@@ -52,7 +52,7 @@ services:
     depends_on:
     - registry-server
   registry-app:
-    image: ghcr.io/apigee/registry-app:main
+    image: ghcr.io/apigee/registry-viewer:main
     environment:
     - GOOGLE_SIGNIN_CLIENTID=testClientId
     - REGISTRY_SERVICE=http://localhost:9999

@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: registry-app
-        image: ghcr.io/apigee/registry-app:main
+        image: ghcr.io/apigee/registry-viewer:main
         imagePullPolicy: Always
         env:
         - name: PORT

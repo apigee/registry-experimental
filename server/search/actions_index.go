@@ -21,10 +21,10 @@ import (
 
 	experimental_rpc "github.com/apigee/registry-experimental/rpc"
 	"github.com/apigee/registry-experimental/server/search/internal/indexer"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/genproto/googleapis/longrunning"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // Index handles the corresponding API request.
@@ -50,9 +50,12 @@ func (s *SearchServer) Index(ctx context.Context, req *experimental_rpc.IndexReq
 	if err != nil {
 		return nil, err
 	}
-	db.UpdateDocuments(ctx, documents)
-	metadata, _ := ptypes.MarshalAny(&experimental_rpc.IndexMetadata{})
-	response, _ := ptypes.MarshalAny(&experimental_rpc.IndexResponse{
+	err = db.UpdateDocuments(ctx, documents)
+	if err != nil {
+		return nil, err
+	}
+	metadata, _ := anypb.New(&experimental_rpc.IndexMetadata{})
+	response, _ := anypb.New(&experimental_rpc.IndexResponse{
 		Message: "OK",
 	})
 	return &longrunning.Operation{

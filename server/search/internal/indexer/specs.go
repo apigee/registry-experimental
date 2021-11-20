@@ -15,8 +15,6 @@
 package indexer
 
 import (
-	"fmt"
-
 	"github.com/apigee/registry-experimental/server/search/internal/storage/models"
 	registry_rpc "github.com/apigee/registry/rpc"
 	discovery_v1 "github.com/google/gnostic/discovery"
@@ -48,22 +46,4 @@ func NewDocumentsForSpec(spec *registry_rpc.ApiSpec, contents []byte) ([]*models
 		return newDocumentsForOpenAPIv3(spec, document)
 	}
 	return nil, nil
-}
-
-func newDocumentForSpecField(spec *registry_rpc.ApiSpec, f models.Field, w models.Weight, text string) *models.Document {
-	return (&models.Document{
-		Key:    fmt.Sprintf("%s#%s", spec.Name, f),
-		Kind:   specEntityName,
-		Field:  f,
-		Vector: models.TSVector{RawText: text, Weight: w},
-	}).Escape()
-}
-
-func newDocumentForSpecPath(spec *registry_rpc.ApiSpec, f models.Field, w models.Weight, path, text string) *models.Document {
-	return (&models.Document{
-		Key:    fmt.Sprintf("%s#%s", spec.Name, path),
-		Kind:   specEntityName,
-		Field:  f,
-		Vector: models.TSVector{RawText: text, Weight: w},
-	}).Escape()
 }

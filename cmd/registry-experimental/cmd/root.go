@@ -19,10 +19,9 @@ import (
 
 	"fmt"
 
-	"github.com/apex/log"
-	"github.com/apex/log/handlers/text"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/compute"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/search"
+	"github.com/apigee/registry/log"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
@@ -32,18 +31,13 @@ func Command(ctx context.Context) *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "registry-experimental",
 		Short: "Experimental utilities for working with the API Registry",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			// Initialize global default logger with unique process identifier.
-			if len(logID) == 0 {
-				logID = fmt.Sprintf("[ %.8s ] ", uuid.New())
-			}
-			logger := &log.Logger{
-				Level:   log.DebugLevel,
-				Handler: text.Default,
-			}
-			log.Log = logger.WithField("uid", logID)
-		},
 	}
+
+	// Bind a logger instance to the local context with metadata for outbound requests.
+	logger := log.NewLogger(log.DebugLevel)
+	ctx = log.NewOutboundContext(log.NewContext(ctx, logger), log.Metadata{
+		UID: fmt.Sprintf("%.8s", uuid.New()),
+	})
 
 	cmd.AddCommand(compute.Command(ctx))
 	cmd.AddCommand(search.Command(ctx))

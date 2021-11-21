@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/compute"
+	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/generate"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/search"
 	"github.com/apigee/registry/log"
 	"github.com/google/uuid"
@@ -40,6 +41,7 @@ func Command(ctx context.Context) *cobra.Command {
 	})
 
 	cmd.AddCommand(compute.Command(ctx))
+	cmd.AddCommand(generate.Command(ctx))
 	cmd.AddCommand(search.Command(ctx))
 
 	cmd.PersistentFlags().StringVar(&logID, "log-id", "", "Assign an ID which gets attached to the log produced")

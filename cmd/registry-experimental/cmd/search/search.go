@@ -37,7 +37,7 @@ func Command(ctx context.Context) *cobra.Command {
 				return
 			}
 
-			log.FromContext(ctx).Debugf("Searching for %s", args[0])
+			log.Debugf(ctx, "Searching for %s", args[0])
 			// search for some text
 			query := bleve.NewQueryStringQuery(args[0])
 			search := bleve.NewSearchRequest(query)

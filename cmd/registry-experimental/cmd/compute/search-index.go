@@ -137,6 +137,6 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	}
 	defer index.Close()
 	// Index the spec.
-	log.FromContext(ctx).Debugf("Indexing %s", task.specName)
+	log.Debugf(ctx, "Indexing %s", task.specName)
 	return index.Index(task.specName, message)
 }

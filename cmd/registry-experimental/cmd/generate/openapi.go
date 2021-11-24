@@ -29,7 +29,6 @@ import (
 	"github.com/apigee/registry/rpc"
 	"github.com/apigee/registry/server/registry/names"
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func openapiCommand(ctx context.Context) *cobra.Command {
@@ -99,21 +98,25 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromZippedProtos(spec.Name, data)
 		if err != nil {
-			return fmt.Errorf("error processing protos: %s (%s)", spec.Name, err.Error())
+			log.FromContext(ctx).WithError(err).Warnf("error processing protos: %s", spec.Name)
 		}
 	} else {
-		return fmt.Errorf("we don't know how to generate OpenAPI for %s", spec.Name)
+		log.FromContext(ctx).Infof("we don't know how to generate OpenAPI for %s", spec.Name)
+		return nil
 	}
-	subject := spec.GetName()
+	specName, _ := names.ParseSpec(spec.GetName())
 	messageData := []byte(openapi)
 	newSpec := &rpc.ApiSpec{
-		Name:     subject + "/specs/" + relation,
-		MimeType: core.MimeTypeForMessageType("application/x.openapi+gzip;version=3"),
+		Name:     specName.Version().Spec(relation).String(),
+		MimeType: core.MimeTypeForMessageType("application/x.openapi;version=3"),
 		Contents: messageData,
 	}
-	_, err = task.client.CreateApiSpec(ctx, &rpc.CreateApiSpecRequest{ApiSpec: newSpec})
+	_, err = task.client.UpdateApiSpec(ctx, &rpc.UpdateApiSpecRequest{
+		ApiSpec:      newSpec,
+		AllowMissing: true,
+	})
 	if err != nil {
-		return err
+		log.FromContext(ctx).WithError(err).Warn("Failed to generate OpenAPI")
 	}
 	return nil
 }
@@ -125,6 +128,7 @@ func openAPIFromZippedProtos(name string, b []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	fmt.Printf("WORKING IN %s\n", root)
 	// whenever we finish, delete the tmp directory
 	defer os.RemoveAll(root)
 	// unzip the protos to the temp directory
@@ -158,42 +162,44 @@ func openAPIFromZippedProtos(name string, b []byte) (string, error) {
 func generateOpenAPIForDirectory(name string, root string) (string, error) {
 	lint := &rpc.Lint{}
 	lint.Name = name
-	// run the api-linter on each proto file
+	// run protoc on all of the protos in the main directory
+	protos := []string{}
 	err := filepath.Walk(root+"/protos",
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 			if strings.HasSuffix(path, ".proto") {
-				lintFile, err := lintFileForProto(path, root)
-				if err != nil {
-					return err
-				}
-				lint.Files = append(lint.Files, lintFile)
+				protos = append(protos, strings.TrimPrefix(path, root+"/"))
 			}
 			return nil
 		})
-	return "todo", err
-}
-
-func lintFileForProto(path string, root string) (*rpc.LintFile, error) {
-	filename := strings.TrimPrefix(path, root+"/protos/")
-	cmd := exec.Command("api-linter", filename, "-I", "protos", "-I", "api-common-protos", "-I", "googleapis", "--output-format", "json")
+	if err != nil {
+		return "", err
+	}
+	fmt.Printf("protoc should be run on %+v\n", protos)
+	parts := []string{}
+	parts = append(parts, protos...)
+	parts = append(parts, "-I")
+	parts = append(parts, "protos")
+	parts = append(parts, "-I")
+	parts = append(parts, "api-common-protos")
+	parts = append(parts, "-I")
+	parts = append(parts, "googleapis")
+	parts = append(parts, "--openapi_out=.")
+	cmd := exec.Command("protoc", parts...)
 	cmd.Dir = root
+	fmt.Printf("running %+v\n", cmd)
 	data, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, err
+		fmt.Printf("error %+v\n", err)
+		return "", err
 	}
-	var result rpc.Lint
-	// The API linter returns a JSON array. Since the proto parser requires a top-level struct,
-	// wrap the results so that they are in the form of an rpc.Lint JSON serialization.
-	wrappedJSON := "{\"files\": " + string(data) + "}"
-	err = protojson.Unmarshal([]byte(wrappedJSON), &result)
+	fmt.Printf("output: %s\n", string(data))
+	// attempt to read an openapi.yaml file
+	bytes, err := ioutil.ReadFile(root + "/openapi.yaml")
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	if len(result.Files) > 0 {
-		return result.Files[0], err
-	}
-	return nil, err
+	return string(bytes), err
 }

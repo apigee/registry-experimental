@@ -59,7 +59,7 @@ class StyleGuideGenerator(object):
                     guideline_id_to_guideline[guideline_id]["rules"].append(
                         {
                             "id": rule_name.strip(),
-                            "description" : parsed_yaml["rule"]["summary"].strip(),
+                            "description" : parsed_yaml["rule"]["summary"].replace('\n', ' ').strip(),
                             "linter": "api-linter",
                             "linter_rulename": rule_name.strip(),
                             "severity": "ERROR",
@@ -102,7 +102,6 @@ def show_usage():
     print("generate_api_linter_styleguide <output_file>")
 
 if __name__ == "__main__":
-
     # Validate CLI args
     args = sys.argv
     if len(args) < 2:

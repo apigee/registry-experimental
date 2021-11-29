@@ -15,10 +15,11 @@
 package main
 
 import (
-	"github.com/apigee/registry/cmd/capabilities/worker-server/worker"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/apigee/registry-experimental/cmd/workers/worker-server/worker"
 )
 
 func main() {

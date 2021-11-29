@@ -1,0 +1,70 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#
+# Deployment for the Registry Viewer
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry-app
+spec:
+  selector:
+    matchLabels:
+      app: registry-app
+  template:
+    metadata:
+      labels:
+        app: registry-app
+    spec:
+      containers:
+      - name: registry-app
+        image: ghcr.io/apigee/registry-viewer:main
+        imagePullPolicy: Always
+        env:
+        - name: PORT
+          value: "8888"
+        - name: GOOGLE_SIGNIN_CLIENTID
+          valueFrom:
+            configMapKeyRef:
+              name: registry-config
+              key: GOOGLE_SIGNIN_CLIENTID
+        - name: REGISTRY_SERVICE
+          value: "/"
+        ports:
+        - name: app-port
+          containerPort: 8888
+        readinessProbe:
+          httpGet:
+            port: app-port
+            path: /
+            scheme: HTTP
+        livenessProbe:
+          httpGet:
+            port: app-port
+            path: /
+            scheme: HTTP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-app-cluster-lb
+spec:
+  type: ClusterIP
+  selector:
+    app: registry-app
+  ports:
+  - protocol: TCP
+    port: 8888
+    targetPort: 8888

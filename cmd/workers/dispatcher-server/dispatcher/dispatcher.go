@@ -24,9 +24,9 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/apigee/registry/cmd/capabilities/worker-server/worker"
+	"github.com/apigee/registry-experimental/cmd/workers/worker-server/worker"
 	"github.com/apigee/registry/rpc"
-	"github.com/apigee/registry/server"
+	"github.com/apigee/registry/server/registry"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -35,7 +35,7 @@ import (
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 )
 
-const subscriptionName = server.TopicName + "-pull-subscriber"
+const subscriptionName = registry.TopicName + "-pull-subscriber"
 
 type Dispatcher struct {
 	pubsubClient *pubsub.Client
@@ -50,9 +50,9 @@ func (d *Dispatcher) setUp(ctx context.Context) error {
 	}
 
 	var topic *pubsub.Topic
-	topic, err = d.pubsubClient.CreateTopic(ctx, server.TopicName)
+	topic, err = d.pubsubClient.CreateTopic(ctx, registry.TopicName)
 	if status.Code(err) == codes.AlreadyExists {
-		topic = d.pubsubClient.Topic(server.TopicName)
+		topic = d.pubsubClient.Topic(registry.TopicName)
 	} else if err != nil {
 		return err
 	}

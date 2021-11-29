@@ -59,9 +59,15 @@ func TestGraphQL(t *testing.T) {
 		t.FailNow()
 	}
 	defer registryClient.Close()
+	adminClient, err := connection.NewAdminClient(ctx)
+	if err != nil {
+		t.Logf("Failed to create client: %+v", err)
+		t.FailNow()
+	}
+	defer adminClient.Close()
 	// Create sample registry.
 	projectID := "test-graphql"
-	buildTestProject(ctx, registryClient, t, projectID, 20)
+	buildTestProject(ctx, adminClient, registryClient, t, projectID, 20)
 	// Build query.
 	query := `
  	  query ($cursor: String){
@@ -100,7 +106,7 @@ func TestGraphQL(t *testing.T) {
 		t.Errorf("Unexpected number of APIs from query 2")
 	}
 	// Delete the test project
-	deleteTestProject(ctx, registryClient, t, projectID)
+	deleteTestProject(ctx, adminClient, t, projectID)
 }
 
 func evaluateQuery(params *graphql.Params) *Payload {
@@ -143,8 +149,8 @@ type API struct {
 	ID string `json:"id"`
 }
 
-func buildTestProject(ctx context.Context, registryClient connection.Client, t *testing.T, name string, apiCount int) {
-	deleteTestProject(ctx, registryClient, t, name)
+func buildTestProject(ctx context.Context, adminClient connection.AdminClient,registryClient connection.Client, t *testing.T, name string, apiCount int) {
+	deleteTestProject(ctx, adminClient, t, name)
 	// Create the test project.
 	req := &rpc.CreateProjectRequest{
 		ProjectId: name,
@@ -153,7 +159,7 @@ func buildTestProject(ctx context.Context, registryClient connection.Client, t *
 			Description: "A test catalog",
 		},
 	}
-	project, err := registryClient.CreateProject(ctx, req)
+	project, err := adminClient.CreateProject(ctx, req)
 	check(t, "error creating project %s", err)
 	// Create test APIs.
 	for i := 0; i < apiCount; i++ {
@@ -171,11 +177,11 @@ func buildTestProject(ctx context.Context, registryClient connection.Client, t *
 	}
 }
 
-func deleteTestProject(ctx context.Context, registryClient connection.Client, t *testing.T, name string) {
+func deleteTestProject(ctx context.Context, client connection.AdminClient, t *testing.T, name string) {
 	req := &rpc.DeleteProjectRequest{
 		Name: "projects/" + name,
 	}
-	if err := registryClient.DeleteProject(ctx, req); status.Code(err) != codes.NotFound {
+	if err := client.DeleteProject(ctx, req); status.Code(err) != codes.NotFound {
 		check(t, "Failed to delete test project: %+v", err)
 	}
 }

@@ -19,17 +19,17 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/apex/log"
 	"github.com/apigee/registry/cmd/registry/core"
 	"github.com/apigee/registry/connection"
+	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/rpc"
-	"github.com/apigee/registry/server/names"
+	"github.com/apigee/registry/server/registry/names"
 	"github.com/blevesearch/bleve"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/proto"
 
-	oas2 "github.com/googleapis/gnostic/openapiv2"
-	oas3 "github.com/googleapis/gnostic/openapiv3"
+	oas2 "github.com/google/gnostic/openapiv2"
+	oas3 "github.com/google/gnostic/openapiv3"
 )
 
 var bleveMutex sync.Mutex
@@ -42,31 +42,31 @@ func searchIndexCommand(ctx context.Context) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			filter, err := cmd.Flags().GetString("filter")
 			if err != nil {
-				log.WithError(err).Fatal("Failed to get filter from flags")
+				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")
 			}
 
 			ctx := context.Background()
 			client, err := connection.NewClient(ctx)
 			if err != nil {
-				log.WithError(err).Fatal("Failed to get client")
+				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
 			taskQueue, wait := core.WorkerPool(ctx, 64)
 			defer wait()
 			// Generate tasks.
 			name := args[0]
-			if m := names.SpecRegexp().FindStringSubmatch(name); m != nil {
-				err = core.ListSpecs(ctx, client, m, filter, func(spec *rpc.ApiSpec) {
+			if spec, err := names.ParseSpec(name); err == nil {
+				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) {
 					taskQueue <- &indexSpecTask{
 						client:   client,
 						specName: spec.Name,
 					}
 				})
 				if err != nil {
-					log.WithError(err).Fatal("Failed to list specs")
+					log.FromContext(ctx).WithError(err).Fatal("Failed to list specs")
 				}
 			} else {
-				log.Fatalf("We don't know how to index %s", name)
+				log.FromContext(ctx).Fatalf("We don't know how to index %s", name)
 			}
 		},
 	}
@@ -137,6 +137,6 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	}
 	defer index.Close()
 	// Index the spec.
-	log.Debugf("Indexing %s", task.specName)
+	log.Debugf(ctx, "Indexing %s", task.specName)
 	return index.Index(task.specName, message)
 }

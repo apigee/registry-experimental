@@ -61,7 +61,7 @@ class StyleGuideGenerator(object):
                             "id": rule_name.strip(),
                             "description" : parsed_yaml["rule"]["summary"].replace('\n', ' ').strip(),
                             "linter": "api-linter",
-                            "linter_rulename": rule_name.strip(),
+                            "linter_rulename": "::".join([e.strip() for e in parsed_yaml["rule"]["name"]]),
                             "severity": "ERROR",
                             "doc_uri" : "linter.aip.dev"+parsed_yaml["permalink"].strip()
                         }

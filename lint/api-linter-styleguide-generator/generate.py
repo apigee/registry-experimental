@@ -99,7 +99,7 @@ class ApiLinterStyleGuideGenerator(object):
         subprocess.run(["rm", "-rf", "api-linter"])
 
 def show_usage():
-    print("generate_api_linter_styleguide <output_file>")
+    print("Usage: generate <output_file>")
 
 if __name__ == "__main__":
     # Validate CLI args

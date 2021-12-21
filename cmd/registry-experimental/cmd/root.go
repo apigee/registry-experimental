@@ -23,6 +23,7 @@ import (
 	"github.com/apex/log/handlers/text"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/compute"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/search"
+	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/wipeout"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
@@ -47,6 +48,7 @@ func Command(ctx context.Context) *cobra.Command {
 
 	cmd.AddCommand(compute.Command(ctx))
 	cmd.AddCommand(search.Command(ctx))
+	cmd.AddCommand(wipeout.Command(ctx))
 
 	cmd.PersistentFlags().StringVar(&logID, "log-id", "", "Assign an ID which gets attached to the log produced")
 	return cmd

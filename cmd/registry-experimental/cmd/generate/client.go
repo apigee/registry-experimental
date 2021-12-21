@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 
 	"github.com/apex/log"
@@ -92,7 +93,7 @@ func (task *generateClientTask) Run(ctx context.Context) error {
 		return err
 	}
 	var client []byte
-	relation := "client"
+	relation := "go-http-client"
 	if core.IsDiscovery(spec.GetMimeType()) {
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		data, err := core.GetBytesForSpec(ctx, task.client, spec)
@@ -128,15 +129,14 @@ func clientFromDiscovery(name string, b []byte, language string) ([]byte, error)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("WORKING IN %s\n", root)
 	// whenever we finish, delete the tmp directory
-	//defer os.RemoveAll(root)
+	defer os.RemoveAll(root)
 
 	// write the spec into the temp directory
 	ioutil.WriteFile(root+"/discovery.json", b, 0444)
 
 	// run the code generator
-	cmd := exec.Command("google-api-go-generator",
+	cmd := exec.Command("go-http-client-generator",
 		"-api_json_file",
 		"discovery.json",
 		"-gendir",

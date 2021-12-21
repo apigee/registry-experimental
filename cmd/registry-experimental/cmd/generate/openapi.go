@@ -106,9 +106,14 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	}
 	specName, _ := names.ParseSpec(spec.GetName())
 	messageData := []byte(openapi)
+	messageData, err = core.GZippedBytes(messageData)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to compress generated OpenAPI")
+		return nil
+	}
 	newSpec := &rpc.ApiSpec{
 		Name:     specName.Version().Spec(relation).String(),
-		MimeType: core.MimeTypeForMessageType("application/x.openapi;version=3"),
+		MimeType: core.MimeTypeForMessageType("application/x.openapi+gzip;version=3"),
 		Contents: messageData,
 	}
 	_, err = task.client.UpdateApiSpec(ctx, &rpc.UpdateApiSpecRequest{

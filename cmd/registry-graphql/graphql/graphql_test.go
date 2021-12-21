@@ -149,7 +149,7 @@ type API struct {
 	ID string `json:"id"`
 }
 
-func buildTestProject(ctx context.Context, adminClient connection.AdminClient,registryClient connection.Client, t *testing.T, name string, apiCount int) {
+func buildTestProject(ctx context.Context, adminClient connection.AdminClient, registryClient connection.Client, t *testing.T, name string, apiCount int) {
 	deleteTestProject(ctx, adminClient, t, name)
 	// Create the test project.
 	req := &rpc.CreateProjectRequest{

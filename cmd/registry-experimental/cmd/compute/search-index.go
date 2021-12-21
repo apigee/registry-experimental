@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/apex/log"
 	"github.com/apigee/registry/cmd/registry/core"
 	"github.com/apigee/registry/connection"
+	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/rpc"
 	"github.com/apigee/registry/server/registry/names"
 	"github.com/blevesearch/bleve"
@@ -42,13 +42,13 @@ func searchIndexCommand(ctx context.Context) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			filter, err := cmd.Flags().GetString("filter")
 			if err != nil {
-				log.WithError(err).Fatal("Failed to get filter from flags")
+				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")
 			}
 
 			ctx := context.Background()
 			client, err := connection.NewClient(ctx)
 			if err != nil {
-				log.WithError(err).Fatal("Failed to get client")
+				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
 			taskQueue, wait := core.WorkerPool(ctx, 64)
@@ -63,10 +63,10 @@ func searchIndexCommand(ctx context.Context) *cobra.Command {
 					}
 				})
 				if err != nil {
-					log.WithError(err).Fatal("Failed to list specs")
+					log.FromContext(ctx).WithError(err).Fatal("Failed to list specs")
 				}
 			} else {
-				log.Fatalf("We don't know how to index %s", name)
+				log.FromContext(ctx).Fatalf("We don't know how to index %s", name)
 			}
 		},
 	}
@@ -137,6 +137,6 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	}
 	defer index.Close()
 	// Index the spec.
-	log.Debugf("Indexing %s", task.specName)
+	log.Debugf(ctx, "Indexing %s", task.specName)
 	return index.Index(task.specName, message)
 }

@@ -7,13 +7,12 @@ require (
 	cloud.google.com/go/cloudtasks v1.0.0
 	cloud.google.com/go/pubsub v1.17.1
 	github.com/GoogleCloudPlatform/cloudsql-proxy v1.26.0
-	github.com/apex/log v1.9.0
-	github.com/apigee/registry v0.3.10
+	github.com/apigee/registry v0.4.1
 	github.com/blevesearch/bleve v1.0.14
 	github.com/envoyproxy/go-control-plane v0.9.10-0.20210907150352-cf90f659a021
 	github.com/gogo/googleapis v1.4.1
 	github.com/golang/protobuf v1.5.2
-	github.com/google/gnostic v0.5.6
+	github.com/google/gnostic v0.5.7
 	github.com/google/uuid v1.3.0
 	github.com/googleapis/gax-go/v2 v2.1.1
 	github.com/graphql-go/graphql v0.8.0

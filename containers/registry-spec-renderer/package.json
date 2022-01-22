@@ -1,0 +1,23 @@
+{
+  "name": "registry-spec-renderer",
+  "version": "1.0.0",
+  "description": "App to render different types of API specifications",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Gitesh Koli",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@asyncapi/react-component": "^0.24.19",
+    "@asyncapi/web-component": "^0.24.19",
+    "@webcomponents/webcomponentsjs": "^2.6.0",
+    "@giteshk-org/apigeeregistry":"^0.0.1",
+    "express": "^4.17.2",
+    "graphiql": "^1.5.16",
+    "handlebars": "^4.7.7",
+    "react-dom": "^17.0.2",
+    "swagger-ui-dist": "^4.1.3"
+  }
+}

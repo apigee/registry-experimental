@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>Async API Sample</title>
+  </head>
+  <body style="margin: 0;">
+
+<script src="/renderer/async/webcomponents-bundle.js"></script>
+<script src="/renderer/async/lib/asyncapi-web-component.js" defer></script>
+
+<asyncapi-component
+  schemaUrl="{{{specUrl}}}"
+  schemaFetchOptions='{"method":"GET","mode":"cors"}'
+  cssImportPath="/renderer/async/lib/styles/fiori.css">
+</asyncapi-component>
+
+  </body>
+</html>

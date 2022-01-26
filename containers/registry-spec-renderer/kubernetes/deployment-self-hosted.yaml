@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry-spec-renderer
+  labels:
+    app: registry-spec-renderer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry-spec-renderer
+  template:
+    metadata:
+      name: registry-spec-renderer
+      labels:
+        app: registry-spec-renderer
+    spec:
+      containers:
+      - name: webapp
+        image: ghcr.io/apigee/registry-spec-renderer:main
+        env:
+        - name: "PORT"
+          value: "8080"
+        - name: "APG_REGISTRY_ADDRESS"
+          valueFrom:
+            configMapKeyRef:
+              name: registry-service-config
+              key: APG_REGISTRY_ADDRESS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-spec-renderer-lb
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: registry-spec-renderer

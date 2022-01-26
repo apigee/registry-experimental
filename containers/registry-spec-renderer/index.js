@@ -3,7 +3,6 @@ const fs = require("fs");
 const handlebars = require("handlebars");
 const { RegistryClient } = require("@giteshk-org/apigeeregistry");
 const grpc = require("@grpc/grpc-js");
-const { template } = require('handlebars');
 
 var client_options = {};
 if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
@@ -56,7 +55,7 @@ app.get('/renderer/:apiformat/projects/:projectId/locations/:locationId/apis/:ap
 
 app.all("/spec/projects/:projectId/locations/:locationId/apis/:apiId/versions/:versionId/specs/:specId", (req, res) => {
     if (req.method !== 'POST' && req.method !== 'GET') {
-        res.sendStatus("404");
+        res.sendStatus(404);
         res.end();
         return;
     }
@@ -79,4 +78,8 @@ app.all("/spec/projects/:projectId/locations/:locationId/apis/:apiId/versions/:v
         })
 });
 
+app.get('/healthz', (req, res) =>{
+    res.sendStatus(200);
+    res.end();
+});
 app.listen(process.env.PORT || 3000);

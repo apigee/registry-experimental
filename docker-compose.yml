@@ -63,5 +63,16 @@ services:
     - registry-server
     depends_on:
     - registry-server
+  registry-spec-renderer:
+    image: ghcr.io/apigee/registry-spec-renderer:main
+    environment:
+    - APG_REGISTRY_ADDRESS=registry-server:8080
+    - PORT=3000
+    ports:
+    - "3000:3000"
+    links:
+    - registry-server
+    depends_on:
+    - registry-server
 volumes:
   registry-db-vol:

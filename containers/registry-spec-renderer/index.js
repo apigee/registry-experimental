@@ -33,24 +33,53 @@ app.use('/renderer/graphql', express.static('node_modules/react'))
 app.use('/renderer/graphql', express.static('node_modules/react-dom'))
 app.use('/renderer/graphql', express.static('node_modules/graphiql'))
 
-app.get('/renderer/:apiformat/projects/:projectId/locations/:locationId/apis/:apiId/versions/:versionId/specs/:specId', (req, res) => {
-    res.setHeader("content-type", "text/html; charset=UTF-8");
-    spec_url = "/spec/projects/" + req.params.projectId + "/locations/" + req.params.locationId + "/apis/" + req.params.apiId + "/versions/" + req.params.versionId + "/specs/" + req.params.specId;
-    renderer_template = "";
-    switch (req.params.apiformat) {
-        case "openapi":
-            renderer_template = swagger_ui_template.toString();
-            break;
-        case "async":
-            renderer_template = async_template.toString();
-            break;
-        case "graphql":
-            renderer_template = graphiql_template.toString();
-            break;
-    }
-    hbstemplate = handlebars.compile(renderer_template);
-    res.send(hbstemplate({ specUrl: spec_url }));
-    res.end();
+app.get('/render/projects/:projectId/locations/:locationId/apis/:apiId/versions/:versionId/specs/:specId', (req, res) => {
+    spec_name = "projects/" + req.params.projectId + "/locations/" + req.params.locationId + "/apis/" + req.params.apiId + "/versions/" + req.params.versionId + "/specs/" + req.params.specId;
+
+    client.getApiSpec({
+        name: spec_name
+    }, (err,response) => {
+        if(err) {
+            res.sendStatus(500);
+            res.end();
+
+        } else {
+            console.log(response.mimeType);
+            let apiFormat = '';
+            if (response.mimeType.includes("openapi")) {
+                apiFormat = 'openapi';
+            } else if (response.mimeType.includes("asyncapi")) {
+                apiFormat = 'asyncapi';
+            } else if (response.mimeType.includes("discovery")) {
+                apiFormat = 'discovery';
+            } else if (response.mimeType.includes("proto")) {
+                apiFormat = 'proto';
+            } else if (response.mimeType.includes("graphql")) {
+                apiFormat = 'graphql';
+            }
+            var renderer_template = "";
+            switch (apiFormat) {
+                case "openapi":
+                    renderer_template = swagger_ui_template.toString();
+                    break;
+                case "async":
+                    renderer_template = async_template.toString();
+                    break;
+                case "graphql":
+                    renderer_template = graphiql_template.toString();
+                    break;
+            }
+            specUrl = "/spec/" + spec_name;
+            if (renderer_template != "") {
+                res.setHeader("content-type", "text/html; charset=UTF-8");
+                hbstemplate = handlebars.compile(renderer_template);
+                res.send(hbstemplate({specUrl: specUrl}));
+            } else {
+                res.redirect(specUrl);
+            }
+            res.end();
+        }
+    })
 });
 
 app.all("/spec/projects/:projectId/locations/:locationId/apis/:apiId/versions/:versionId/specs/:specId", (req, res) => {

@@ -2,7 +2,7 @@
 This container allows for rendering of specs from the API Registry.
 
 ### To run this against a self hosted version of Apigee Registry you will need to 
-define 'APG_REGISTRY_ADDRESS' environment variable
+
 1. Create a namespace for registry-spec-renderer
     ```
    kubectl create ns registry-spec-renderer

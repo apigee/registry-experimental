@@ -26,7 +26,6 @@ func Command(ctx context.Context) *cobra.Command {
 		Short: "Generate resources from the API Registry",
 	}
 
-	cmd.AddCommand(clientCommand(ctx))
 	cmd.AddCommand(openapiCommand(ctx))
 
 	cmd.PersistentFlags().String("filter", "", "Filter selected resources")

@@ -1,5 +1,22 @@
-all:
+lite:
 	go install ./...
+
+all:
+	./tools/GENERATE-RPC.sh
+	./tools/GENERATE-GRPC.sh
+	./tools/GENERATE-GAPIC.sh
+	./tools/GENERATE-APX.sh
+	go install ./...
+
+apg:
+	./tools/GENERATE-APX.sh
+	go install ./cmd/apx
+
+protos:
+	./tools/GENERATE-RPC.sh
+	./tools/GENERATE-GRPC.sh
+	./tools/GENERATE-GAPIC.sh
+	./tools/GENERATE-ENVOY-DESCRIPTORS.sh
 
 test:
 	go test ./...

@@ -149,7 +149,7 @@ type API struct {
 	ID string `json:"id"`
 }
 
-func buildTestProject(ctx context.Context, adminClient connection.AdminClient,registryClient connection.Client, t *testing.T, name string, apiCount int) {
+func buildTestProject(ctx context.Context, adminClient connection.AdminClient, registryClient connection.Client, t *testing.T, name string, apiCount int) {
 	deleteTestProject(ctx, adminClient, t, name)
 	// Create the test project.
 	req := &rpc.CreateProjectRequest{
@@ -179,7 +179,8 @@ func buildTestProject(ctx context.Context, adminClient connection.AdminClient,re
 
 func deleteTestProject(ctx context.Context, client connection.AdminClient, t *testing.T, name string) {
 	req := &rpc.DeleteProjectRequest{
-		Name: "projects/" + name,
+		Name:  "projects/" + name,
+		Force: true,
 	}
 	if err := client.DeleteProject(ctx, req); status.Code(err) != codes.NotFound {
 		check(t, "Failed to delete test project: %+v", err)

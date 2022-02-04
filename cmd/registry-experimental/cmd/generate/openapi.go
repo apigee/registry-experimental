@@ -32,9 +32,10 @@ import (
 )
 
 func openapiCommand(ctx context.Context) *cobra.Command {
-	return &cobra.Command{
+	var specID string
+	cmd := &cobra.Command{
 		Use:   "openapi",
-		Short: "Generate an OpenAPI spec for a protocol buffer API specification",
+		Short: "Generate an OpenAPI spec from another specificaton format",
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 
@@ -57,8 +58,9 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 				// Iterate through a collection of specs and evaluate each.
 				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) {
 					taskQueue <- &generateOpenAPITask{
-						client:   client,
-						specName: spec.Name,
+						client:    client,
+						specName:  spec.Name,
+						newSpecID: specID,
 					}
 				})
 				if err != nil {
@@ -67,11 +69,14 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 			}
 		},
 	}
+	cmd.Flags().StringVar(&specID, "spec-id", "generated.yaml", "ID to use for generated spec")
+	return cmd
 }
 
 type generateOpenAPITask struct {
-	client   connection.Client
-	specName string
+	client    connection.Client
+	specName  string
+	newSpecID string
 }
 
 func (task *generateOpenAPITask) String() string {
@@ -92,11 +97,17 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	relation := "generated.yaml"
+	relation := task.newSpecID
 	var openapi string
 	if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromZippedProtos(spec.Name, data)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Warnf("error processing protos: %s", spec.Name)
+		}
+	} else if core.IsDiscovery(spec.GetMimeType()) {
+		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
+		openapi, err = openAPIFromDiscovery(spec.Name, data)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warnf("error processing protos: %s", spec.Name)
 		}
@@ -207,4 +218,29 @@ func generateOpenAPIForDirectory(name string, root string) (string, error) {
 		return "", err
 	}
 	return string(bytes), err
+}
+
+// openAPIFromDiscovery runs the OpenAPI generator and returns the results.
+func openAPIFromDiscovery(name string, b []byte) (string, error) {
+	// create a tmp directory
+	root, err := ioutil.TempDir("", "registry-disco-")
+	if err != nil {
+		return "", err
+	}
+	// whenever we finish, delete the tmp directory
+	defer os.RemoveAll(root)
+	// write the spec to a file and run the converter
+	err = ioutil.WriteFile(root+"/discovery.json", b, 0666)
+	if err != nil {
+		return "", err
+	}
+	args := []string{"--from", "google", "--to", "openapi_3", "discovery.json"}
+	cmd := exec.Command("api-spec-converter", args...)
+	cmd.Dir = root
+	data, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("error %+v\n", err)
+		return "", err
+	}
+	return string(data), err
 }

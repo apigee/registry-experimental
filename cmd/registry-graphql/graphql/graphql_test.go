@@ -179,7 +179,8 @@ func buildTestProject(ctx context.Context, adminClient connection.AdminClient, r
 
 func deleteTestProject(ctx context.Context, client connection.AdminClient, t *testing.T, name string) {
 	req := &rpc.DeleteProjectRequest{
-		Name: "projects/" + name,
+		Name:  "projects/" + name,
+		Force: true,
 	}
 	if err := client.DeleteProject(ctx, req); status.Code(err) != codes.NotFound {
 		check(t, "Failed to delete test project: %+v", err)

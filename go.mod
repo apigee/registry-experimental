@@ -7,6 +7,7 @@ require (
 	cloud.google.com/go/cloudtasks v1.0.0
 	cloud.google.com/go/pubsub v1.17.1
 	github.com/GoogleCloudPlatform/cloudsql-proxy v1.26.0
+	github.com/apex/log v1.9.0
 	github.com/apigee/registry v0.4.2
 	github.com/blevesearch/bleve v1.0.14
 	github.com/envoyproxy/go-control-plane v0.9.10-0.20210907150352-cf90f659a021

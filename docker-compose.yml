@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ services:
     environment:
     - GOOGLE_SIGNIN_CLIENTID=testClientId
     - REGISTRY_SERVICE=http://localhost:9999
+    - SPEC_RENDERER_SERVICE=http://localhost:3000/render
     - PORT=8888
     ports:
     - "8888:8888"

@@ -14,6 +14,7 @@
 
 bases:
 - ../base
+- certs.yaml
 
 patchesStrategicMerge:
 - patch.yaml

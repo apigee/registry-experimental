@@ -1,0 +1,40 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: registry-controller-cronjob
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 100
+  suspend: false
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        app: registry-controller-cronjob
+    spec:
+      template:
+        metadata:
+          labels:
+            app: registry-controller-cronjob
+        spec:
+          containers:
+          - name: registry-linters
+            image: ghcr.io/apigee/registry-linter:main
+            env:
+            - name: APG_REGISTRY_INSECURE
+              value: "1"
+            - name: APG_REGISTRY_ADDRESS
+              value: $(REGISTRY_SERVICE_NAME):8080
+            - name: REGISTRY_PROJECT_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: registry-config
+                  key: REGISTRY_PROJECT_NAME
+            args:
+            - bin/sh
+            - -c
+            - registry resolve projects/${REGISTRY_PROJECT_NAME}/locations/global/artifacts/apihub-manifest; rc=$(echo $?); exit $rc
+          restartPolicy: Never
+      backoffLimit: 3

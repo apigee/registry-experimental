@@ -10,7 +10,7 @@ Steps to install Apigee Registry & Viewer in your GKE Cluster:
 
 1. Copy the sample folder and create a new folder
    ```shell
-       cp -rf kubenetes/sample kubenetes/registry-demo
+       cp -rf kubernetes/sample kubernetes/registry-demo
    ```
 2. We need a static IP for this demo:
 

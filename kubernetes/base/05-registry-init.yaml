@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: registry-init-job
+spec:
+  parallelism: 1
+  completions: 1
+  backoffLimit: 3
+  template:
+    metadata:
+      name: registry-init-job
+    spec:
+      containers:
+      - name: registry-init
+        image: ghcr.io/apigee/registry-tools:main
+        env:
+        - name: APG_ADMIN_INSECURE
+          value: "1"
+        - name: APG_ADMIN_ADDRESS
+          value: $(MY_SERVICE_NAME):8080
+        - name: APG_REGISTRY_INSECURE
+          value: "1"
+        - name: APG_REGISTRY_ADDRESS
+          value: $(REGISTRY_SERVICE_NAME):8080
+        - name: REGISTRY_PROJECT_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: registry-config
+              key: REGISTRY_PROJECT_NAME
+        args:
+        - bin/sh
+        - -c
+        - sleep 5;
+          apg admin migrate-database --follow &&
+          apg admin create-project --project_id ${REGISTRY_PROJECT_NAME} || true &&
+          registry upload manifest /config-files/apihub-manifest.yaml --project-id=${REGISTRY_PROJECT_NAME} &&
+          registry upload styleguide /config-files/apihub-styleguide.yaml --project-id=${REGISTRY_PROJECT_NAME};
+          rc=$(echo $?);
+          exit $rc;
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config-files
+      volumes:
+      - name: config-volume
+        configMap:
+          name: registry-controller-files
+      restartPolicy: Never

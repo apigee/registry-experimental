@@ -89,7 +89,7 @@ metadata:
     cloud.google.com/app-protocols: '{"envoy-port":"HTTP", "admin-port": "HTTP"}'
     cloud.google.com/backend-config: '{"ports": {"9999":"registry-server-envoy-backendconfig"}}'
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: registry-envoy
   ports:

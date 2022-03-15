@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,59 +13,63 @@
 # limitations under the License.
 
 #
-# Deployment for the Registry Viewer
+# Deployment for the Registry Spec Renderer
 #
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: registry-app
+  name: registry-spec-renderer
+  labels:
+    app: registry-spec-renderer
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: registry-app
+      app: registry-spec-renderer
   template:
     metadata:
+      name: registry-spec-renderer
       labels:
-        app: registry-app
+        app: registry-spec-renderer
     spec:
       containers:
-      - name: registry-app
-        image: ghcr.io/apigee/registry-viewer:main
-        imagePullPolicy: Always
+      - name: webapp
+        image: ghcr.io/apigee/registry-spec-renderer:main
         env:
+        - name: APG_REGISTRY_ADDRESS
+          value: $(REGISTRY_SERVICE_NAME):8080
+        - name: APG_REGISTRY_INSECURE
+          value: "1"
         - name: PORT
           value: "8888"
-        - name: GOOGLE_SIGNIN_CLIENTID
-          valueFrom:
-            configMapKeyRef:
-              name: registry-config
-              key: GOOGLE_SIGNIN_CLIENTID
-        - name: REGISTRY_SERVICE
-          value: "/"
-        - name: SPEC_RENDERER_SERVICE
-          value: "/render"
         ports:
-        - name: app-port
+        - name: renderer-port
           containerPort: 8888
         readinessProbe:
           httpGet:
-            port: app-port
-            path: /
+            port: renderer-port
+            path: /healthz
             scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 10
         livenessProbe:
           httpGet:
-            port: app-port
-            path: /
+            port: renderer-port
+            path: /healthz
             scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 10
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: registry-app-cluster-lb
+  name: registry-spec-renderer-cluster-lb
 spec:
   type: ClusterIP
   selector:
-    app: registry-app
+    app: registry-spec-renderer
   ports:
   - protocol: TCP
     port: 8888

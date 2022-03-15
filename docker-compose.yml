@@ -76,6 +76,7 @@ services:
     environment:
     - APG_REGISTRY_ADDRESS=registry-server:8080
     - PORT=3000
+    - APG_REGISTRY_INSECURE=1
     ports:
     - "3000:3000"
     links:

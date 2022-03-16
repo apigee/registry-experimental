@@ -5,7 +5,8 @@ const {RegistryClient} = require("@giteshk-org/apigeeregistry");
 const grpc = require("@grpc/grpc-js");
 
 var client_options = {};
-if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+if (process.env.APG_REGISTRY_INSECURE
+    && process.env.APG_REGISTRY_INSECURE == "1") {
   client_options.sslCreds = grpc.credentials.createInsecure();
 }
 
@@ -42,6 +43,46 @@ app.use('/renderer/graphql', express.static('node_modules/react'))
 app.use('/renderer/graphql', express.static('node_modules/react-dom'))
 app.use('/renderer/graphql', express.static('node_modules/graphiql'))
 
+function renderTemplate(res, apiFormat, spec_name) {
+  var renderer_template = "";
+  switch (apiFormat) {
+    case "openapi":
+      renderer_template = swagger_ui_template.toString();
+      break;
+    case "async":
+      renderer_template = async_template.toString();
+      break;
+    case "graphql":
+      renderer_template = graphiql_template.toString();
+      break;
+  }
+  specUrl = "/spec/" + spec_name;
+  if (renderer_template != "") {
+    res.setHeader("content-type", "text/html; charset=UTF-8");
+    hbstemplate = handlebars.compile(renderer_template);
+    res.send(hbstemplate({specUrl: specUrl}));
+  } else {
+    res.redirect(specUrl);
+  }
+  res.end();
+}
+
+function discoverAPIFormat(text) {
+  let apiFormat = '';
+  if (text.includes("openapi")) {
+    apiFormat = 'openapi';
+  } else if (text.includes("asyncapi")) {
+    apiFormat = 'asyncapi';
+  } else if (text.includes("discovery")) {
+    apiFormat = 'discovery';
+  } else if (text.includes("proto")) {
+    apiFormat = 'proto';
+  } else if (text.includes("graphql")) {
+    apiFormat = 'graphql';
+  }
+  return apiFormat;
+}
+
 /**
  * Render an API Spec from registry.
  * Chooses the renderer to use based on mimeType of the Spec
@@ -49,8 +90,9 @@ app.use('/renderer/graphql', express.static('node_modules/graphiql'))
 app.get(
     '/render/projects/:projectId/locations/:locationId/apis/:apiId/versions/:versionId/specs/:specId',
     (req, res) => {
-      spec_name = "projects/" + req.params.projectId + "/locations/"
-          + req.params.locationId + "/apis/" + req.params.apiId + "/versions/"
+      api_name = "projects/" + req.params.projectId + "/locations/"
+          + req.params.locationId + "/apis/" + req.params.apiId;
+      spec_name = api_name + "/versions/"
           + req.params.versionId + "/specs/" + req.params.specId;
 
       client.getApiSpec({
@@ -60,39 +102,26 @@ app.get(
           res.sendStatus(500);
           res.end();
         } else {
-          let apiFormat = '';
-          if (response.mimeType.includes("openapi")) {
-            apiFormat = 'openapi';
-          } else if (response.mimeType.includes("asyncapi")) {
-            apiFormat = 'asyncapi';
-          } else if (response.mimeType.includes("discovery")) {
-            apiFormat = 'discovery';
-          } else if (response.mimeType.includes("proto")) {
-            apiFormat = 'proto';
-          } else if (response.mimeType.includes("graphql")) {
-            apiFormat = 'graphql';
-          }
-          var renderer_template = "";
-          switch (apiFormat) {
-            case "openapi":
-              renderer_template = swagger_ui_template.toString();
-              break;
-            case "async":
-              renderer_template = async_template.toString();
-              break;
-            case "graphql":
-              renderer_template = graphiql_template.toString();
-              break;
-          }
-          specUrl = "/spec/" + spec_name;
-          if (renderer_template != "") {
-            res.setHeader("content-type", "text/html; charset=UTF-8");
-            hbstemplate = handlebars.compile(renderer_template);
-            res.send(hbstemplate({specUrl: specUrl}));
+          apiFormat = discoverAPIFormat(response.mimeType);
+          if (apiFormat == '') {
+            client.getApi({
+              name: api_name
+            }, (err, response2) => {
+              if (err) {
+                res.sendStatus(500);
+                res.end();
+              } else {
+                apiFormat = '';
+                if (response2.labels['apihub-style']) {
+                  apiFormat = discoverAPIFormat(
+                      response2.labels['apihub-style']);
+                }
+                renderTemplate(res, apiFormat, spec_name);
+              }
+            });
           } else {
-            res.redirect(specUrl);
+            renderTemplate(res, apiFormat, spec_name);
           }
-          res.end();
         }
       })
     });
@@ -133,4 +162,10 @@ app.get('/healthz', (req, res) => {
   res.sendStatus(200);
   res.end();
 });
-app.listen(process.env.PORT || 3000);
+
+app.listen(process.env.PORT || 80, function (err) {
+  if (err) {
+    console.log("Error in server setup")
+  }
+  console.log("Server listening on Port", process.env.PORT || 80);
+});

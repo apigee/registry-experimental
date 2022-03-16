@@ -11,7 +11,7 @@ RUN npm --unsafe-perm install
 
 FROM launcher.gcr.io/google/nodejs
 ENV NPM_AUTH_TOKEN=""
-ENV PORT=8080
+ENV PORT=80
 ENV APG_REGISTRY_ADDRESS=apigeeregistry.googleapis.com:443
 
 COPY --from=builder /app /app

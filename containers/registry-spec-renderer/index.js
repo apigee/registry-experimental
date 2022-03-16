@@ -49,7 +49,7 @@ function renderTemplate(res, apiFormat, spec_name) {
     case "openapi":
       renderer_template = swagger_ui_template.toString();
       break;
-    case "async":
+    case "asyncapi":
       renderer_template = async_template.toString();
       break;
     case "graphql":
@@ -99,6 +99,7 @@ app.get(
         name: spec_name
       }, (err, response) => {
         if (err) {
+          console.error(err);
           res.sendStatus(500);
           res.end();
         } else {
@@ -108,6 +109,7 @@ app.get(
               name: api_name
             }, (err, response2) => {
               if (err) {
+                console.error(err);
                 res.sendStatus(500);
                 res.end();
               } else {

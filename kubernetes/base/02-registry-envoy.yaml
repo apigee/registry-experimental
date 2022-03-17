@@ -35,7 +35,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: REGISTRY_SERVER_HOST
-          value: "registry-server-grpc.api-registry.svc.cluster.local"
+          value: $(REGISTRY_SERVICE_NAME)
         - name: REGISTRY_SERVER_PORT
           value: "8080"
         - name: PORT
@@ -89,7 +89,7 @@ metadata:
     cloud.google.com/app-protocols: '{"envoy-port":"HTTP", "admin-port": "HTTP"}'
     cloud.google.com/backend-config: '{"ports": {"9999":"registry-server-envoy-backendconfig"}}'
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: registry-envoy
   ports:
@@ -106,6 +106,21 @@ apiVersion: v1
 kind: Service
 metadata:
   name: registry-server-external-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: registry-envoy
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9999
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-server-internal-lb
+  annotations:
+    networking.gke.io/load-balancer-type: "Internal"
 spec:
   type: LoadBalancer
   selector:

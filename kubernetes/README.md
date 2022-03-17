@@ -1,7 +1,11 @@
-# Deploying Registry Server and Registry Viewer on GKE
+# Deploying Registry project on GKE
 
-The kubernetes directory has all the configuration to setup a registry server
-and registry viewer in you Kubernetes cluster.
+The kubernetes directory has all the configuration to setup :
+1. Registry Server
+2. Envoy proxy for gRPC-web transcoding 
+3. Registry Controller (which lints the specs and creates artifacts based on analysis)
+4. Registry Viewer to see the APIs/ Versions/Specs/Artifacts stored in the Registry
+5. Registry Spec Renderer (Swagger UI, GraphiQL, Async API)
 
 This deployment runs a pod with postgres database. It can be easily replaced
 with Cloud SQL for PostgreSQL.
@@ -10,7 +14,7 @@ Steps to install Apigee Registry & Viewer in your GKE Cluster:
 
 1. Copy the sample folder and create a new folder
    ```shell
-       cp -rf kubenetes/sample kubenetes/registry-demo
+       cp -rf kubernetes/sample kubernetes/registry-demo
    ```
 2. We need a static IP for this demo:
 

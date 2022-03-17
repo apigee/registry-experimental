@@ -21,15 +21,21 @@ services:
     environment:
     - PGDATA=/var/lib/postgresql/data/pgdata
     - POSTGRES_DB=apigee_registry
-    - POSTGRES_USER=dbuser
+    - POSTGRES_USER=postgres
+    - PGUSER=postgres
     - POSTGRES_PASSWORD=passw0rd
+    healthcheck:
+      test: [ "CMD-SHELL", 'pg_isready' ]
+      interval: 10s
+      timeout: 10s
+      retries: 6
   registry-server:
     image: ghcr.io/apigee/registry-server:main
     ports:
     - "8080:8080"
     environment:
     - REGISTRY_DATABASE_DRIVER=postgres
-    - REGISTRY_DATABASE_CONFIG="host=registry-database port=5432 user=dbuser dbname=apigee_registry password=passw0rd sslmode=disable"
+    - REGISTRY_DATABASE_CONFIG="host=registry-database port=5432 user=postgres dbname=apigee_registry password=passw0rd sslmode=disable"
     - REGISTRY_LOGGING_LEVEL=debug
     - REGISTRY_LOGGING_FORMAT=text
     - REGISTRY_PUBSUB_ENABLE=false
@@ -38,7 +44,8 @@ services:
     links:
     - registry-database
     depends_on:
-    - registry-database
+      registry-database:
+        condition: service_healthy
   envoy-registry:
     image: ghcr.io/apigee/registry-envoy:main
     environment:
@@ -69,6 +76,7 @@ services:
     environment:
     - APG_REGISTRY_ADDRESS=registry-server:8080
     - PORT=3000
+    - APG_REGISTRY_INSECURE=1
     ports:
     - "3000:3000"
     links:

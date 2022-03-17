@@ -18,14 +18,26 @@ resources:
 - 02-registry-envoy.yaml
 - 03-registry-app.yaml
 - 04-registry-ingress.yaml
-
-namespace: api-registry
+- 05-registry-init.yaml
+- 06-registry-controller.yaml
+- 07-registry-spec-render.yaml
 
 configMapGenerator:
 - name: registry-config
   literals:
+  - REGISTRY_PROJECT_NAME="demo"
   - POSTGRES_DB="apigee_registry"
   - POSTGRES_USER="dbuser"
   - POSTGRES_PASSWORD="passw0rd"
   - REGISTRY_DATABASE_CONFIG="host=registry-database-svc.api-registry.svc.cluster.local port=5432 user=dbuser dbname=apigee_registry password=passw0rd sslmode=disable"
   - GOOGLE_SIGNIN_CLIENTID="testvalue"
+- name: registry-controller-files
+  files:
+  - ./apihub-manifest.yaml
+  - ./apihub-styleguide.yaml
+vars:
+- name: REGISTRY_SERVICE_NAME
+  objref:
+    kind: Service
+    name: registry-server-grpc
+    apiVersion: v1

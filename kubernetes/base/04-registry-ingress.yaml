@@ -12,27 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#
-# We deploy an ingress so we can assign static ip and
-# add a Google Managed Certificate for the Registry Viewer
-#
-
-apiVersion: networking.gke.io/v1
-kind: ManagedCertificate
-metadata:
-  name: registry-app-cert
-spec:
-  domains:
-  - registry-app.example.com
----
 apiVersion: networking.gke.io/v1beta1
 kind: FrontendConfig
 metadata:
   name: registry-app-frontend
 spec:
-  redirectToHttps:
-    enabled: true
-    responseCodeName: "301"
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -40,8 +24,6 @@ metadata:
   name: registry-app-ingress
   annotations:
     networking.gke.io/v1beta1.FrontendConfig: registry-app-frontend
-    kubernetes.io/ingress.global-static-ip-name: registry-app-static-ip
-    networking.gke.io/managed-certificates: registry-app-cert
     kubernetes.io/ingress.class: "gce"
 spec:
   defaultBackend:
@@ -66,3 +48,24 @@ spec:
             name: registry-envoy-http-lb
             port:
               number: 9999
+      - pathType: ImplementationSpecific
+        path: "/render/*"
+        backend:
+          service:
+            name: registry-spec-renderer-cluster-lb
+            port:
+              number: 8888
+      - pathType: ImplementationSpecific
+        path: "/renderer/*"
+        backend:
+          service:
+            name: registry-spec-renderer-cluster-lb
+            port:
+              number: 8888
+      - pathType: ImplementationSpecific
+        path: "/spec/*"
+        backend:
+          service:
+            name: registry-spec-renderer-cluster-lb
+            port:
+              number: 8888

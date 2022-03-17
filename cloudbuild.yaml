@@ -14,7 +14,7 @@
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'gcr.io/${PROJECT_ID}/registry-authz-server', '-f', 'containers/registry-authz-server/Dockerfile', '.']
+  args: [ 'build', '-t', 'gcr.io/${PROJECT_ID}/registry-authz-server:${BRANCH_NAME}', '-f', 'containers/registry-authz-server/Dockerfile', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '--build-arg=NPM_AUTH_TOKEN=${_NPM_AUTH_TOKEN}', '-t', 'gcr.io/${PROJECT_ID}/registry-spec-renderer', 'containers/registry-spec-renderer' ]
+  args: [ 'build', '-t', 'gcr.io/${PROJECT_ID}/registry-spec-renderer:${BRANCH_NAME}', 'containers/registry-spec-renderer' ]
 images: ['gcr.io/${PROJECT_ID}/registry-authz-server', 'gcr.io/${PROJECT_ID}/registry-spec-renderer']

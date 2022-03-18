@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prism
+  labels: {
+    "istio.io/rev": "asm-managed"
+  }
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: mock-server-gateway
+  namespace: prism
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mock-server-admin-sa
+  namespace: prism
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: create-mock-server-role
+  namespace: prism
+rules:
+- apiGroups:
+  - ""
+  - "apps"
+  - "networking.istio.io"
+  resources:
+  - deployments
+  - services
+  - virtualservices
+  verbs:
+  - get
+  - create
+  - update
+  - list
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: create-mock-service-role-binding
+  namespace: prism
+subjects:
+- kind: ServiceAccount
+  name: mock-server-admin-sa
+roleRef:
+  kind: Role
+  name: create-mock-server-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: registry-prism-cronjob
+  namespace: prism
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 100
+  suspend: false
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        app: registry-prism-cronjob
+    spec:
+      template:
+        metadata:
+          labels:
+            app: registry-prism-cronjob
+        spec:
+          serviceAccountName: mock-server-admin-sa
+          containers:
+          - name: registry-prism-mocker
+            image: ghcr.io/giteshk-org/registry-prism-mock-controller:api-mocker
+            imagePullPolicy: Always
+            env:
+            - name: APG_REGISTRY_ADDRESS
+              value: "${APG_REGISTRY_ADDRESS}"
+            - name: APG_REGISTRY_INSECURE
+              value: "${APG_REGISTRY_INSECURE}"
+            - name: REGISTRY_PROJECT_NAME
+              value: "${REGISTRY_PROJECT_NAME}"
+            - name: MOCKSERVICE_DOMAIN
+              value: "${MOCKSERVICE_DOMAIN}"
+            - name: CLOUDSDK_CONTAINER_CLUSTER
+              value: "${CLOUDSDK_CONTAINER_CLUSTER}"
+#            - name: CLOUDSDK_COMPUTE_REGION
+#              value: "${MOCKSERVICE_GKE_LOCATION}"
+            - name: CLOUDSDK_COMPUTE_ZONE
+              value: "${CLOUDSDK_COMPUTE_ZONE}"
+          restartPolicy: Never
+      backoffLimit: 3

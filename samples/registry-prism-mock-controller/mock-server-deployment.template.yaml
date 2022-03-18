@@ -1,0 +1,82 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#
+# Deployment for the Registry Server
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-${REGISTRY_VERSION_SPEC}-server
+  namespace: prism
+spec:
+  selector:
+    matchLabels:
+      app: mock-${REGISTRY_VERSION_SPEC}-server
+  template:
+    metadata:
+      labels:
+        app: mock-${REGISTRY_VERSION_SPEC}-server
+    spec:
+      containers:
+      - name: mock-server
+        image: ghcr.io/giteshk-org/prism-registry-mock-server:api-mocker
+        imagePullPolicy: Always
+        env:
+        - name: PORT
+          value: "4010"
+        - name: REGISTRY_SPEC
+          value: "${REGISTRY_SPEC}"
+        - name: APG_REGISTRY_ADDRESS
+          value: "${APG_REGISTRY_ADDRESS}"
+        - name: APG_REGISTRY_INSECURE
+          value: "${APG_REGISTRY_INSECURE}"
+        ports:
+        - containerPort: 4010
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mock-${REGISTRY_VERSION_SPEC}-lb
+  namespace: prism
+  labels:
+    app: mock-${REGISTRY_VERSION_SPEC}-server
+spec:
+  type: ClusterIP
+  selector:
+    app: mock-${REGISTRY_VERSION_SPEC}-server
+  ports:
+  - protocol: TCP
+    port: 4010
+    targetPort: 4010
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: mock-${REGISTRY_VERSION_SPEC}-virtualservice
+  namespace: prism
+  labels:
+    app: mock-${REGISTRY_VERSION_SPEC}-server
+spec:
+  hosts:
+  - ${MOCK_SERVICE_ENDPOINT}
+  gateways:
+  - mock-server-gateway
+  http:
+  - route:
+    - destination:
+        host: mock-${REGISTRY_VERSION_SPEC}-lb.prism.svc.cluster.local
+        port:
+          number: 4010

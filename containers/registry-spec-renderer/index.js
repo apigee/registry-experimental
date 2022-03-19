@@ -67,7 +67,7 @@ function renderTemplate(res, apiFormat, spec_name) {
   res.end();
 }
 
-function discoverAPIFormat(text) {
+function getAPIFormat(text) {
   let apiFormat = '';
   if (text.includes("openapi")) {
     apiFormat = 'openapi';
@@ -103,7 +103,7 @@ app.get(
           res.sendStatus(500);
           res.end();
         } else {
-          apiFormat = discoverAPIFormat(response.mimeType);
+          apiFormat = getAPIFormat(response.mimeType);
           if (apiFormat == '') {
             client.getApi({
               name: api_name
@@ -115,7 +115,7 @@ app.get(
               } else {
                 apiFormat = '';
                 if (response2.labels['apihub-style']) {
-                  apiFormat = discoverAPIFormat(
+                  apiFormat = getAPIFormat(
                       response2.labels['apihub-style']);
                 }
                 renderTemplate(res, apiFormat, spec_name);

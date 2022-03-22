@@ -17,7 +17,7 @@ set -ex
 
 if [ "$APG_REGISTRY_ADDRESS" == "apigeeregistry.googleapis.com:443" ]
 then
-  export APG_REGISTRY_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+  export APG_REGISTRY_TOKEN="$(gcloud auth application-default print-access-token)"
 fi
 
 registry get $REGISTRY_SPEC --contents > /openapi.yaml

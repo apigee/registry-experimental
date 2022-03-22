@@ -24,7 +24,7 @@ API="$(echo $REGISTRY_SPEC | cut -d "/" -f6)"
 VERSION="$(echo $REGISTRY_SPEC | cut -d "/" -f8)"
 SPEC="$(echo $REGISTRY_SPEC | cut -d "/" -f10)"
 
-export REGISTRY_VERSION_SPEC="$API-$VERSION-$SPEC"
+export REGISTRY_VERSION_SPEC="$(echo $API-$VERSION-$SPEC | sed 's/[^a-zA-Z0-9\-]/-/g')"
 export MOCK_SERVICE_ENDPOINT="mock-${REGISTRY_VERSION_SPEC}.${MOCKSERVICE_DOMAIN}"
 
 cat /mock-server-deployment.template.yaml | envsubst > /tmp/mock-server-deployment-${REGISTRY_VERSION_SPEC}.yaml
@@ -33,7 +33,7 @@ kubectl apply -f /tmp/mock-server-deployment-${REGISTRY_VERSION_SPEC}.yaml
 
 if [ "$APG_REGISTRY_ADDRESS" == "apigeeregistry.googleapis.com:443" ]
 then
-  export APG_REGISTRY_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+  export APG_REGISTRY_TOKEN="$(gcloud auth application-default print-access-token)"
 fi
 
 apg registry create-artifact \

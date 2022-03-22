@@ -40,9 +40,9 @@ directory.
     --role roles/iam.workloadIdentityUser \
     --member "serviceAccount:${REGISTRY_PROJECT_NAME}.svc.id.goog[prism/registry-admin-sa]"
 
-   kubectl annotate serviceaccount registry-viewer-sa \
+   kubectl annotate serviceaccount registry-admin-sa \
     --namespace prism \
-    iam.gke.io/gcp-service-account=registry-viewer@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account=registry-admin@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com
    ```
 5. Create a service account with the Apigee Registry Viewer permission (to read specs from the registry)
    ```
@@ -63,9 +63,9 @@ directory.
     --role roles/iam.workloadIdentityUser \
     --member "serviceAccount:${REGISTRY_PROJECT_NAME}.svc.id.goog[prism/registry-viewer-sa]"
 
-   kubectl annotate serviceaccount registry-admin-sa \
+   kubectl annotate serviceaccount registry-viewer-sa \
     --namespace prism \
-    iam.gke.io/gcp-service-account=registry-admin@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account=registry-viewer@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com
 
    ```
 6. Get the external IP address of Istio Ingress Gateway
@@ -79,7 +79,7 @@ domain for demonstration purposes. For the IP address 3.4.5.6 use 3-4-5-6.sslip.
     registry upload manifest ./prism-manifest.yaml --project-id=${REGISTRY_PROJECT_NAME}
     ```
 9. Verify the environment variables and apply the prism controller deployment.
-```
+    ```
     export APG_REGISTRY_ADDRESS=apigeeregistry.googleapis.com:443
     export APG_REGISTRY_INSECURE=0
     export MOCKSERVICE_DOMAIN=3-4-5-6.sslip.io
@@ -87,6 +87,6 @@ domain for demonstration purposes. For the IP address 3.4.5.6 use 3-4-5-6.sslip.
     export CLOUDSDK_CONTAINER_CLUSTER=registry-mock-server-cluster
     export CLOUDSDK_COMPUTE_ZONE=us-central1-c 
     envsubst < kubernetes/02-prism-controller.yaml | kubectl apply -f -
-```
+    ```
 10. The controller will create an artifact `prism-mock-endpoint` on every spec of type OpenAPI.
 

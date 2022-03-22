@@ -34,7 +34,7 @@ spec:
         iam.gke.io/gke-metadata-server-enabled: "true"
       containers:
       - name: mock-server
-        image: ghcr.io/apigee/prism-registry-mock-server:latest
+        image: ghcr.io/giteshk-org/prism-registry-mock-server:api-mocker
         imagePullPolicy: Always
         env:
         - name: PORT

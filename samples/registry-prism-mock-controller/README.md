@@ -17,12 +17,14 @@ directory.
 2. Connect to the cluster
 3. Apply the ASM configuration
    ```
-    kubectl apply -f kubenetes/01-asm-configuation.yaml
+    kubectl apply -f kubernetes/01-asm-configuration.yaml
    ```
 4. Create a service account with Registry Admin role (for the controller to write back artifacts)
    ```
-   export REGISTRY_PROJECT_NAME=openapi
-
+   export REGISTRY_PROJECT_NAME=apihub-demo-fossa
+   
+   gcloud config set project $REGISTRY_PROJECT_NAME
+   
    gcloud iam service-accounts create registry-admin \
     --project=${REGISTRY_PROJECT_NAME}
    
@@ -32,8 +34,11 @@ directory.
 
    gcloud iam service-accounts add-iam-policy-binding registry-admin@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:registry-admin.svc.id.goog[prism/registry-admin-sa]"
+    --member "serviceAccount:${REGISTRY_PROJECT_NAME}.svc.id.goog[prism/registry-admin-sa]"
 
+   kubectl annotate serviceaccount registry-viewer-sa \
+    --namespace prism \
+    iam.gke.io/gcp-service-account=registry-viewer@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com
    ```
 5. Create a service account with the Apigee Registry Viewer permission (to read specs from the registry)
    ```
@@ -48,7 +53,11 @@ directory.
 
    gcloud iam service-accounts add-iam-policy-binding registry-viewer@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:registry-viewer.svc.id.goog[prism/registry-viewer-sa]"
+    --member "serviceAccount:${REGISTRY_PROJECT_NAME}.svc.id.goog[prism/registry-viewer-sa]"
+
+   kubectl annotate serviceaccount registry-admin-sa \
+    --namespace prism \
+    iam.gke.io/gcp-service-account=registry-admin@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com
 
    ```
 6. Get the external IP address of Istio Ingress Gateway
@@ -63,10 +72,10 @@ domain for demonstration purposes. For the IP address 3.4.5.6 use 3-4-5-6.sslip.
     export APG_REGISTRY_ADDRESS=apigeeregistry.googleapis.com:443
     export APG_REGISTRY_INSECURE=0
     export MOCKSERVICE_DOMAIN=3-4-5-6.sslip.io
-    export REGISTRY_PROJECT_NAME=openapi
+
     export CLOUDSDK_CONTAINER_CLUSTER=registry-mock-server-cluster
     export CLOUDSDK_COMPUTE_ZONE=us-central1-c 
-    envsubst < 02-prism-controller.yaml | kubectl apply -f -
+    envsubst < kubernetes/02-prism-controller.yaml | kubectl apply -f -
 ```
 9. The controller will create an artifact `prism-mock-endpoint` on every spec of type OpenAPI.
 

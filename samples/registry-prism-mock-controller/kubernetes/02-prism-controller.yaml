@@ -12,14 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: prism
-  labels: {
-    "istio.io/rev": "asm-managed"
-  }
----
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
@@ -35,18 +27,6 @@ spec:
       protocol: HTTP
     hosts:
     - "*"
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: registry-viewer-sa
-  namespace: prism
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: registry-admin-sa
-  namespace: prism
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -109,8 +89,8 @@ spec:
             iam.gke.io/gke-metadata-server-enabled: "true"
           containers:
           - name: registry-prism-mocker
-            image: ghcr.io/apigee/registry-prism-mock-controller:latest
-            imagePullPolicy: Always
+            image: ghcr.io/giteshk-org/registry-prism-mock-controller:api-mocker
+            imagePullPolicy: IfNotPresent
             env:
             - name: APG_REGISTRY_ADDRESS
               value: "${APG_REGISTRY_ADDRESS}"

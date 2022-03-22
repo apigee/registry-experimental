@@ -12,22 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
-metadata:
-  name: mock-server-gateway
-  namespace: prism
-spec:
-  selector:
-    istio: ingressgateway # use istio default controller
-  servers:
-  - port:
-      number: 80
-      name: http
-      protocol: HTTP
-    hosts:
-    - "*"
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:

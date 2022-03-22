@@ -18,7 +18,7 @@ set -ex
 
 if [ "$APG_REGISTRY_ADDRESS" == "apigeeregistry.googleapis.com:443" ]
 then
-  export APG_REGISTRY_TOKEN="$(gcloud auth print-access-token)"
+  export APG_REGISTRY_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
 fi
 
 registry resolve projects/${REGISTRY_PROJECT_NAME}/locations/global/artifacts/apihub-prism-mocker-manifest

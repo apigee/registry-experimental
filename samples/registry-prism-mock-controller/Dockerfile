@@ -22,6 +22,8 @@ FROM ghcr.io/apigee/registry-tools:latest as registry-tools
 
 FROM gcr.io/cloud-builders/kubectl
 ENV MOCKSERVICE_DOMAIN=""
+ENV APG_REGISTRY_ADDRESS=apigeeregistry.googleapis.com:443
+ENV APG_REGISTRY_INSECURE=0
 
 COPY --from=registry-tools /bin/registry /bin/registry
 COPY --from=registry-tools /bin/apg /bin/apg

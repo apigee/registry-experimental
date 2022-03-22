@@ -21,7 +21,7 @@ directory.
    ```
 4. Create a service account with Registry Admin role (for the controller to write back artifacts)
    ```
-   export REGISTRY_PROJECT_NAME=apihub-demo-fossa
+   export REGISTRY_PROJECT_NAME=openapi
    
    gcloud config set project $REGISTRY_PROJECT_NAME
    
@@ -31,6 +31,10 @@ directory.
    gcloud projects add-iam-policy-binding registry-admin \
     --member "serviceAccount:registry-admin@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com" \
     --role "roles/apigeeregistry.admin"
+
+   gcloud projects add-iam-policy-binding registry-admin \
+    --member "serviceAccount:registry-admin@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com" \
+    --role "roles/logging.logWriter"
 
    gcloud iam service-accounts add-iam-policy-binding registry-admin@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \
@@ -50,6 +54,10 @@ directory.
    gcloud projects add-iam-policy-binding registry-viewer \
     --member "serviceAccount:registry-viewer@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com" \
     --role "roles/apigeeregistry.viewer"
+
+   gcloud projects add-iam-policy-binding registry-viewer \
+    --member "serviceAccount:registry-viewer@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com" \
+    --role "roles/logging.logWriter"
 
    gcloud iam service-accounts add-iam-policy-binding registry-viewer@${REGISTRY_PROJECT_NAME}.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \

@@ -18,7 +18,7 @@ set -ex
 
 if [ "$APG_REGISTRY_ADDRESS" == "apigeeregistry.googleapis.com:443" ]
 then
-  export APG_REGISTRY_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+  export APG_REGISTRY_TOKEN="$(gcloud auth print-access-token)"
 fi
 
 registry upload manifest /prism-manifest.yaml --project-id=${REGISTRY_PROJECT_NAME} || true

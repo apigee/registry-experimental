@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if [ "$APG_REGISTRY_ADDRESS" == 'apigeeregistry.googleapis.com:443' ]
+then
+  export APG_REGISTRY_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+fi
 
 registry get $REGISTRY_SPEC --contents > /openapi.yaml
 

@@ -26,6 +26,10 @@ SPEC="$(echo $REGISTRY_SPEC | cut -d "/" -f10)"
 
 export REGISTRY_VERSION_SPEC="$API-$VERSION-$SPEC"
 export MOCK_SERVICE_ENDPOINT="mock-${REGISTRY_VERSION_SPEC}.${MOCKSERVICE_DOMAIN}"
+if [ "$APG_REGISTRY_ADDRESS" == 'apigeeregistry.googleapis.com:443' ]
+then
+  export APG_REGISTRY_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+fi
 
 cat /mock-server-deployment.template.yaml | envsubst > /tmp/mock-server-deployment-${REGISTRY_VERSION_SPEC}.yaml
 

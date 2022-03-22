@@ -90,7 +90,7 @@ spec:
           containers:
           - name: registry-prism-mocker
             image: ghcr.io/giteshk-org/registry-prism-mock-controller:api-mocker
-            imagePullPolicy: IfNotPresent
+            imagePullPolicy: Always
             env:
             - name: APG_REGISTRY_ADDRESS
               value: "${APG_REGISTRY_ADDRESS}"

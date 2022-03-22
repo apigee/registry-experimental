@@ -74,8 +74,11 @@ directory.
     ```
 7. Create a custom domain that points to this ip address. You can use sslip.io 
 domain for demonstration purposes. For the IP address 3.4.5.6 use 3-4-5-6.sslip.io 
-
-8. Verify the environment variables and apply the prism controller deployment.
+8. Upload the manifest to the registry
+    ```
+    registry upload manifest ./prism-manifest.yaml --project-id=${REGISTRY_PROJECT_NAME}
+    ```
+9. Verify the environment variables and apply the prism controller deployment.
 ```
     export APG_REGISTRY_ADDRESS=apigeeregistry.googleapis.com:443
     export APG_REGISTRY_INSECURE=0
@@ -85,5 +88,5 @@ domain for demonstration purposes. For the IP address 3.4.5.6 use 3-4-5-6.sslip.
     export CLOUDSDK_COMPUTE_ZONE=us-central1-c 
     envsubst < kubernetes/02-prism-controller.yaml | kubectl apply -f -
 ```
-9. The controller will create an artifact `prism-mock-endpoint` on every spec of type OpenAPI.
+10. The controller will create an artifact `prism-mock-endpoint` on every spec of type OpenAPI.
 

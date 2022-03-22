@@ -32,7 +32,6 @@ COPY ./create-mock.sh /create-mock.sh
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 COPY ./mock-server-deployment.template.yaml /mock-server-deployment.template.yaml
-COPY ./prism-manifest.yaml /prism-manifest.yaml
 
 RUN apt-get update -y && apt-get install gettext-base -y \
     && chmod +x /create-mock.sh /docker-entrypoint.sh

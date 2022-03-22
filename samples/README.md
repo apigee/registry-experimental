@@ -10,7 +10,7 @@ Here are some examples of how to integrate with Apigee Registry.
   * Renderers supported : Swagger UI, GraphiQL, AsyncApi Renderer. 
 
 * **Registy Mock Generator** 
-  * It provides the ability to generate mock endpoints using prism.
+  * It provides the ability to generate mock endpoints using Prism.
   * This sample demonstrates the use of the Controller framework provided 
     by the Apigee Registry project.
   * A custom controller checks the state of the Registry and deploys the prism 

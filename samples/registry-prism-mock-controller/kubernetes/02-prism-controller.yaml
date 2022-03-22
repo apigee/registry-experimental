@@ -25,7 +25,13 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: mock-server-admin-sa
+  name: registry-viewer-sa
+  namespace: prism
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: registry-admin-sa
   namespace: prism
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -56,7 +62,7 @@ metadata:
   namespace: prism
 subjects:
 - kind: ServiceAccount
-  name: mock-server-admin-sa
+  name: registry-admin-sa
 roleRef:
   kind: Role
   name: create-mock-server-role
@@ -84,7 +90,9 @@ spec:
           labels:
             app: registry-prism-cronjob
         spec:
-          serviceAccountName: mock-server-admin-sa
+          serviceAccountName: registry-admin-sa
+          nodeSelector:
+            iam.gke.io/gke-metadata-server-enabled: "true"
           containers:
           - name: registry-prism-mocker
             image: ghcr.io/giteshk-org/registry-prism-mock-controller:api-mocker

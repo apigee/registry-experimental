@@ -29,6 +29,9 @@ spec:
       labels:
         app: mock-${REGISTRY_VERSION_SPEC}-server
     spec:
+      serviceAccountName: registry-viewer-sa
+      nodeSelector:
+        iam.gke.io/gke-metadata-server-enabled: "true"
       containers:
       - name: mock-server
         image: ghcr.io/giteshk-org/prism-registry-mock-server:api-mocker

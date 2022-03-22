@@ -31,11 +31,6 @@ cat /mock-server-deployment.template.yaml | envsubst > /tmp/mock-server-deployme
 
 kubectl apply -f /tmp/mock-server-deployment-${REGISTRY_VERSION_SPEC}.yaml
 
-if [ "$APG_REGISTRY_ADDRESS" == "apigeeregistry.googleapis.com:443" ]
-then
-  export APG_REGISTRY_TOKEN="$(gcloud auth application-default print-access-token)"
-fi
-
 apg registry create-artifact \
   --parent $REGISTRY_SPEC \
   --artifact_id "prism-mock-endpoint" \

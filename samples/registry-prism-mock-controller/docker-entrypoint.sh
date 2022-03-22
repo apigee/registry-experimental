@@ -16,11 +16,6 @@
 
 set -ex
 
-if [ "$APG_REGISTRY_ADDRESS" == "apigeeregistry.googleapis.com:443" ]
-then
-  export APG_REGISTRY_TOKEN="$(gcloud auth application-default print-access-token)"
-fi
-
 registry resolve projects/${REGISTRY_PROJECT_NAME}/locations/global/artifacts/apihub-prism-mocker-manifest
 
 rc=$(echo $?)

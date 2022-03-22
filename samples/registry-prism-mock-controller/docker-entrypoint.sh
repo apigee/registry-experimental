@@ -16,6 +16,11 @@
 
 set -ex
 
+if [ "$APG_REGISTRY_ADDRESS" == 'apigeeregistry.googleapis.com:443' ]
+then
+  export APG_REGISTRY_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+fi
+
 registry upload manifest /prism-manifest.yaml --project-id=${REGISTRY_PROJECT_NAME} || true
 
 registry resolve projects/${REGISTRY_PROJECT_NAME}/locations/global/artifacts/apihub-prism-mocker-manifest

@@ -26,6 +26,10 @@ spec:
             configMapKeyRef:
               name: registry-service-config
               key: APG_REGISTRY_ADDRESS
+        - name: "APG_REGISTRY_INSECURE"
+          value: "1"
+        - name: "MOCK_ENDPOINT_ARTIFACT_NAME"
+          value: "mock-endpoint"
 ---
 apiVersion: v1
 kind: Service

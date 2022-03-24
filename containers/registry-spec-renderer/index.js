@@ -3,12 +3,17 @@ const fs = require("fs");
 const handlebars = require("handlebars");
 const {RegistryClient} = require("@giteshk-org/apigeeregistry");
 const grpc = require("@grpc/grpc-js");
+const jsYaml = require('js-yaml');
+var cors = require('cors')
 
 var client_options = {};
 if (process.env.APG_REGISTRY_INSECURE
     && process.env.APG_REGISTRY_INSECURE == "1") {
   client_options.sslCreds = grpc.credentials.createInsecure();
 }
+
+const MOCK_ENDPOINT_ARTIFACT_NAME = process.env.MOCK_ENDPOINT_ARTIFACT_NAME
+    || "mock-endpoint";
 
 if (process.env.APG_REGISTRY_ADDRESS) {
   items = process.env.APG_REGISTRY_ADDRESS.split(":");
@@ -25,6 +30,7 @@ const graphiql_template = fs.readFileSync("renderers/graphiql.html.template");
 const async_template = fs.readFileSync("renderers/async-ui.html.template");
 
 const app = express();
+app.use(cors())
 
 //Serve static assets for openapi renderer
 app.use('/renderer/openapi',
@@ -55,9 +61,12 @@ function renderTemplate(res, apiFormat, spec_name) {
     case "graphql":
       renderer_template = graphiql_template.toString();
       break;
+    default:
+      renderer_template = "spec_file"
+      break;
   }
-  specUrl = "/spec/" + spec_name;
-  if (renderer_template != "") {
+  specUrl = "/spec/" + apiFormat + "/" + spec_name;
+  if (renderer_template != "spec_file") {
     res.setHeader("content-type", "text/html; charset=UTF-8");
     hbstemplate = handlebars.compile(renderer_template);
     res.send(hbstemplate({specUrl: specUrl}));
@@ -132,7 +141,7 @@ app.get(
  * Return the contents of an API Spec
  */
 app.all(
-    "/spec/projects/:projectId/locations/:locationId/apis/:apiId/versions/:versionId/specs/:specId",
+    "/spec/:specType/projects/:projectId/locations/:locationId/apis/:apiId/versions/:versionId/specs/:specId",
     (req, res) => {
       if (req.method !== 'POST' && req.method !== 'GET') {
         res.sendStatus(404);
@@ -153,12 +162,55 @@ app.all(
               res.sendStatus(500);
               res.end();
             } else {
-              res.setHeader("content-type", response.contentType);
-              res.send(response.data);
-              res.end();
+              specObj = {};
+              if(req.params.specType == 'openapi') {
+                try {
+                  specObj = JSON.parse(response.data);
+                } catch {
+                  specObj = YAML.load(response.data);
+                }
+                return addMockAddressForOpenAPI(specObj, spec_url, res);
+              }else {
+                res.setHeader("content-type", response.contentType);
+                res.send(response.data);
+                res.end();
+              }
             }
           })
     });
+
+/**
+ * Check if the mock-server artifact exists on the spec.
+ * If it does add that to the list of servers
+ *
+ * @param openAPISpecObj
+ * @param spec_url
+ * @param res
+ */
+function addMockAddressForOpenAPI(openAPISpecObj, spec_url, res) {
+  client.getArtifactContents({
+    name: spec_url + "/artifacts/" + MOCK_ENDPOINT_ARTIFACT_NAME
+  }).then(body => {
+    mockendpoint = body.data
+    if (!empty(mockendpoint)) {
+      client.getApiSpec()
+      if (/^2\./.test(openAPISpecObj.swagger) && !openAPISpecObj.host) {
+        openAPISpecObj.host = mockendpoint;
+      } else if (/^3\./.test(openAPISpecObj.openapi)) {
+        openAPISpecObj = openAPISpecObj || {
+          servers: []
+        }
+        openAPISpecObj.servers.push(
+            {url: mockendpoint, description: "Mock endpoint"});
+      }
+    }
+    res.json(openAPISpecObj);
+    res.end();
+  }).catch(() => {
+    res.json(openAPISpecObj);
+    res.end();
+  })
+}
 
 app.get('/healthz', (req, res) => {
   res.sendStatus(200);

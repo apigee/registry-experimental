@@ -23,6 +23,8 @@ spec:
           value: "8080"
         - name: "GOOGLE_APPLICATION_CREDENTIALS"
           value: "/var/run/secret/cloud.google.com/service-account.json"
+        - name: "MOCK_ENDPOINT_ARTIFACT_NAME"
+          value: "mock-endpoint"
         volumeMounts:
         - name: "service-account"
           mountPath: "/var/run/secret/cloud.google.com"

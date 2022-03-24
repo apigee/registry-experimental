@@ -13,6 +13,7 @@
     "@asyncapi/web-component": "^0.24.19",
     "@giteshk-org/apigeeregistry": "^0.0.1",
     "@webcomponents/webcomponentsjs": "^2.6.0",
+    "cors": "^2.8.5",
     "express": "^4.17.2",
     "graphiql": "^1.5.16",
     "handlebars": "^4.7.7",

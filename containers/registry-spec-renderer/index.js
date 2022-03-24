@@ -178,14 +178,14 @@ app.all(
               res.end();
             } else {
               specObj = {};
-              if(req.params.specType == 'openapi') {
+              if (req.params.specType == 'openapi') {
                 try {
                   specObj = JSON.parse(response.data);
                 } catch {
-                  specObj = YAML.load(response.data);
+                  specObj = jsYaml.load(response.data);
                 }
                 return addMockAddressForOpenAPI(specObj, spec_url, res);
-              }else {
+              } else {
                 res.setHeader("content-type", response.contentType);
                 res.send(response.data);
                 res.end();
@@ -205,20 +205,23 @@ app.all(
 function addMockAddressForOpenAPI(openAPISpecObj, spec_url, res) {
   client.getArtifactContents({
     name: spec_url + "/artifacts/" + MOCK_ENDPOINT_ARTIFACT_NAME
-  }).then(body => {
-    mockendpoint = body.data
-    if (!empty(mockendpoint)) {
-      client.getApiSpec()
-      if (/^2\./.test(openAPISpecObj.swagger) && !openAPISpecObj.host) {
-        openAPISpecObj.host = mockendpoint;
-      } else if (/^3\./.test(openAPISpecObj.openapi)) {
-        openAPISpecObj = openAPISpecObj || {
-          servers: []
+  }).then(arr => {
+    arr.forEach((body) => {
+      if (body.data) {
+        mockendpoint = body.data.toString('utf8')
+        if (mockendpoint.length > 0) {
+          if (openAPISpecObj.swagger && openAPISpecObj.swagger.startsWith("2") && !openAPISpecObj.host) {
+            openAPISpecObj.host = mockendpoint;
+          } else if (openAPISpecObj.openapi && openAPISpecObj.openapi.startsWith("3")) {
+            openAPISpecObj = openAPISpecObj || {
+              servers: []
+            }
+            openAPISpecObj.servers.push(
+                {url: mockendpoint, description: "Mock endpoint"});
+          }
         }
-        openAPISpecObj.servers.push(
-            {url: mockendpoint, description: "Mock endpoint"});
       }
-    }
+    });
     res.json(openAPISpecObj);
     res.end();
   }).catch(() => {

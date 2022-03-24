@@ -58,7 +58,16 @@ gcloud compute instances create-with-container registry-renderer-instance1 \
    kubectl create secret generic registry-spec-renderer-sa-key \
    --from-file service-account.json -n registry-spec-renderer
    ```
-5. Apply the deployment 
+5. Assign a static IP for your Service
+   ```shell
+       gcloud compute addresses create registry-spec-renderer-static-ip \
+       --global \
+       --ip-version IPV4
+   ```
+6. Update the cert domain in the deployment.yaml with either sslip.io or 
+   a custom domain
+
+7. Apply the deployment 
    ```
     kubectl apply -f kubernetes/deployment.yaml -n registry-spec-renderer
    ```

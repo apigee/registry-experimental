@@ -75,5 +75,12 @@ services:
     - registry-server
     depends_on:
     - registry-server
+  registry-tools:
+    image: ghcr.io/apigee/registry-tools:main
+    environment:
+    - APG_REGISTRY_ADDRESS=registry-server:8080
+    - APG_ADMIN_ADDRESS=registry-server:8080
+    - APG_REGISTRY_INSECURE=1
+    - APG_ADMIN_INSECURE=1
 volumes:
   registry-db-vol:

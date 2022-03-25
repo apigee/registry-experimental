@@ -4,7 +4,7 @@
   "description": "Prism mock server for openapi specs stored in Apigee Registry",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "npm dedupe && rm -f dist/* && tsc",
+    "build": "rm -f dist/* && tsc",
     "fix": "gts fix",
     "lint": "gts check"
   },
@@ -12,6 +12,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@giteshk-org/apigeeregistry": "^0.0.1",
+    "@grpc/grpc-js": "^1.5.9",
     "@stoplight/prism-cli": "^4.8.0",
     "@stoplight/prism-http": "^4.8.0",
     "cors": "^2.8.5",
@@ -23,7 +24,6 @@
     "/dist"
   ],
   "devDependencies": {
-    "@grpc/grpc-js": "^1.5.9",
     "@stoplight/types": "^12.5.0",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",

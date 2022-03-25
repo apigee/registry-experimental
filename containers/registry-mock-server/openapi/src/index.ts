@@ -1,24 +1,8 @@
-/**
- * Copyright 2022 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import * as express from 'express';
 import * as cors from 'cors';
 import {RegistryClient} from '@giteshk-org/apigeeregistry';
 import {ClientOptions} from 'google-gax';
-import {credentials} from '@grpc/grpc-js';
+import * as grpc from '@grpc/grpc-js';
 const Yaml = require('js-yaml');
 
 import {IHttpOperation} from '@stoplight/types';
@@ -40,7 +24,7 @@ const client_options = <ClientOptions>{};
 
 if (process.env.APG_REGISTRY_INSECURE) {
   if (process.env.APG_REGISTRY_INSECURE === '1') {
-    client_options.sslCreds = credentials.createInsecure();
+    client_options.sslCreds = grpc.credentials.createInsecure();
   }
 }
 
@@ -67,13 +51,6 @@ function _sendError(err: Error, res: Response) {
 
 /**
  * Process the mock request
- * This method will fetch the spec contents from Registry
- * and pass the spec to the Prism Library.
- *
- * Prism Library will generate responses based on the contents of the spec.
- * * Prism Documentation details of how responses are generated:
- * https://meta.stoplight.io/docs/prism/ZG9jOjk1-http-mocking#response-examples
- *
  * @param req
  * @param res
  */

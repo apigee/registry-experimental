@@ -11,11 +11,13 @@
   "dependencies": {
     "@asyncapi/react-component": "^0.24.19",
     "@asyncapi/web-component": "^0.24.19",
+    "@giteshk-org/apigeeregistry": "^0.0.1",
     "@webcomponents/webcomponentsjs": "^2.6.0",
-    "@giteshk-org/apigeeregistry":"^0.0.1",
+    "cors": "^2.8.5",
     "express": "^4.17.2",
     "graphiql": "^1.5.16",
     "handlebars": "^4.7.7",
+    "js-yaml": "^4.1.0",
     "react-dom": "^17.0.2",
     "swagger-ui-dist": "^4.1.3"
   }

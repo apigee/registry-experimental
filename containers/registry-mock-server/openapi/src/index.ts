@@ -18,7 +18,7 @@ import * as express from 'express';
 import * as cors from 'cors';
 import {RegistryClient} from '@giteshk-org/apigeeregistry';
 import {ClientOptions} from 'google-gax';
-import * as grpc from '@grpc/grpc-js';
+import {credentials} from '@grpc/grpc-js';
 const Yaml = require('js-yaml');
 
 import {IHttpOperation} from '@stoplight/types';
@@ -40,7 +40,7 @@ const client_options = <ClientOptions>{};
 
 if (process.env.APG_REGISTRY_INSECURE) {
   if (process.env.APG_REGISTRY_INSECURE === '1') {
-    client_options.sslCreds = grpc.credentials.createInsecure();
+    client_options.sslCreds = credentials.createInsecure();
   }
 }
 

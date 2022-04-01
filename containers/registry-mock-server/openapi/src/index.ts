@@ -67,6 +67,13 @@ function _sendError(err: Error, res: Response) {
 
 /**
  * Process the mock request
+ * This method will fetch the spec contents from Registry
+ * and pass the spec to the Prism Library.
+ *
+ * Prism Library will generate responses based on the contents of the spec.
+ * * Prism Documentation details of how responses are generated:
+ * https://meta.stoplight.io/docs/prism/ZG9jOjk1-http-mocking#response-examples
+ *
  * @param req
  * @param res
  */

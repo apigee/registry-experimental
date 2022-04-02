@@ -90,5 +90,13 @@ services:
     - APG_ADMIN_ADDRESS=registry-server:8080
     - APG_REGISTRY_INSECURE=1
     - APG_ADMIN_INSECURE=1
+  registry-mock-service:
+    image: ghcr.io/apigee/registry-prism-mock-server:main
+    ports:
+    - "4000:4000"
+    environment:
+    - APG_REGISTRY_ADDRESS=registry-server:8080
+    - APG_REGISTRY_INSECURE=1
+    - PORT=4000
 volumes:
   registry-db-vol:

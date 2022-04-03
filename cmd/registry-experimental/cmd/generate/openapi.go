@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC. All Rights Reserved.
+// Copyright 2022 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	}
 	newSpec := &rpc.ApiSpec{
 		Name:     specName.Version().Spec(relation).String(),
-		MimeType: core.MimeTypeForMessageType("application/x.openapi+gzip;version=3"),
+		MimeType: "application/x.openapi+gzip;version=3",
 		Contents: messageData,
 	}
 	_, err = task.client.UpdateApiSpec(ctx, &rpc.UpdateApiSpecRequest{
@@ -138,13 +138,15 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 }
 
 // openAPIFromZippedProtos runs the OpenAPI generator and returns the results.
+// This uses protoc and https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+// which can be installed using
+//   go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 func openAPIFromZippedProtos(name string, b []byte) (string, error) {
 	// create a tmp directory
 	root, err := ioutil.TempDir("", "registry-protos-")
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("WORKING IN %s\n", root)
 	// whenever we finish, delete the tmp directory
 	defer os.RemoveAll(root)
 	// unzip the protos to the temp directory
@@ -193,7 +195,6 @@ func generateOpenAPIForDirectory(name string, root string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("protoc should be run on %+v\n", protos)
 	parts := []string{}
 	parts = append(parts, protos...)
 	parts = append(parts, "-I")
@@ -221,6 +222,9 @@ func generateOpenAPIForDirectory(name string, root string) (string, error) {
 }
 
 // openAPIFromDiscovery runs the OpenAPI generator and returns the results.
+// This uses https://github.com/LucyBot-Inc/api-spec-converter
+// which can be installed using
+//   npm install -g api-spec-converter
 func openAPIFromDiscovery(name string, b []byte) (string, error) {
 	// create a tmp directory
 	root, err := ioutil.TempDir("", "registry-disco-")

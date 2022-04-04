@@ -19,11 +19,11 @@ gcloud compute firewall-rules create registry-renderer-service-fw \
     --rules tcp:80
 
 
-gcloud compute instances create-with-container registry-renderer-instance1 \
+gcloud compute instances create-with-container registry-renderer-instance \
 	--machine-type=e2-micro  --tags=registry-spec-renderer,http-server \
 	--scopes=https://www.googleapis.com/auth/cloud-platform \
 	--restart-on-failure --service-account=registry-reader@$REGISTRY_PROJECT_IDENTIFIER.iam.gserviceaccount.com\
-    --container-image ghcr.io/apigee/registry-spec-renderer:latest
+    --container-image ghcr.io/apigee/registry-spec-renderer:main
 ```
 
 ### To run this against the opensource version of Apigee Registry on GKE you will need to:  

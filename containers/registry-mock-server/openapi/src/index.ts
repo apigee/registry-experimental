@@ -200,6 +200,49 @@ app.all('/mock/*', (req: Request, res: Response) => {
 });
 
 /**
+ * Mock request endpoint for API Deployments
+ *
+ * This handler will lookup the latest spec revision from the deployment and
+ * forward the request to /projects/:projectId/locations/:locationId/apis/:apiId/versions/:versionId/specs/:specId/*
+ * handler
+ */
+app.all(
+  '/projects/:projectId/locations/:locationId/apis/:apiId/deployments/:deploymentId/*',
+  (req, res, next) => {
+    processParams(req, res);
+    const url =
+      'projects/' +
+      res.locals.projectId +
+      '/locations/' +
+      res.locals.locationId +
+      '/apis/' +
+      res.locals.apiId +
+      '/deployments/' +
+      res.locals.deploymentId;
+    client.getApiDeployment(
+      {
+        name: url,
+      },
+      (err, response) => {
+        if (response && response.apiSpecRevision) {
+          /**
+           * Pass on the handling of this request to the next route
+           * /projects/:projectId/locations/:locationId/apis/:apiId/versions/:versionId/specs/:specId/*
+           */
+          req.url = '/' + response.apiSpecRevision + res.locals['apiPath'];
+          next();
+        } else {
+          if (!err) {
+            err = new Error('Error processing deployment[' + url + ']');
+          }
+          _sendError(err, res);
+        }
+      }
+    );
+  }
+);
+
+/**
  * Mock request endpoint with registry spec in request Path
  */
 app.all(

@@ -17,14 +17,14 @@ const express = require('express')
 const fs = require("fs");
 const handlebars = require("handlebars");
 const {RegistryClient} = require("@giteshk-org/apigeeregistry");
-const grpc = require("@grpc/grpc-js");
+const {credentials} = require("@grpc/grpc-js");
 const jsYaml = require('js-yaml');
 var cors = require('cors')
 
 var client_options = {};
 if (process.env.APG_REGISTRY_INSECURE
     && process.env.APG_REGISTRY_INSECURE == "1") {
-  client_options.sslCreds = grpc.credentials.createInsecure();
+  client_options.sslCreds = credentials.createInsecure();
 }
 
 const MOCK_ENDPOINT_ARTIFACT_NAME = process.env.MOCK_ENDPOINT_ARTIFACT_NAME
@@ -167,7 +167,9 @@ app.all(
       let spec_url = "projects/" + req.params.projectId + "/locations/"
           + req.params.locationId + "/apis/" + req.params.apiId + "/versions/"
           + req.params.versionId + "/specs/" + req.params.specId;
-
+      let version_url = "projects/" + req.params.projectId + "/locations/"
+          + req.params.locationId + "/apis/" + req.params.apiId + "/versions/"
+          + req.params.versionId;
       client.getApiSpecContents(
           {
             name: spec_url

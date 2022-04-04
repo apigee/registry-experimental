@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,67 +32,53 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
-  AUTHZ_SERVER: ${{github.repository_owner}}/registry-authz-server
-  SPEC_RENDERER: ${{github.repository_owner}}/registry-spec-renderer
-
 jobs:
-  build:
-
+  build_containers:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-
+    strategy:
+      matrix:
+        include:
+        -   image: ${{github.repository_owner}}/registry-authz-server
+            context: "."
+            dockerfile: "containers/registry-authz-server/Dockerfile"
+        -   image: ${{github.repository_owner}}/registry-spec-renderer
+            context: "containers/registry-spec-renderer"
+            dockerfile: "containers/registry-spec-renderer/Dockerfile"
+        -   image: ${{github.repository_owner}}/registry-prism-mock-server
+            context: "containers/registry-mock-server/openapi"
+            dockerfile: containers/registry-mock-server/openapi/Dockerfile
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      # Login against a Docker registry except on PR
-      # https://github.com/docker/login-action
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+    # Login against a Docker registry except on PR
+    # https://github.com/docker/login-action
+    - name: Log into registry ${{ env.REGISTRY }}
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Extract metadata (tags, labels) for Docker
-      # https://github.com/docker/metadata-action
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.AUTHZ_SERVER }}
+    # Extract metadata (tags, labels) for Docker
+    # https://github.com/docker/metadata-action
+    - name: Extract Docker metadata
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        images: ${{ env.REGISTRY }}/${{ matrix.image }}
 
-      # Build and push Docker image with Buildx (don't push on PR)
-      # https://github.com/docker/build-push-action
-      - name: Build and push registry-authz-server Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-        with:
-          context: .
-          file: containers/registry-authz-server/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      # Extract metadata (tags, labels) for Docker
-      # https://github.com/docker/metadata-action
-      - name: Extract Docker metadata
-        id: meta_spec_renderer
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.SPEC_RENDERER }}
-
-      # Build and push Docker image with Buildx (don't push on PR)
-      # https://github.com/docker/build-push-action
-      - name: Build and push registry-spec-renderer Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-        with:
-          context: containers/registry-spec-renderer
-          file: containers/registry-spec-renderer/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta_spec_renderer.outputs.tags }}
-          labels: ${{ steps.meta_spec_renderer.outputs.labels }}
-
+    # Build and push Docker image with Buildx (don't push on PR)
+    # https://github.com/docker/build-push-action
+    - name: Build and push ${{ env.REGISTRY }}/${{ matrix.image }} Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: ${{ matrix.context }}
+        file: ${{ matrix.dockerfile }}
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}

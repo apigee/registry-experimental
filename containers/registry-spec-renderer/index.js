@@ -19,6 +19,7 @@ const handlebars = require("handlebars");
 const {RegistryClient} = require("@giteshk-org/apigeeregistry");
 const {credentials} = require("@grpc/grpc-js");
 const jsYaml = require('js-yaml');
+const { parseURL } = require("whatwg-url");
 var cors = require('cors')
 
 var client_options = {};
@@ -262,7 +263,10 @@ function addMockAddressForOpenAPI(openAPISpecObj, spec_url, api_url, res) {
       }
       if (openAPISpecObj.swagger && openAPISpecObj.swagger.startsWith("2")
           && !openAPISpecObj.host) {
-        openAPISpecObj.host = deployment.endpointUri;
+        let parsedUrl = parseURL(deployment.endpointUri);
+        openAPISpecObj.host = parsedUrl.host;
+        openAPISpecObj.basePath = "/" + parsedUrl.path.join("/");
+        openAPISpecObj.schemes = [parsedUrl.scheme];
       } else if (openAPISpecObj.openapi &&
           openAPISpecObj.openapi.startsWith("3")) {
         openAPISpecObj = openAPISpecObj || {

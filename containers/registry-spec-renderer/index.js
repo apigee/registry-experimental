@@ -237,8 +237,8 @@ function addMockAddressForOpenAPI(openAPISpecObj, spec_url, api_url, res) {
   client.listApiDeployments({
     parent: api_url,
     filter: "api_spec_revision == '" + spec_url + "'"
-  }).then(deployments => {
-    if (deployments.length > 0) {
+  }, (err, deployments) => {
+    if (!err && deployments && deployments.length > 0) {
       deployments.forEach(deployment => {
         if (!deployment.endpointUri) {
           return;
@@ -259,14 +259,6 @@ function addMockAddressForOpenAPI(openAPISpecObj, spec_url, api_url, res) {
         }
       })
     }
-    res.json(openAPISpecObj);
-    res.end();
-  }).catch(err => {
-    /**
-     * Ignore error and just return the spec without the additional
-     * deployment information.
-     */
-    console.error(err)
     res.json(openAPISpecObj);
     res.end();
   });

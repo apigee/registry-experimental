@@ -27,8 +27,7 @@ if (process.env.APG_REGISTRY_INSECURE
   client_options.sslCreds = credentials.createInsecure();
 }
 
-const MOCK_ENDPOINT_ARTIFACT_NAME = process.env.MOCK_ENDPOINT_ARTIFACT_NAME
-    || "mock-endpoint";
+const MOCK_ENDPOINT = process.env.MOCK_ENDPOINT;
 
 if (process.env.APG_REGISTRY_ADDRESS) {
   items = process.env.APG_REGISTRY_ADDRESS.split(":");
@@ -222,7 +221,6 @@ app.all(
             }
           })
     });
-
 /**
  * Filter the list of deployments with the matching spec revision.
  *
@@ -238,27 +236,47 @@ function addMockAddressForOpenAPI(openAPISpecObj, spec_url, api_url, res) {
     parent: api_url,
     filter: "api_spec_revision == '" + spec_url + "'"
   }, (err, deployments) => {
-    if (!err && deployments && deployments.length > 0) {
-      deployments.forEach(deployment => {
-        if (!deployment.endpointUri) {
-          return;
-        }
-        if (openAPISpecObj.swagger && openAPISpecObj.swagger.startsWith("2")
-            && !openAPISpecObj.host) {
-          openAPISpecObj.host = deployment.endpointUri;
-        } else if (openAPISpecObj.openapi &&
-            openAPISpecObj.openapi.startsWith("3")) {
-          openAPISpecObj = openAPISpecObj || {
-            servers: []
-          }
-          openAPISpecObj.servers.push(
-              {
-                url: deployment.endpointUri,
-                description: deployment.displayName
-              });
-        }
-      })
+
+    if (err) {
+      /**
+       * Ignore errors since we will specify a mock endpoint
+       * even if we cannot get list of deployments.
+       */
+      console.error(err);
     }
+
+    if(!deployments) {
+      deployments = [];
+    }
+
+    if (MOCK_ENDPOINT) {
+      deployments.push({
+        endpointUri: MOCK_ENDPOINT + "/" + spec_url,
+        displayName: "Mock Service"
+      });
+    }
+
+    deployments.forEach(deployment => {
+      if (!deployment.endpointUri) {
+        return;
+      }
+      if (openAPISpecObj.swagger && openAPISpecObj.swagger.startsWith("2")
+          && !openAPISpecObj.host) {
+        openAPISpecObj.host = deployment.endpointUri;
+      } else if (openAPISpecObj.openapi &&
+          openAPISpecObj.openapi.startsWith("3")) {
+        openAPISpecObj = openAPISpecObj || {
+          servers: []
+        }
+        openAPISpecObj.servers.push(
+            {
+              url: deployment.endpointUri,
+              description: deployment.displayName
+            });
+      }
+    })
+
+
     res.json(openAPISpecObj);
     res.end();
   });

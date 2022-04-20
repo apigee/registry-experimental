@@ -4,12 +4,12 @@ This container allows for rendering of specs from the API Registry.
 ### To run this service on a GCE instance run the following command:
 ```
 export REGISTRY_PROJECT_IDENTIFIER=$(gcloud config list --format 'value(core.project)')
-gcloud iam service-accounts create registry-reader \
+gcloud iam service-accounts create registry-viewer \
     --description="Registry Reader" \
     --display-name="Registry Reader"
 
 gcloud projects add-iam-policy-binding $REGISTRY_PROJECT_IDENTIFIER \
-    --member="serviceAccount:registry-reader@$REGISTRY_PROJECT_IDENTIFIER.iam.gserviceaccount.com" \
+    --member="serviceAccount:registry-viewer@$REGISTRY_PROJECT_IDENTIFIER.iam.gserviceaccount.com" \
     --role="roles/apigeeregistry.viewer"
 
 gcloud compute firewall-rules create registry-renderer-service-fw \
@@ -19,11 +19,11 @@ gcloud compute firewall-rules create registry-renderer-service-fw \
     --rules tcp:80
 
 
-gcloud compute instances create-with-container registry-renderer-instance1 \
+gcloud compute instances create-with-container registry-renderer-instance \
 	--machine-type=e2-micro  --tags=registry-spec-renderer,http-server \
 	--scopes=https://www.googleapis.com/auth/cloud-platform \
-	--restart-on-failure --service-account=registry-reader@$REGISTRY_PROJECT_IDENTIFIER.iam.gserviceaccount.com\
-    --container-image ghcr.io/apigee/registry-spec-renderer:latest
+	--restart-on-failure --service-account=registry-viewer@$REGISTRY_PROJECT_IDENTIFIER.iam.gserviceaccount.com\
+    --container-image ghcr.io/apigee/registry-spec-renderer:main
 ```
 
 ### To run this against the opensource version of Apigee Registry on GKE you will need to:  

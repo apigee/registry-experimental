@@ -17,18 +17,18 @@ const express = require('express')
 const fs = require("fs");
 const handlebars = require("handlebars");
 const {RegistryClient} = require("@giteshk-org/apigeeregistry");
-const grpc = require("@grpc/grpc-js");
+const {credentials} = require("@grpc/grpc-js");
 const jsYaml = require('js-yaml');
+const { parseURL } = require("whatwg-url");
 var cors = require('cors')
 
 var client_options = {};
 if (process.env.APG_REGISTRY_INSECURE
     && process.env.APG_REGISTRY_INSECURE == "1") {
-  client_options.sslCreds = grpc.credentials.createInsecure();
+  client_options.sslCreds = credentials.createInsecure();
 }
 
-const MOCK_ENDPOINT_ARTIFACT_NAME = process.env.MOCK_ENDPOINT_ARTIFACT_NAME
-    || "mock-endpoint";
+const MOCK_ENDPOINT = process.env.MOCK_ENDPOINT;
 
 if (process.env.APG_REGISTRY_ADDRESS) {
   items = process.env.APG_REGISTRY_ADDRESS.split(":");
@@ -108,6 +108,33 @@ function getAPIFormat(text) {
 }
 
 /**
+ * Render the spec associated to the Deployment.
+ * From the deployment find out the spec revision to render.
+ */
+app.get(
+    '/render/projects/:projectId/locations/:locationId/apis/:apiId/deployments/:deploymentId',
+    (req, res) => {
+      deployment_name = "projects/" + req.params.projectId + "/locations/"
+          + req.params.locationId + "/apis/" + req.params.apiId
+          + "/deployments/" + req.params.deploymentId;
+      client.getApiDeployment({
+        name: deployment_name
+      }, (err, deployment) => {
+        if (err || !deployment.apiSpecRevision) {
+          if (err) {
+            console.error(err);
+          } else {
+            console.error(deployment_name + "not found");
+          }
+          res.sendStatus(500);
+          res.end();
+        } else {
+          res.redirect(302, "/render/" + deployment.apiSpecRevision);
+        }
+      })
+    });
+
+/**
  * Render an API Spec from registry.
  * Chooses the renderer to use based on mimeType of the Spec
  */
@@ -167,7 +194,8 @@ app.all(
       let spec_url = "projects/" + req.params.projectId + "/locations/"
           + req.params.locationId + "/apis/" + req.params.apiId + "/versions/"
           + req.params.versionId + "/specs/" + req.params.specId;
-
+      let api_url = "projects/" + req.params.projectId + "/locations/"
+          + req.params.locationId + "/apis/" + req.params.apiId;
       client.getApiSpecContents(
           {
             name: spec_url
@@ -184,7 +212,8 @@ app.all(
                 } catch {
                   specObj = jsYaml.load(response.data);
                 }
-                return addMockAddressForOpenAPI(specObj, spec_url, res);
+                return addMockAddressForOpenAPI(specObj, spec_url, api_url,
+                    res);
               } else {
                 res.setHeader("content-type", response.contentType);
                 res.send(response.data);
@@ -193,41 +222,68 @@ app.all(
             }
           })
     });
-
 /**
- * Check if the mock-server artifact exists on the spec.
- * If it does add that to the list of servers
+ * Filter the list of deployments with the matching spec revision.
+ *
+ * Add the endpointUri for the matched deployments to the servers object
+ * for the API Specs
  *
  * @param openAPISpecObj
  * @param spec_url
  * @param res
  */
-function addMockAddressForOpenAPI(openAPISpecObj, spec_url, res) {
-  client.getArtifactContents({
-    name: spec_url + "/artifacts/" + MOCK_ENDPOINT_ARTIFACT_NAME
-  }).then(arr => {
-    arr.forEach((body) => {
-      if (body.data) {
-        mockendpoint = body.data.toString('utf8')
-        if (mockendpoint.length > 0) {
-          if (openAPISpecObj.swagger && openAPISpecObj.swagger.startsWith("2") && !openAPISpecObj.host) {
-            openAPISpecObj.host = mockendpoint;
-          } else if (openAPISpecObj.openapi && openAPISpecObj.openapi.startsWith("3")) {
-            openAPISpecObj = openAPISpecObj || {
-              servers: []
-            }
-            openAPISpecObj.servers.push(
-                {url: mockendpoint, description: "Mock endpoint"});
-          }
-        }
+function addMockAddressForOpenAPI(openAPISpecObj, spec_url, api_url, res) {
+  client.listApiDeployments({
+    parent: api_url,
+    filter: "api_spec_revision == '" + spec_url + "'"
+  }, (err, deployments) => {
+
+    if (err) {
+      /**
+       * Ignore errors since we will specify a mock endpoint
+       * even if we cannot get list of deployments.
+       */
+      console.error(err);
+    }
+
+    if(!deployments) {
+      deployments = [];
+    }
+
+    if (MOCK_ENDPOINT) {
+      deployments.push({
+        endpointUri: MOCK_ENDPOINT + "/" + spec_url,
+        displayName: "Mock Service"
+      });
+    }
+
+    deployments.forEach(deployment => {
+      if (!deployment.endpointUri) {
+        return;
       }
-    });
+      if (openAPISpecObj.swagger && openAPISpecObj.swagger.startsWith("2")
+          && !openAPISpecObj.host) {
+        let parsedUrl = parseURL(deployment.endpointUri);
+        openAPISpecObj.host = parsedUrl.host;
+        openAPISpecObj.basePath = "/" + parsedUrl.path.join("/");
+        openAPISpecObj.schemes = [parsedUrl.scheme];
+      } else if (openAPISpecObj.openapi &&
+          openAPISpecObj.openapi.startsWith("3")) {
+        openAPISpecObj = openAPISpecObj || {
+          servers: []
+        }
+        openAPISpecObj.servers.push(
+            {
+              url: deployment.endpointUri,
+              description: deployment.displayName
+            });
+      }
+    })
+
+
     res.json(openAPISpecObj);
     res.end();
-  }).catch(() => {
-    res.json(openAPISpecObj);
-    res.end();
-  })
+  });
 }
 
 app.get('/healthz', (req, res) => {

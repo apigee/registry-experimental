@@ -36,17 +36,18 @@ then
 else
   # Otherwise, all containers are built.
   SUFFIX=""
-  CONTAINERS=("authz-server" "registry-bundle" "worker" "dispatcher")
+  CONTAINERS=("registry-authz-server" "registry-bundle" "worker" "dispatcher" "registry-linters")
   PLATFORMS=("linux/amd64,linux/arm64")
 fi
 
 # This builds each desired container sequentially.
-for CONTAINER in ${CONTAINERS[*]}; do
-docker buildx build \
-	--file containers/${CONTAINER}/Dockerfile \
-	--tag ${ORGANIZATION}/${CONTAINER}${SUFFIX}:latest \
-	--platform $PLATFORMS \
-	--progress plain \
-	--push \
-	.
+for CONTAINER in ${CONTAINERS[*]}
+do
+  docker buildx build \
+    --file containers/${CONTAINER}/Dockerfile \
+    --tag ${ORGANIZATION}/${CONTAINER}${SUFFIX}:latest \
+    --platform $PLATFORMS \
+    --progress plain \
+    --push \
+    .
 done

@@ -50,6 +50,9 @@ jobs:
         -   image: ${{github.repository_owner}}/registry-prism-mock-server
             context: "containers/registry-mock-server/openapi"
             dockerfile: containers/registry-mock-server/openapi/Dockerfile
+        -   image: ${{github.repository_owner}}/registry-linters
+            context: "."
+            dockerfile: "containers/registry-linters/Dockerfile"
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2

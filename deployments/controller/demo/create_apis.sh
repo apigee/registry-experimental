@@ -39,7 +39,7 @@ do
     apg registry create-api-spec \
     --parent projects/demo/locations/global/apis/petstore/versions/$i.0.0 \
     --api_spec_id openapi.yaml \
-    --api_spec.contents `registry-encode-spec < deployments/controller/demo/data/openapi.yaml@r0` \
+    --api_spec.contents `cat deployments/controller/demo/data/openapi.yaml@r0 | gzip --stdout | xxd -p | tr -d '\n'` \
     --api_spec.mime_type "application/x.openapi+gzip;version=3" \
     --json
 done

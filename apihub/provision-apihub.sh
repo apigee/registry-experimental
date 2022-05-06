@@ -15,6 +15,13 @@
 # limitations under the License.
 #
 
+# This script automates the "Get started with API hub" flow described
+# at https://cloud.google.com/apigee/docs/api-hub/get-started-api-hub.
+# It handles prerequisites and provisions an instance of the API hub
+# which includes a hosted instance of the Apigee Registry API.
+# For more about the Registry Provisioning API that is used in this
+# script, see https://cloud.google.com/apigee/docs/api-hub/provision.
+
 # Usage: provision-apihub.sh -p GCP-PROJECT-ID -l us-central1 -u GCP-USER-EMAIL -r KEY-RING-NAME -k KEY-NAME
 
 unset project_id

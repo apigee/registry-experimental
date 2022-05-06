@@ -5,7 +5,7 @@ service that allows organizations to build a consolidated directory of
 information about all of the APIs at all stages of their lifecycles, from
 design and implementation through deprecation and retirement. It includes and
 builds on a hosted instance of the
-[Apigee Registry API](https://github.com/apigee/registry).
+[API Registry API](https://github.com/apigee/registry).
 
 The Apigee API hub is currently available in public preview. It can be
 provisioned using steps described at

@@ -22,7 +22,18 @@
 # For more about the Registry Provisioning API that is used in this
 # script, see https://cloud.google.com/apigee/docs/api-hub/provision.
 
-# Usage: provision-apihub.sh -p GCP-PROJECT-ID -l us-central1 -u GCP-USER-EMAIL -r KEY-RING-NAME -k KEY-NAME
+# Prerequisites:
+# - A Google Cloud account (USER_EMAIL) with billing enabled.
+# - A Google Cloud project (PROJECT_ID).
+# - The gcloud tool (https://cloud.google.com/sdk/gcloud).
+# - A chosen location (RUNTIME_LOCATION) for the instance. Currently "us-central1"
+#   is recommended. Other supported locations are listed at
+#     https://cloud.google.com/apigee/docs/api-hub/provision
+# - A chosen CMEK (https://cloud.google.com/kms/docs/cmek) key ring name
+#   (KEY_RING_NAME) and key name (KEY_NAME).
+
+# Usage:
+#  provision-apihub.sh -u USER_EMAIL -p PROJECT_ID -l RUNTIME_LOCATION -r KEY_RING_NAME -k KEY_NAME
 
 unset project_id
 unset location

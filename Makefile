@@ -16,7 +16,6 @@ protos:
 	./tools/GENERATE-RPC.sh
 	./tools/GENERATE-GRPC.sh
 	./tools/GENERATE-GAPIC.sh
-	./tools/GENERATE-ENVOY-DESCRIPTORS.sh
 
 test:
 	go test ./...

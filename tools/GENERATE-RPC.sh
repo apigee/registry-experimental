@@ -24,5 +24,7 @@ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
 for proto in ${ALL_PROTOS[@]}; do
 	echo "Generating Go types for $proto"
-	protoc $proto --proto_path='.' --proto_path=$COMMON_PROTOS_PATH --go_opt='module=github.com/apigee/registry-experimental' --go_out='.'
+	protoc $proto --proto_path='.' --proto_path=$COMMON_PROTOS_PATH --go_opt='module=github.com/apigee/registry-experimental' --go_out='.'\
+	# protoc -I=$SRC_DIR --python_out=$DST_DIR $SRC_DIR/addressbook.proto
+	#protoc $proto --proto_path='.' --proto_path=$COMMON_PROTOS_PATH --python_out='module=github.com/apigee/registry-experimental/consistency/rpc'  path/to/file.proto
 done

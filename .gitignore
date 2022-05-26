@@ -1,2 +1,6 @@
 **/node_modules
 **/package-lock.json
+consistency/rpc/build
+consistency/rpc/google_cloud_apigeeregistry.egg-info
+consistency/registry-protos
+third_party

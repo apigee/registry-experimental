@@ -18,6 +18,9 @@ protos:
 	./tools/GENERATE-GAPIC.sh
 	./tools/GENERATE-ENVOY-DESCRIPTORS.sh
 
+py-protos:
+	./tools/GENERATE-PYTHON.sh
+
 test:
 	go test ./...
 

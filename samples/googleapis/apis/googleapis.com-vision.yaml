@@ -1,0 +1,38 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: googleapis.com-vision
+data:
+  displayName: googleapis.com-vision
+  description: Cloud Vision API
+  versions:
+    - metadata:
+        name: v1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://github.com/APIs-guru/openapi-directory/blob/4262544a5067f9df2efa5622cc21890afd6e06be/APIs/googleapis.com/vision/v1/openapi.yaml
+    - metadata:
+        name: v1p1beta1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://github.com/APIs-guru/openapi-directory/blob/4262544a5067f9df2efa5622cc21890afd6e06be/APIs/googleapis.com/vision/v1p1beta1/openapi.yaml
+    - metadata:
+        name: v1p2beta1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://github.com/APIs-guru/openapi-directory/blob/4262544a5067f9df2efa5622cc21890afd6e06be/APIs/googleapis.com/vision/v1p2beta1/openapi.yaml

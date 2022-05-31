@@ -1,0 +1,38 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: googleapis.com-translate
+data:
+  displayName: googleapis.com-translate
+  description: Google Cloud Translation API
+  versions:
+    - metadata:
+        name: v2
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://github.com/APIs-guru/openapi-directory/blob/4262544a5067f9df2efa5622cc21890afd6e06be/APIs/googleapis.com/translate/v2/openapi.yaml
+    - metadata:
+        name: v3
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://github.com/APIs-guru/openapi-directory/blob/4262544a5067f9df2efa5622cc21890afd6e06be/APIs/googleapis.com/translate/v3/openapi.yaml
+    - metadata:
+        name: v3beta1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://github.com/APIs-guru/openapi-directory/blob/4262544a5067f9df2efa5622cc21890afd6e06be/APIs/googleapis.com/translate/v3beta1/openapi.yaml

@@ -1,0 +1,9 @@
+apiVersion: apigeeregistry/v1
+kind: DisplaySettings
+metadata:
+  name: apihub-display-settings
+data:
+  description: Defines display settings for the API hub UI
+  organization: Example Organization
+  apiGuideEnabled: true
+  apiScoreEnabled: true

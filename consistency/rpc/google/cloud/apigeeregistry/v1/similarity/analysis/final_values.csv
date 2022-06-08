@@ -1,0 +1,6 @@
+dice,(0.3, 2, 0.8887501840948729)
+jaro_winkler,(0.1, 2, 0.8301625497707991)
+sift4,(-1, -1, 0)
+longest_common_subsequence,(-1, -1, 0)
+4gram,(-1, -1, 0)
+normalized_levenshtein,(0.2, 2, 0.845141324060927)

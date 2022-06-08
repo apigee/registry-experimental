@@ -15,20 +15,14 @@
 # limitations under the License.
 #
 
-ALL_PROTOS=(
-	google/cloud/apigeeregistry/v1/*.proto
-)
-
-SERVICE_PROTOS=(
-	google/cloud/apigeeregistry/v1/search_service.proto
-)
-
-COMMON_PROTOS_PATH='third_party/api-common-protos'
+ALL_PROTOS=google/cloud/apigeeregistry/v1/*.proto
+SERVICE_PROTOS=google/cloud/apigeeregistry/v1/search_service.proto
+COMMON_PROTOS_PATH='registry-protos'
 
 function clone_common_protos {
 	if [ ! -d $COMMON_PROTOS_PATH ]
 	then
-		git clone https://github.com/googleapis/api-common-protos $COMMON_PROTOS_PATH
+		git clone https://github.com/apigee/registry $COMMON_PROTOS_PATH
 	fi
 }
 

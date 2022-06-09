@@ -24,6 +24,7 @@ import (
 
 	auth "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -32,8 +33,7 @@ func main() {
 
 	// Make a raw gRPC connection to a local authz-server.
 	address := "localhost:50051"
-	opts := []grpc.DialOption{grpc.WithInsecure()}
-	conn, err := grpc.Dial(address, opts...)
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}

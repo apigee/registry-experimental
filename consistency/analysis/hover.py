@@ -14,7 +14,7 @@ from sklearn.metrics.cluster import completeness_score
 from sklearn.metrics.cluster import v_measure_score
 from sklearn.cluster import dbscan
 
-tagged_df = pd.read_csv (r'/home/gelaw/work-stuff/gocode/src/registry-experimental/consistency/rpc/google/cloud/apigeeregistry/v1/similarity/algorithms /vocab1000.csv')
+tagged_df = pd.read_csv (r'/home/gelaw/work-stuff/gocode/src/registry-experimental/consistency/rpc/google/cloud/apigeeregistry/v1/similarity/analysis/vocab1000.csv')
 tagged_df = tagged_df.drop(tagged_df.index[300:])
 word_labels = tagged_df.iloc[:, 0]
 word_labels = word_labels.to_numpy()

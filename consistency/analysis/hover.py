@@ -2,9 +2,9 @@
 
 
 ### the followign code gets 300 manually tagged words from Google's API, uses dbscan clustering to generate labels,
-# and reveals the words corresponding to each point as you hover. Words in the same cluster colored the same. 
-# If needed, remove the noises ( points with -1) just to plot words with defined clusters. 
-# Intended for visualization of the algorithm we used for clustering.  
+### and reveals the words corresponding to each point as you hover. Words in the same cluster colored the same. 
+### If needed, remove the noises ( points with -1) just to plot words with defined clusters. 
+### Intended for visualization of the algorithm we used for clustering.  
 import numpy as np
 import pandas as pd
 from sklearn.cluster import dbscan

@@ -1,0 +1,374 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 4.3
+# Built for x86_64-pc-linux-gnu
+# Copyright (C) 1988-2020 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+ 
+
+# Make data base, printed on Mon Jun 13 10:34:02 2022
+
+# Variables
+
+# environment
+GDK_BACKEND = x11
+# environment
+LC_ALL = C
+# environment
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-12efb4ab-6404-44d5-b608-a207971ff61c.sock
+# environment
+VSCODE_CWD = /home/gelaw
+# environment
+WAYLAND_DISPLAY_LOW_DENSITY = wayland-1
+# default
+MAKE_COMMAND := make
+# environment
+QT_ACCESSIBILITY = 1
+# environment
+GOPATH = /home/gelaw/go
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# default
+.VARIABLES := 
+# environment
+PWD = /home/gelaw/work-stuff/gocode/src/registry-experimental
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# environment
+XDG_DATA_DIRS = /home/gelaw/.local/share:/home/gelaw/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# environment
+VSCODE_LOG_STACK = false
+# automatic
+%F = $(notdir $%)
+# environment
+VSCODE_CODE_CACHE_PATH = /home/gelaw/.config/Code/CachedData/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+# environment
+LANG = C
+# default
+.LOADED := 
+# default
+.INCLUDE_DIRS = /usr/local/include /usr/include /usr/include
+# makefile
+MAKEFLAGS = pqrR
+# makefile
+CURDIR := /home/gelaw/work-stuff/gocode/src/registry-experimental
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+MFLAGS = -pqrR
+# default
+.SHELLFLAGS := -c
+# environment
+SOMMELIER_GLAMOR = 1
+# environment
+WAYLAND_DISPLAY = wayland-0
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+XCURSOR_THEME = Adwaita
+# makefile (from 'Makefile', line 1)
+MAKEFILE_LIST := Makefile
+# automatic
+@F = $(notdir $@)
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# environment
+VSCODE_PID = 786
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+*F = $(notdir $*)
+# environment
+QT_QPA_PLATFORMTHEME = gtk2
+# environment
+CHROME_DESKTOP = code-url-handler.desktop
+# environment
+DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# default
+MAKE_HOST := x86_64-pc-linux-gnu
+# makefile
+SHELL = /bin/sh
+# default
+MAKECMDGOALS := all
+# environment
+SHLVL = 0
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# environment
+LD_ARGV0_REL = ../bin/garcon
+# environment
+PATH = /usr/local/go/bin:/home/gelaw/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+# default
+MAKEFILES := 
+# environment
+XCURSOR_SIZE_LOW_DENSITY = 15
+# automatic
+^F = $(notdir $^)
+# environment
+INVOCATION_ID = a4e101ecee8e4b63ab76649a2bcfbed4
+# environment
+XDG_CONFIG_HOME = /home/gelaw/.config
+# environment
+VSCODE_LOG_NATIVE = false
+# environment
+SOMMELIER_VERSION = 0.20
+# automatic
+?F = $(notdir $?)
+# environment
+LS_COLORS = 
+# automatic
++F = $(notdir $+)
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# 'override' directive
+GNUMAKEFLAGS := 
+# environment
+BROWSER = /usr/bin/garcon-url-handler
+# environment
+LOGNAME = gelaw
+# makefile
+.DEFAULT_GOAL := lite
+# environment
+DISPLAY = :0
+# environment
+USER = gelaw
+# default
+MAKE_VERSION := 4.3
+# environment
+MANAGERPID = 129
+# environment
+NCURSES_NO_UTF8_ACS = 1
+# environment
+SOMMELIER_DRM_DEVICE = /dev/dri/renderD128
+# environment
+_ = /usr/share/code/code
+# environment
+XDG_RUNTIME_DIR = /run/user/1000
+# environment
+DISPLAY_LOW_DENSITY = :1
+# environment
+JOURNAL_STREAM = 7:17832
+# environment
+GOMODCACHE = /home/gelaw/go/pkg/mod
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+HOME = /home/gelaw
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# environment
+VSCODE_IPC_HOOK = /run/user/1000/vscode-3755eb59-1.67.2-main.sock
+# environment
+XCURSOR_SIZE = 30
+# environment
+GOPROXY = https://proxy.golang.org,direct
+# default
+.RECIPEPREFIX := 
+# automatic
+<F = $(notdir $<)
+# default
+SUFFIXES := 
+# environment
+QT_AUTO_SCREEN_SCALE_FACTOR = 1
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
+# variable set hash-table stats:
+# Load=88/1024=9%, Rehash=0, Collisions=4/128=3%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 49, inode 254818): 30 files, no impossibilities.
+
+# 30 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+deploy:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 30):
+	@echo "Error! REGISTRY_PROJECT_IDENTIFIER must be set."; exit 1
+	gcloud run deploy registry-backend --image gcr.io/${REGISTRY_PROJECT_IDENTIFIER}/registry-server:latest --platform managed
+
+deploy-workers:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 73):
+	./deployments/worker-setup/DEPLOY-WORKERS.sh
+
+lite:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 2):
+	go install ./...
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+ 
+#  Last modified 2022-06-09 11:58:17.851405981
+#  File has been updated.
+#  Successfully updated.
+
+protos:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 16):
+	./tools/GENERATE-RPC.sh
+	./tools/GENERATE-GRPC.sh
+	./tools/GENERATE-GAPIC.sh
+	./tools/GENERATE-ENVOY-DESCRIPTORS.sh
+
+deploy-controller-dashboard:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 58):
+	@echo "Error! REGISTRY_PROJECT_IDENTIFIER must be set."; exit 1
+	./deployments/controller/dashboard/DEPLOY.sh
+
+deploy-controller-job:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 48):
+	@echo "Error! REGISTRY_PROJECT_IDENTIFIER must be set."; exit 1
+	@echo "Error! REGISTRY_MANIFEST_ID must be set."; exit 1
+	gcloud container clusters get-credentials registry-backend --zone us-central1-a
+	envsubst < deployments/controller/gke-job/cron-job.yaml | kubectl apply -f -
+
+apg:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 12):
+	./tools/GENERATE-APX.sh
+	go install ./cmd/apx
+
+build-workers:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 66):
+	@echo "Error! REGISTRY_PROJECT_IDENTIFIER must be set."; exit 1
+	gcloud config set project ${REGISTRY_PROJECT_IDENTIFIER}
+	gcloud builds submit --config deployments/worker-setup/cloudbuild.yaml \
+    --substitutions _REGISTRY_PROJECT_IDENTIFIER="${REGISTRY_PROJECT_IDENTIFIER}"
+
+py-protos:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 22):
+	./tools/GENERATE-PYTHON.sh
+
+deploy-gke:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 37):
+	@echo "Error! REGISTRY_PROJECT_IDENTIFIER must be set."; exit 1
+	./deployments/gke/DEPLOY-TO-GKE.sh
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+all:
+#  Command line target.
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := all
+# automatic
+# * := 
+# automatic
+# < := 
+# automatic
+# + := 
+# automatic
+# % := 
+# automatic
+# ^ := 
+# automatic
+# ? := 
+# automatic
+# | := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/11=9%
+#  recipe to execute (from 'Makefile', line 5):
+	./tools/GENERATE-RPC.sh
+	./tools/GENERATE-GRPC.sh
+	./tools/GENERATE-GAPIC.sh
+	./tools/GENERATE-APX.sh
+	go install ./...
+
+test:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 25):
+	go test ./...
+
+deploy-controller: deploy-controller-job deploy-controller-dashboard
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+ 
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# files hash-table stats:
+# Load=16/1024=2%, Rehash=0, Collisions=1/30=3%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 47 / storage = 471 B / avg = 10 B
+# current buf: size = 8162 B / used = 471 B / count = 47 / avg = 10 B
+
+# strcache performance: lookups = 68 / hit rate = 30%
+ 
+# hash-table stats:
+# Load=47/8192=1%, Rehash=0, Collisions=0/68=0%
+# Finished Make data base on Mon Jun 13 10:34:02 2022
+
+ 

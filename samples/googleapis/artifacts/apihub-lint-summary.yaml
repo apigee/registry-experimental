@@ -1,0 +1,10 @@
+apiVersion: apigeeregistry/v1
+kind: ScoreCardDefinition
+metadata:
+  name: lint-summary
+data:
+  target_resource:
+    pattern: apis/-/versions/-/specs/-
+  score_patterns:
+  - $resource.spec/artifacts/score-lint-errors
+  - $resource.spec/artifacts/score-lint-warnings

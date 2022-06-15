@@ -1,0 +1,18 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: googleapis.com-analyticsadmin
+data:
+  displayName: googleapis.com-analyticsadmin
+  description: Google Analytics Admin API
+  versions:
+    - metadata:
+        name: v1alpha
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/analyticsadmin/v1alpha/openapi.yaml

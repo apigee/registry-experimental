@@ -1,10 +1,10 @@
 apiVersion: apigeeregistry/v1
 kind: API
 metadata:
-  name: googleapis.com-firebase
+  name: googleapis.com-analyticshub
 data:
-  displayName: googleapis.com-firebase
-  description: Firebase Management API
+  displayName: googleapis.com-analyticshub
+  description: Analytics Hub API
   versions:
     - metadata:
         name: v1beta1
@@ -15,4 +15,4 @@ data:
             data:
               filename: openapi.yaml
               mimeType: application/x.openapi+gzip;version=3
-              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/firebase/v1beta1/openapi.yaml
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/analyticshub/v1beta1/openapi.yaml

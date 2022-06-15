@@ -1,0 +1,48 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: googleapis.com-cloudfunctions
+data:
+  displayName: googleapis.com-cloudfunctions
+  description: Cloud Functions API
+  versions:
+    - metadata:
+        name: v1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/cloudfunctions/v1/openapi.yaml
+    - metadata:
+        name: v2
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/cloudfunctions/v2/openapi.yaml
+    - metadata:
+        name: v2alpha
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/cloudfunctions/v2alpha/openapi.yaml
+    - metadata:
+        name: v2beta
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/cloudfunctions/v2beta/openapi.yaml

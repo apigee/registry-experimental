@@ -15,4 +15,4 @@ data:
             data:
               filename: openapi.yaml
               mimeType: application/x.openapi+gzip;version=3
-              sourceURI: https://github.com/APIs-guru/openapi-directory/blob/4262544a5067f9df2efa5622cc21890afd6e06be/APIs/googleapis.com/youtube/v3/openapi.yaml
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/youtube/v3/openapi.yaml

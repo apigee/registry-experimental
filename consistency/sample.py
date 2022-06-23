@@ -5,7 +5,7 @@ from google.cloud.apigeeregistry.v1 import admin_models_pb2
 from google.cloud.apigeeregistry.v1 import registry_service_pb2_grpc
 from google.cloud.apigeeregistry.v1 import registry_service_pb2
 from google.cloud.apigeeregistry.v1 import registry_models_pb2
-#import admin_service_pb2_grpc
+from metrics import vocabulary_pb2
 
 def main():
     # Creating admin client
@@ -105,6 +105,34 @@ def main():
         print(f"GetApiSpec response: {response}")
     except grpc.RpcError as rpc_error:
         print(f"Received RPC error: code={rpc_error.code()} message={rpc_error.details()}")
+    
+    # Get vocabulary artifacts
+    try:
+        response = stub.ListArtifacts(
+            registry_service_pb2.ListArtifactsRequest(
+                parent="projects/-/locations/global/apis/-/versions/-/specs/-",
+                filter="name.contains(\"vocabulary\")"
+            ))
+    except grpc.RpcError as rpc_error:
+        print(f"Received RPC error: code={rpc_error.code()} message={rpc_error.details()}")
+    
+    for artifact in response.artifacts:
+        contents = stub.GetArtifactContents(
+            registry_service_pb2.GetArtifactContentsRequest(
+                name=artifact.name,
+            )
+        )
+
+        vocab = vocabulary_pb2.Vocabulary()
+        vocab.ParseFromString(contents.data)
+        for entry in vocab.schemas:
+            print(f'Word: "{entry.word}" frequency: {entry.count}')
+        for entry in vocab.properties:
+            print(f'Word: "{entry.word}" frequency: {entry.count}')
+        for entry in vocab.operations:
+            print(f'Word: "{entry.word}" frequency: {entry.count}')
+        for entry in vocab.parameters:
+            print(f'Word: "{entry.word}" frequency: {entry.count}')
 
 if __name__ == "__main__":
     main()

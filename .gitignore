@@ -3,4 +3,5 @@
 consistency/rpc/build
 consistency/rpc/google_cloud_apigeeregistry.egg-info
 consistency/registry-protos
+consistency/gnostic-protos
 third_party

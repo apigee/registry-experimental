@@ -1,0 +1,68 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: googleapis.com-gkehub
+data:
+  displayName: googleapis.com-gkehub
+  description: GKE Hub API
+  versions:
+    - metadata:
+        name: v1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/gkehub/v1/openapi.yaml
+    - metadata:
+        name: v1alpha
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/gkehub/v1alpha/openapi.yaml
+    - metadata:
+        name: v1alpha2
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/gkehub/v1alpha2/openapi.yaml
+    - metadata:
+        name: v1beta
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/gkehub/v1beta/openapi.yaml
+    - metadata:
+        name: v1beta1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/gkehub/v1beta1/openapi.yaml
+    - metadata:
+        name: v2alpha
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/gkehub/v2alpha/openapi.yaml

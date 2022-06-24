@@ -71,7 +71,7 @@ data:
           linterRulename: operation-parameters
           severity: WARNING
           docUri: https://meta.stoplight.io/docs/spectral/ZG9jOjExNw-open-api-rules#operation-parameters
-      status: ACTIVE
+      state: ACTIVE
     - id: Info
       displayName: Govern properties of Info
       description: ""
@@ -100,7 +100,7 @@ data:
           linterRulename: info-license
           severity: WARNING
           docUri: https://meta.stoplight.io/docs/spectral/ZG9jOjExNw-open-api-rules#info-license
-      status: ACTIVE
+      state: ACTIVE
     - id: Markdown
       displayName: Govern properties of Markdown
       description: ""
@@ -121,7 +121,7 @@ data:
           linterRulename: no-script-tags-in-markdown
           severity: ERROR
           docUri: https://meta.stoplight.io/docs/spectral/ZG9jOjExNw-open-api-rules#no-script-tags-in-markdown
-      status: ACTIVE
+      state: ACTIVE
     - id: Path
       displayName: Govern properties of Paths
       description: ""
@@ -152,7 +152,7 @@ data:
           linterRulename: path-declarations-must-exist
           severity: WARNING
           docUri: https://meta.stoplight.io/docs/spectral/ZG9jOjExNw-open-api-rules#path-declarations-must-exist
-      status: ACTIVE
+      state: ACTIVE
   linters:
     - name: spectral
       uri: https://github.com/stoplightio/spectral

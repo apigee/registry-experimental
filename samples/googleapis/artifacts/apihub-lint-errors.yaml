@@ -3,6 +3,8 @@ kind: ScoreDefinition
 metadata:
   name: lint-errors
 data:
+  display_name: "Lint Errors"
+  description: "Number of lint errors found in conformance report"
   target_resource:
     pattern: "apis/-/versions/-/specs/-"
   score_formula:

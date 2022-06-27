@@ -3,6 +3,8 @@ kind: ScoreCardDefinition
 metadata:
   name: lint-summary
 data:
+  display_name: "Lint Summary"
+  description: "Summary of lint scores"
   target_resource:
     pattern: apis/-/versions/-/specs/-
   score_patterns:

@@ -35,7 +35,7 @@ where `PROJECT` is set to the name of the target project.
 
 Note: Please make sure you are running a registry instance of version `v0.5.3` or higher.
 
-* Now, since you are running the local version, you will need to manually invoke the controller to generate the expeccted artifacts.
+* Now, since you are running the local version, you will need to manually invoke the controller to generate the expected artifacts.
 *  Run the following command to invoke the controller:
 ```
 registry resolve projects/$PROJECT/locations/global/artifacts/apihub-manifest
@@ -43,7 +43,7 @@ registry resolve projects/$PROJECT/locations/global/artifacts/apihub-manifest
 
 Note: Please make sure you have installed [spectral linter](https://meta.stoplight.io/docs/spectral/ZG9jOjYyMDc0Mw-installation) version 5.X.X
 
-* Due to the dependency relationships between different artifacts, you will need to invoke the controller atleast 3 times in order to get all the artifacts generated. The artifacts generated in each invocation will be as follows:
+* Due to the dependency relationships between different artifacts, you will need to invoke the controller at least 3 times in order to get all the artifacts generated. The artifacts generated in each invocation will be as follows:
     - First invocation:
         - vocabulary (you might see some errors here due to invalid spec definitions)
         - complexity (you might see some errors here due to invalid spec definitions)
@@ -89,7 +89,7 @@ Note: Please make sure you have installed [spectral linter](https://meta.stoplig
     registry get projects/shrutiparab-sandbox/locations/global/apis/googleapis.com-analyticshub/versions/v1beta1/specs/openapi.yaml/artifacts/scorecard-lint-summary --contents
     ```
 
-    The expected response should be something like follows:
+3. The expected response should be something like follows:
     - score-lint-errors
         ```
         {
@@ -151,3 +151,4 @@ Note: Please make sure you have installed [spectral linter](https://meta.stoplig
         }
         ```
 
+registry apply -f googleapis -R --parent projects/shrutiparab-sandbox/locations/global

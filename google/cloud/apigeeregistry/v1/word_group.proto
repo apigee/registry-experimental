@@ -18,11 +18,11 @@
 syntax = "proto3";
 
 package google.cloud.apigeeregistry.v1;
-
+import "google/api/field_behavior.proto";
 message WordGroup {
-    string id = 1;
-    string kind = 2;
+    string id = 1 [ (google.api.field_behavior) = REQUIRED ];
+    string kind = 2 [ (google.api.field_behavior) = REQUIRED ];
 
     // Stores the frequency of a word in the group
-    map<string, int32> word_frequency = 3;
+    map<string, int32> word_frequency = 3 [ (google.api.field_behavior) = REQUIRED ];
 }

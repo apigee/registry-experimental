@@ -12,10 +12,11 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+from google.api import field_behavior_pb2 as google_dot_api_dot_field__behavior__pb2
 from google.cloud.apigeeregistry.v1 import word_group_pb2 as google_dot_cloud_dot_apigeeregistry_dot_v1_dot_word__group__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n7google/cloud/apigeeregistry/v1/consistency_report.proto\x12\x1egoogle.cloud.apigeeregistry.v1\x1a/google/cloud/apigeeregistry/v1/word_group.proto\"\xc9\x02\n\x11\x43onsistencyReport\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04kind\x18\x02 \x01(\t\x12W\n\x12\x63urrent_variations\x18\x03 \x03(\x0b\x32;.google.cloud.apigeeregistry.v1.ConsistencyReport.Variation\x12T\n\x0fpast_variations\x18\x04 \x03(\x0b\x32;.google.cloud.apigeeregistry.v1.ConsistencyReport.Variation\x12\x14\n\x0cunique_terms\x18\x05 \x03(\t\x1aU\n\tVariation\x12\x0c\n\x04term\x18\x01 \x01(\t\x12:\n\x07\x63luster\x18\x02 \x01(\x0b\x32).google.cloud.apigeeregistry.v1.WordGroupb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n7google/cloud/apigeeregistry/v1/consistency_report.proto\x12\x1egoogle.cloud.apigeeregistry.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a/google/cloud/apigeeregistry/v1/word_group.proto\"\xdd\x02\n\x11\x43onsistencyReport\x12\x0f\n\x02id\x18\x01 \x01(\tB\x03\xe0\x41\x02\x12\x11\n\x04kind\x18\x02 \x01(\tB\x03\xe0\x41\x02\x12W\n\x12\x63urrent_variations\x18\x03 \x03(\x0b\x32;.google.cloud.apigeeregistry.v1.ConsistencyReport.Variation\x12T\n\x0fpast_variations\x18\x04 \x03(\x0b\x32;.google.cloud.apigeeregistry.v1.ConsistencyReport.Variation\x12\x14\n\x0cunique_terms\x18\x05 \x03(\t\x1a_\n\tVariation\x12\x11\n\x04term\x18\x01 \x01(\tB\x03\xe0\x41\x02\x12?\n\x07\x63luster\x18\x02 \x01(\x0b\x32).google.cloud.apigeeregistry.v1.WordGroupB\x03\xe0\x41\x02\x62\x06proto3')
 
 
 
@@ -39,8 +40,16 @@ _sym_db.RegisterMessage(ConsistencyReport.Variation)
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _CONSISTENCYREPORT._serialized_start=141
-  _CONSISTENCYREPORT._serialized_end=470
-  _CONSISTENCYREPORT_VARIATION._serialized_start=385
-  _CONSISTENCYREPORT_VARIATION._serialized_end=470
+  _CONSISTENCYREPORT_VARIATION.fields_by_name['term']._options = None
+  _CONSISTENCYREPORT_VARIATION.fields_by_name['term']._serialized_options = b'\340A\002'
+  _CONSISTENCYREPORT_VARIATION.fields_by_name['cluster']._options = None
+  _CONSISTENCYREPORT_VARIATION.fields_by_name['cluster']._serialized_options = b'\340A\002'
+  _CONSISTENCYREPORT.fields_by_name['id']._options = None
+  _CONSISTENCYREPORT.fields_by_name['id']._serialized_options = b'\340A\002'
+  _CONSISTENCYREPORT.fields_by_name['kind']._options = None
+  _CONSISTENCYREPORT.fields_by_name['kind']._serialized_options = b'\340A\002'
+  _CONSISTENCYREPORT._serialized_start=174
+  _CONSISTENCYREPORT._serialized_end=523
+  _CONSISTENCYREPORT_VARIATION._serialized_start=428
+  _CONSISTENCYREPORT_VARIATION._serialized_end=523
 # @@protoc_insertion_point(module_scope)

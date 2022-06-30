@@ -18,21 +18,22 @@ syntax = "proto3";
 
 package google.cloud.apigeeregistry.v1;
 
+import "google/api/field_behavior.proto";
 import "google/cloud/apigeeregistry/v1/word_group.proto";
 
 message ConsistencyReport {
-    string id = 1;
-    string  kind = 2; 
+    string id = 1 [ (google.api.field_behavior) = REQUIRED ];
+    string  kind = 2 [ (google.api.field_behavior) = REQUIRED ]; 
 
    message Variation {
-        string term = 1;
-        WordGroup cluster = 2; 
+        string term = 1 [ (google.api.field_behavior) = REQUIRED ];
+        WordGroup cluster = 2 [ (google.api.field_behavior) = REQUIRED ]; 
    }
    // Stores the variations detected in the current upload
    repeated Variation current_variations = 3;
 
    // Stores a snapshot of the variations detected in the last upload. 
-   repeated Variation past_variations = 4 ;
+   repeated Variation past_variations = 4;
 
    // Stores the unique terms in the current upload
    repeated string unique_terms = 5;

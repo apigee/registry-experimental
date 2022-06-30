@@ -12,9 +12,10 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+from google.api import field_behavior_pb2 as google_dot_api_dot_field__behavior__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n/google/cloud/apigeeregistry/v1/word_group.proto\x12\x1egoogle.cloud.apigeeregistry.v1\"\xb1\x01\n\tWordGroup\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04kind\x18\x02 \x01(\t\x12T\n\x0eword_frequency\x18\x03 \x03(\x0b\x32<.google.cloud.apigeeregistry.v1.WordGroup.WordFrequencyEntry\x1a\x34\n\x12WordFrequencyEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n/google/cloud/apigeeregistry/v1/word_group.proto\x12\x1egoogle.cloud.apigeeregistry.v1\x1a\x1fgoogle/api/field_behavior.proto\"\xc0\x01\n\tWordGroup\x12\x0f\n\x02id\x18\x01 \x01(\tB\x03\xe0\x41\x02\x12\x11\n\x04kind\x18\x02 \x01(\tB\x03\xe0\x41\x02\x12Y\n\x0eword_frequency\x18\x03 \x03(\x0b\x32<.google.cloud.apigeeregistry.v1.WordGroup.WordFrequencyEntryB\x03\xe0\x41\x02\x1a\x34\n\x12WordFrequencyEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\x62\x06proto3')
 
 
 
@@ -40,8 +41,14 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   _WORDGROUP_WORDFREQUENCYENTRY._options = None
   _WORDGROUP_WORDFREQUENCYENTRY._serialized_options = b'8\001'
-  _WORDGROUP._serialized_start=84
-  _WORDGROUP._serialized_end=261
-  _WORDGROUP_WORDFREQUENCYENTRY._serialized_start=209
-  _WORDGROUP_WORDFREQUENCYENTRY._serialized_end=261
+  _WORDGROUP.fields_by_name['id']._options = None
+  _WORDGROUP.fields_by_name['id']._serialized_options = b'\340A\002'
+  _WORDGROUP.fields_by_name['kind']._options = None
+  _WORDGROUP.fields_by_name['kind']._serialized_options = b'\340A\002'
+  _WORDGROUP.fields_by_name['word_frequency']._options = None
+  _WORDGROUP.fields_by_name['word_frequency']._serialized_options = b'\340A\002'
+  _WORDGROUP._serialized_start=117
+  _WORDGROUP._serialized_end=309
+  _WORDGROUP_WORDFREQUENCYENTRY._serialized_start=257
+  _WORDGROUP_WORDFREQUENCYENTRY._serialized_end=309
 # @@protoc_insertion_point(module_scope)

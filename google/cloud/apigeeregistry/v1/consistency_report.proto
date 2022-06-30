@@ -1,0 +1,39 @@
+// Copyright 2021 Google LLC. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Holds words labeled into the same group
+
+syntax = "proto3";
+
+package google.cloud.apigeeregistry.v1;
+
+import "google/cloud/apigeeregistry/v1/word_group.proto";
+
+message ConsistencyReport {
+    string id = 1;
+    string  kind = 2; 
+
+   message Variation {
+        string term = 1;
+        WordGroup cluster = 2; 
+   }
+   // Stores the variations detected in the current upload
+   repeated Variation current_variations = 3;
+
+   // Stores a snapshot of the variations detected in the last upload. 
+   repeated Variation past_variations = 4 ;
+
+   // Stores the unique terms in the current upload
+   repeated string unique_terms = 5;
+}

@@ -1,0 +1,48 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: cloudfunctions
+data:
+  displayName: cloudfunctions
+  description: Cloud Functions API
+  versions:
+    - metadata:
+        name: v1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/cloudfunctions/v1/openapi.yaml
+    - metadata:
+        name: v2
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/cloudfunctions/v2/openapi.yaml
+    - metadata:
+        name: v2alpha
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/cloudfunctions/v2alpha/openapi.yaml
+    - metadata:
+        name: v2beta
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/cloudfunctions/v2beta/openapi.yaml

@@ -1,0 +1,38 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: pubsub
+data:
+  displayName: pubsub
+  description: Cloud Pub/Sub API
+  versions:
+    - metadata:
+        name: v1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/pubsub/v1/openapi.yaml
+    - metadata:
+        name: v1beta1a
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/pubsub/v1beta1a/openapi.yaml
+    - metadata:
+        name: v1beta2
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/pubsub/v1beta2/openapi.yaml

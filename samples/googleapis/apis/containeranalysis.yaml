@@ -1,0 +1,38 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: containeranalysis
+data:
+  displayName: containeranalysis
+  description: Container Analysis API
+  versions:
+    - metadata:
+        name: v1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/containeranalysis/v1/openapi.yaml
+    - metadata:
+        name: v1alpha1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/containeranalysis/v1alpha1/openapi.yaml
+    - metadata:
+        name: v1beta1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/containeranalysis/v1beta1/openapi.yaml

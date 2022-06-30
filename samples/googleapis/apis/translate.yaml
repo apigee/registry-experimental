@@ -1,0 +1,38 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: translate
+data:
+  displayName: translate
+  description: Cloud Translation API
+  versions:
+    - metadata:
+        name: v2
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/translate/v2/openapi.yaml
+    - metadata:
+        name: v3
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/translate/v3/openapi.yaml
+    - metadata:
+        name: v3beta1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/translate/v3beta1/openapi.yaml

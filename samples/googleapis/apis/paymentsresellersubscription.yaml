@@ -1,0 +1,18 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: paymentsresellersubscription
+data:
+  displayName: paymentsresellersubscription
+  description: Payments Reseller Subscription API
+  versions:
+    - metadata:
+        name: v1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: file:///specs/paymentsresellersubscription/v1/openapi.yaml

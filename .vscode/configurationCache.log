@@ -1,1 +1,0 @@
-{"buildTargets":["all","apg","build-workers","deploy","deploy-controller","deploy-controller-dashboard","deploy-controller-job","deploy-gke","deploy-workers","lite","protos","py-protos","test"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

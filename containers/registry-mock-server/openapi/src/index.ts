@@ -192,8 +192,9 @@ app.all('/mock/*', (req: Request, res: Response) => {
     );
   }
   res.locals.projectId = parts[1];
-  res.locals.locationId = parts[5];
-  res.locals.apiId = parts[7];
+  res.locals.locationId = parts[3];
+  res.locals.apiId = parts[5];
+  res.locals.versionId = parts[7];
   res.locals.specId = parts[9];
   processParams(req, res);
   processMockRequest(req, res);

@@ -23,26 +23,26 @@ import "google/cloud/apigeeregistry/v1/word_group.proto";
 
 // ConsistencyReport stores vocabulary variations detected in a spec 
 // with respect to a collection of specs. Similar words detected by the clustering algorithm 
-// are stored stored in the Variation WordGroups while unique words detected are stored in unique_terms. 
-// Consistency report stores variations from the latest computation as well as from the current computation.
+// are stored in the Variation WordGroups while unique words detected are stored in unique_terms. 
+// Consistency report stores variations from a spec was created/last updated and also from 
+// the most recent state of the spec collection. 
 message ConsistencyReport {
-    string id = 1 [ (google.api.field_behavior) = REQUIRED ];
-    string  kind = 2 [ (google.api.field_behavior) = REQUIRED ]; 
+     string id = 1 [ (google.api.field_behavior) = REQUIRED ];
+     string  kind = 2 [ (google.api.field_behavior) = REQUIRED ]; 
 
-   message Variation {
-        string term = 1 [ (google.api.field_behavior) = REQUIRED ];
-        WordGroup cluster = 2 [ (google.api.field_behavior) = REQUIRED ]; 
-   }
-   // Stores the variations of a spec's vocabulary with respect to a collection of specs.
-   // All flavors of a vocab detected in the spec are grouped and stored here.
-   repeated Variation current_variations = 3;
+     // Stores the variations of a spec's vocabulary with respect to a collection of specs.
+     // All flavors of a vocab detected in the spec are grouped and stored here.
+     message Variation {
+          string term = 1 [ (google.api.field_behavior) = REQUIRED ];
+          WordGroup cluster = 2 [ (google.api.field_behavior) = REQUIRED ]; 
+     }
 
-   // Stores the variations of a spec's vocabulary with respect to a collection of specs 
-   // from the last computation.
-   // All flavors of a vocab detected in the spec are grouped and stored here.
-   // past_variations is a copy of the last current_variations. 
-   repeated Variation past_variations = 4;
+     // current_variations are the variations calculated with respect to the most recent state of the spec collection
+     repeated Variation current_variations = 3;
 
-   // Stores the unique vocabs detected in a spec from the current computation. 
-   repeated string unique_terms = 5;
+     // past_variations are the variations calculated when the spec in consideration was created/last updated
+     repeated Variation past_variations = 4;
+
+     // Stores the unique vocabs detected in a spec from the current computation. 
+     repeated string unique_terms = 5;
 }

@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC. All Rights Reserved.
+// Copyright 2022 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,10 @@ package google.cloud.apigeeregistry.v1;
 import "google/api/field_behavior.proto";
 import "google/cloud/apigeeregistry/v1/word_group.proto";
 
+// ConsistencyReport stores vocabulary variations detected in a spec 
+// with respect to a collection of specs. Similar words detected by the clustering algorithm 
+// are stored stored in the Variation WordGroups while unique words detected are stored in unique_terms. 
+// Consistency report stores variations from the latest computation as well as from the current computation.
 message ConsistencyReport {
     string id = 1 [ (google.api.field_behavior) = REQUIRED ];
     string  kind = 2 [ (google.api.field_behavior) = REQUIRED ]; 
@@ -29,12 +33,16 @@ message ConsistencyReport {
         string term = 1 [ (google.api.field_behavior) = REQUIRED ];
         WordGroup cluster = 2 [ (google.api.field_behavior) = REQUIRED ]; 
    }
-   // Stores the variations detected in the current upload
+   // Stores the variations of a spec's vocabulary with respect to a collection of specs.
+   // All flavors of a vocab detected in the spec are grouped and stored here.
    repeated Variation current_variations = 3;
 
-   // Stores a snapshot of the variations detected in the last upload. 
+   // Stores the variations of a spec's vocabulary with respect to a collection of specs 
+   // from the last computation.
+   // All flavors of a vocab detected in the spec are grouped and stored here.
+   // past_variations is a copy of the last current_variations. 
    repeated Variation past_variations = 4;
 
-   // Stores the unique terms in the current upload
+   // Stores the unique vocabs detected in a spec from the current computation. 
    repeated string unique_terms = 5;
 }

@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC. All Rights Reserved.
+// Copyright 2022 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@ syntax = "proto3";
 
 package google.cloud.apigeeregistry.v1;
 import "google/api/field_behavior.proto";
+
+// WordGroup stores the group of words detected by the clustering algorithm to be similar. 
+// The most frequent or alphabetically the first word is used to ID the entire group. 
 message WordGroup {
     string id = 1 [ (google.api.field_behavior) = REQUIRED ];
     string kind = 2 [ (google.api.field_behavior) = REQUIRED ];

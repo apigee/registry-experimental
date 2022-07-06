@@ -17,7 +17,7 @@
 
 syntax = "proto3";
 
-package google.cloud.apigeeregistry.v1;
+package google.cloud.apigeeregistry.applications.v1alpha1.consistency;
 import "google/api/field_behavior.proto";
 
 // WordGroup stores the group of words detected by the clustering algorithm to be similar. 

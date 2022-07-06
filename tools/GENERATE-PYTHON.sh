@@ -30,8 +30,7 @@ ALL_PROTOS=(
 	$REGISTRY_PROTOS_PATH/google/cloud/apigeeregistry/v1/apihub/*.proto
 	$REGISTRY_PROTOS_PATH/google/cloud/apigeeregistry/v1/scoring/*.proto
 	$GNOSTIC_PROTOS_PATH/metrics/*.proto
-	google/cloud/apigeeregistry/v1/*.proto
-
+	google/cloud/apigeeregistry/applications/v1alpha1/consistency/*.proto
 )
 SERVICE_PROTOS=(
 	$REGISTRY_PROTOS_PATH/google/cloud/apigeeregistry/v1/registry_models.proto

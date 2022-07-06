@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-// Stores words labeled into the same group
+// Stores words labeled into the same group.
 
 syntax = "proto3";
 

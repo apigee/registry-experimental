@@ -126,13 +126,13 @@ def main():
         vocab = vocabulary_pb2.Vocabulary()
         vocab.ParseFromString(contents.data)
         for entry in vocab.schemas:
-            print(f'Word: "{entry.word}" frequency: {entry.count}')
+            print(f'{entry.word} {entry.count}')
         for entry in vocab.properties:
-            print(f'Word: "{entry.word}" frequency: {entry.count}')
+            print(f'{entry.word} {entry.count}')
         for entry in vocab.operations:
-            print(f'Word: "{entry.word}" frequency: {entry.count}')
+            print(f'{entry.word} {entry.count}')
         for entry in vocab.parameters:
-            print(f'Word: "{entry.word}" frequency: {entry.count}')
+            print(f'{entry.word} {entry.count}')
 
 if __name__ == "__main__":
     main()

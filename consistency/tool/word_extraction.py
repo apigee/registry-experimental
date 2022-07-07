@@ -1,13 +1,13 @@
+from urllib import response
 import grpc
 from google.cloud.apigeeregistry.v1 import registry_service_pb2
 from metrics import vocabulary_pb2
 class ExtractWords:
-  def __init__(self, stub, linearize=True):
+    def __init__(self, stub, linearize=True):
       self.stub = stub
       self.linearize = linearize
-  def extract_words(self):
+    def extract_vocabs(self):
       stub = self.stub
-      linearize = self.linearize
       try:
           response = stub.ListArtifacts(
               registry_service_pb2.ListArtifactsRequest(
@@ -16,9 +16,10 @@ class ExtractWords:
               ))
       except grpc.RpcError as rpc_error:
           print(f"Received RPC error: code={rpc_error.code()} message={rpc_error.details()}") 
-          
-      words = [] if linearize else {}
- 
+
+      vocabs = []
+    
+     
       for artifact in response.artifacts:
           contents = stub.GetArtifactContents(
               registry_service_pb2.GetArtifactContentsRequest(
@@ -26,26 +27,33 @@ class ExtractWords:
               )
           )
           vocab = vocabulary_pb2.Vocabulary()
-          vocab.ParseFromString(contents.data)
- 
-          # Linearize all words into a list
-          if linearize:
-              for entry in vocab.schemas:
-                  for _ in range(entry.count):
-                      words.append(entry.word)
-              for entry in vocab.properties:
-                  for _ in range(entry.count):
-                      words.append(entry.word)
-              for entry in vocab.operations:
-                  for _ in range(entry.count):
-                      words.append(entry.word)
-              for entry in vocab.parameters:
-                  for _ in range(entry.count):
-                      words.append(entry.word)
-              return words
+          vocabs.append(vocab.ParseFromString(contents.data))
+
+      return vocabs
+    def get_vocabs(self):
+        vocabs = self.extract_vocabs(self)
+
+        words = [] if self.linearize else {}
+          
+        if self.linearize:
+            for vocab in vocabs:   
+                for entry in vocab.schemas:
+                    for _ in range(entry.count):
+                        words.append(entry.word)
+                for entry in vocab.properties:
+                    for _ in range(entry.count):
+                        words.append(entry.word)
+                for entry in vocab.operations:
+                    for _ in range(entry.count):
+                        words.append(entry.word)
+                for entry in vocab.parameters:
+                    for _ in range(entry.count):
+                        words.append(entry.word)
+            return words
  
           # Put words in a map of frequencies.  
-          else:
+        else:
+            for vocab in vocabs:
               for entry in vocab.schemas:
                   word = entry.word
                   count= entry.count
@@ -70,6 +78,6 @@ class ExtractWords:
                   if word not in words:
                       words[word] = 0
                   words[word] += count
-              return words
+            return words
  
 

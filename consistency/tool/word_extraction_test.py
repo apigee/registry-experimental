@@ -1,8 +1,10 @@
 import unittest
-import word_extracting
+import word_extraction
 class TestWordExtracting(unittest.TestCase):
- 
-   extractor = word_extracting.ExtractWords()
+    
+
+   stub = "stub"
+   extractor = word_extraction.ExtractWords(stub)
    def test_upper(self):
        self.assertEqual('foo'.upper(), 'FOO')
  

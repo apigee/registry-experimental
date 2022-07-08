@@ -1,0 +1,47 @@
+{
+  "test_data": [ 
+	
+   { 
+        "id":"simple", 
+        "schemas": ["ab", "bc", "cd", "ab"],
+        "properties" : ["ab", "bc", "cd", "ab"],
+        "operations" : ["ab", "bc", "cd", "ab"],
+        "parameters":  ["ab", "bc", "cd", "ab"]
+     }, 
+
+   { 
+      "id":"1empty", 
+      "schemas": [],
+      "properties" : ["ab", "bc", "cd", "ab"],
+      "operations" : ["ab", "bc", "cd", "ab"],
+      "parameters":  ["ab", "bc", "cd", "ab"]
+   }, 
+
+   { 
+      "id":"2empty", 
+      "schemas": [],
+      "properties" : ["ab", "bc", "cd", "ab"],
+      "operations" : [],
+      "parameters":  ["ab", "bc", "cd", "ab"]
+   }, 
+
+   { 
+      "id":"allempty", 
+      "schemas": [],
+      "properties" : [],
+      "operations" : [],
+      "parameters":  []
+   }, 
+
+   { 
+      "id":"simple", 
+      "schemas": ["ab", "bc", "cd", "ab"],
+      "properties" : ["ab", "bc", "cd", "ab"],
+      "operations" : ["ab", "bc", "cd", "ab"],
+      "parameters":  ["ab", "bc", "cd", "ab"]
+   }
+    
+
+
+  ]   
+}

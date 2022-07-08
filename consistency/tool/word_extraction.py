@@ -2,10 +2,13 @@ from urllib import response
 import grpc
 from google.cloud.apigeeregistry.v1 import registry_service_pb2
 from metrics import vocabulary_pb2
+
 class ExtractWords:
     def __init__(self, stub, linearize=True):
       self.stub = stub
       self.linearize = linearize
+
+
     def extract_vocabs(self):
       stub = self.stub
       try:
@@ -30,6 +33,8 @@ class ExtractWords:
           vocabs.append(vocab.ParseFromString(contents.data))
 
       return vocabs
+
+
     def get_vocabs(self):
         vocabs = self.extract_vocabs(self)
 
@@ -78,6 +83,8 @@ class ExtractWords:
                   if word not in words:
                       words[word] = 0
                   words[word] += count
+
+                  
             return words
  
 

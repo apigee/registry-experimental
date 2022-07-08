@@ -30,6 +30,7 @@ ALL_PROTOS=(
 	$REGISTRY_PROTOS_PATH/google/cloud/apigeeregistry/v1/apihub/*.proto
 	$REGISTRY_PROTOS_PATH/google/cloud/apigeeregistry/v1/scoring/*.proto
 	$GNOSTIC_PROTOS_PATH/metrics/*.proto
+	google/cloud/apigeeregistry/applications/v1alpha1/consistency/*.proto
 )
 SERVICE_PROTOS=(
 	$REGISTRY_PROTOS_PATH/google/cloud/apigeeregistry/v1/registry_models.proto
@@ -43,6 +44,6 @@ PYTHON_TYPES_PATH='consistency/rpc'
 # # Generating grpc clients 
 pip install grpcio-tools
 echo "Generating gRPC client for ${ALL_PROTOS[*]}"
-python -m grpc_tools.protoc --proto_path=$REGISTRY_PROTOS_PATH --proto_path=$COMMON_PROTOS_PATH --proto_path=$GNOSTIC_PROTOS_PATH --python_out=$PYTHON_TYPES_PATH --grpc_python_out=$PYTHON_TYPES_PATH ${ALL_PROTOS[*]}
+python -m grpc_tools.protoc --proto_path=$REGISTRY_PROTOS_PATH --proto_path=. --proto_path=$COMMON_PROTOS_PATH --proto_path=$GNOSTIC_PROTOS_PATH --python_out=$PYTHON_TYPES_PATH --grpc_python_out=$PYTHON_TYPES_PATH ${ALL_PROTOS[*]}
 
 pip install consistency/rpc

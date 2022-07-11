@@ -13,9 +13,10 @@ _sym_db = _symbol_database.Default()
 
 
 from google.api import field_behavior_pb2 as google_dot_api_dot_field__behavior__pb2
+from google.protobuf import duration_pb2 as google_dot_protobuf_dot_duration__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n8google/cloud/apigeeregistry/v1/controller/manifest.proto\x12)google.cloud.apigeeregistry.v1.controller\x1a\x1fgoogle/api/field_behavior.proto\"\xaf\x01\n\x08Manifest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04kind\x18\x02 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x03 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x04 \x01(\t\x12^\n\x13generated_resources\x18\x05 \x03(\x0b\x32<.google.cloud.apigeeregistry.v1.controller.GeneratedResourceB\x03\xe0\x41\x02\"\xac\x01\n\x11GeneratedResource\x12\x14\n\x07pattern\x18\x01 \x01(\tB\x03\xe0\x41\x02\x12\x0e\n\x06\x66ilter\x18\x02 \x01(\t\x12\x0f\n\x07receipt\x18\x03 \x01(\x08\x12K\n\x0c\x64\x65pendencies\x18\x04 \x03(\x0b\x32\x35.google.cloud.apigeeregistry.v1.controller.Dependency\x12\x13\n\x06\x61\x63tion\x18\x05 \x01(\tB\x03\xe0\x41\x02\"2\n\nDependency\x12\x14\n\x07pattern\x18\x01 \x01(\tB\x03\xe0\x41\x02\x12\x0e\n\x06\x66ilter\x18\x02 \x01(\tBn\n-com.google.cloud.apigeeregistry.v1.controllerB\x17\x43ontrollerManifestProtoP\x01Z\"github.com/apigee/registry/rpc;rpcb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n8google/cloud/apigeeregistry/v1/controller/manifest.proto\x12)google.cloud.apigeeregistry.v1.controller\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1egoogle/protobuf/duration.proto\"\xaf\x01\n\x08Manifest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04kind\x18\x02 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x03 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x04 \x01(\t\x12^\n\x13generated_resources\x18\x05 \x03(\x0b\x32<.google.cloud.apigeeregistry.v1.controller.GeneratedResourceB\x03\xe0\x41\x02\"\xd8\x01\n\x11GeneratedResource\x12\x14\n\x07pattern\x18\x01 \x01(\tB\x03\xe0\x41\x02\x12\x0e\n\x06\x66ilter\x18\x02 \x01(\t\x12\x0f\n\x07receipt\x18\x03 \x01(\x08\x12K\n\x0c\x64\x65pendencies\x18\x04 \x03(\x0b\x32\x35.google.cloud.apigeeregistry.v1.controller.Dependency\x12\x13\n\x06\x61\x63tion\x18\x05 \x01(\tB\x03\xe0\x41\x02\x12*\n\x07refresh\x18\x06 \x01(\x0b\x32\x19.google.protobuf.Duration\"2\n\nDependency\x12\x14\n\x07pattern\x18\x01 \x01(\tB\x03\xe0\x41\x02\x12\x0e\n\x06\x66ilter\x18\x02 \x01(\tBn\n-com.google.cloud.apigeeregistry.v1.controllerB\x17\x43ontrollerManifestProtoP\x01Z\"github.com/apigee/registry/rpc;rpcb\x06proto3')
 
 
 
@@ -55,10 +56,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _GENERATEDRESOURCE.fields_by_name['action']._serialized_options = b'\340A\002'
   _DEPENDENCY.fields_by_name['pattern']._options = None
   _DEPENDENCY.fields_by_name['pattern']._serialized_options = b'\340A\002'
-  _MANIFEST._serialized_start=137
-  _MANIFEST._serialized_end=312
-  _GENERATEDRESOURCE._serialized_start=315
-  _GENERATEDRESOURCE._serialized_end=487
-  _DEPENDENCY._serialized_start=489
-  _DEPENDENCY._serialized_end=539
+  _MANIFEST._serialized_start=169
+  _MANIFEST._serialized_end=344
+  _GENERATEDRESOURCE._serialized_start=347
+  _GENERATEDRESOURCE._serialized_end=563
+  _DEPENDENCY._serialized_start=565
+  _DEPENDENCY._serialized_end=615
 # @@protoc_insertion_point(module_scope)

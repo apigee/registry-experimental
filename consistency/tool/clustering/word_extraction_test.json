@@ -2,46 +2,12 @@
   "test_data": [ 
 	
    { 
-        "id":"simple", 
-        "schemas": ["ab", "bc", "cd", "ab"],
-        "properties" : ["ab", "bc", "cd", "ab"],
-        "operations" : ["ab", "bc", "cd", "ab"],
-        "parameters":  ["ab", "bc", "cd", "ab"]
-     }, 
-
-   { 
-      "id":"1empty", 
-      "schemas": [],
-      "properties" : ["ab", "bc", "cd", "ab"],
-      "operations" : ["ab", "bc", "cd", "ab"],
-      "parameters":  ["ab", "bc", "cd", "ab"]
-   }, 
-
-   { 
-      "id":"2empty", 
-      "schemas": [],
-      "properties" : ["ab", "bc", "cd", "ab"],
-      "operations" : [],
-      "parameters":  ["ab", "bc", "cd", "ab"]
-   }, 
-
-   { 
-      "id":"allempty", 
-      "schemas": [],
-      "properties" : [],
-      "operations" : [],
-      "parameters":  []
-   }, 
-
-   { 
-      "id":"simple", 
-      "schemas": ["ab", "bc", "cd", "ab"],
-      "properties" : ["ab", "bc", "cd", "ab"],
-      "operations" : ["ab", "bc", "cd", "ab"],
-      "parameters":  ["ab", "bc", "cd", "ab"]
-   }
+        "name":"simple", 
+        "schemas": [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+        "properties" : [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+        "operations" : [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+        "parameters":  [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ]
+     }
     
-
-
   ]   
 }

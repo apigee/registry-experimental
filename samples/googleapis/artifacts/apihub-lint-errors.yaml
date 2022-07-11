@@ -5,6 +5,8 @@ metadata:
 data:
   display_name: "Lint Errors"
   description: "Number of lint errors found in conformance report"
+  uri: "https://meta.stoplight.io/docs/spectral/4dec24461f3af-open-api-rules"
+  uri_display_name: "Spectral rules"
   target_resource:
     pattern: "apis/-/versions/-/specs/-"
   score_formula:

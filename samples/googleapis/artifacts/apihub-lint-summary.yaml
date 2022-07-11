@@ -10,3 +10,5 @@ data:
   score_patterns:
   - $resource.spec/artifacts/score-lint-errors
   - $resource.spec/artifacts/score-lint-warnings
+  - $resource.spec/artifacts/score-lint-error-percentage
+  - $resource.spec/artifacts/score-lint-errors-exist

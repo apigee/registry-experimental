@@ -12,7 +12,7 @@ class TestExtractWords(unittest.TestCase):
         ('test1', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*2), 
         ('test2', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*3 )
     ])
-    
+
     @patch.object(ExtractWords, 'extract_vocabs')
     def test_vocab(self, name, expected, mock_extract_vocabs):
         # PATCH
@@ -29,11 +29,9 @@ class TestExtractWords(unittest.TestCase):
         #CALL
         extrct = ExtractWords(stub = "stub")
         actual = extrct.get_vocabs()
-        actual.sort()
  
         # ASSERT
-        expected.sort()
-        self.assertEqual(actual, expected)
+        self.assertListEqual(actual, expected)
  
 if __name__ == '__main__':
     unittest.main()

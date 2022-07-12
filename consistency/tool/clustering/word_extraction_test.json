@@ -1,5 +1,6 @@
 {
-  "simple": [ 
+
+  "test1": [ 
 	
    { 
         "name":"artifact1", 
@@ -7,7 +8,15 @@
         "properties" : [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
         "operations" : [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
         "parameters":  [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ]
-     }
+     }, 
+
+     { 
+      "name":"artifact2", 
+      "schemas":     [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+      "properties" : [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+      "operations" : [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+      "parameters":  [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ]
+   }
     
   ]
 }

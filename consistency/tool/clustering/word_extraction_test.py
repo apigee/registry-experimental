@@ -9,8 +9,7 @@ from parameterized import parameterized
 class TestExtractWords(unittest.TestCase):
  
     @parameterized.expand([
-        ('test1', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*2), 
-        ('test2', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*3 )
+        ('test1', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*2)
     ])
 
     @patch.object(ExtractWords, 'extract_vocabs')

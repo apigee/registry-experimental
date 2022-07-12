@@ -16,15 +16,15 @@ class TestExtractWords(unittest.TestCase):
             data=myfile.read()
 
         # parse file
+        ids = []
         obj = json.loads(data)
-        for i in range(len(obj['test_data'])):
+        for key, value in obj.items():
+            ids.append(key)
             vocab = vocabulary_pb2.Vocabulary()
-            fake_artifact_json = obj['test_data'][i]
-            fake_artifact_vocab = ParseDict(fake_artifact_json, vocab)
-            vocabs.append(fake_artifact_vocab)
-
+            fake_vocab = ParseDict(value[0], vocab)
+            vocabs.append(fake_vocab)
         return vocabs
-    
+
     @patch.object(ExtractWords, 'extract_vocabs')
     def test_fake_vocabs(self, mock_extract_vocabs):
 
@@ -48,4 +48,4 @@ class TestExtractWords(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main() 

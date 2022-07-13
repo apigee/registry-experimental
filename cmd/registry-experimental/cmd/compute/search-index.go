@@ -20,8 +20,8 @@ import (
 	"sync"
 
 	"github.com/apigee/registry/cmd/registry/core"
-	"github.com/apigee/registry/connection"
 	"github.com/apigee/registry/log"
+	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/rpc"
 	"github.com/apigee/registry/server/registry/names"
 	"github.com/blevesearch/bleve"
@@ -56,11 +56,12 @@ func searchIndexCommand(ctx context.Context) *cobra.Command {
 			// Generate tasks.
 			name := args[0]
 			if spec, err := names.ParseSpec(name); err == nil {
-				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) {
+				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) error {
 					taskQueue <- &indexSpecTask{
 						client:   client,
 						specName: spec.Name,
 					}
+					return nil
 				})
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Fatal("Failed to list specs")
@@ -73,7 +74,7 @@ func searchIndexCommand(ctx context.Context) *cobra.Command {
 }
 
 type indexSpecTask struct {
-	client   connection.Client
+	client   connection.RegistryClient
 	specName string
 }
 

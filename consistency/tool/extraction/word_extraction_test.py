@@ -9,7 +9,12 @@ from parameterized import parameterized
 class TestExtractWords(unittest.TestCase):
  
     @parameterized.expand([
-        ('test1', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*2)
+        ('test1', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*2),
+        ('test2', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]),
+        ('test3', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]),
+        ('test4', []), 
+        ('test5', [])
+
     ])
 
     @patch.object(ExtractWords, 'extract_vocabs')
@@ -30,7 +35,10 @@ class TestExtractWords(unittest.TestCase):
         actual = extrct.get_vocabs()
  
         # ASSERT
-        self.assertListEqual(actual, expected)
+        if type(actual) == list and type(expected) == list:
+            self.assertListEqual(actual, expected)
+        else:
+            self.assertEqual(actual, expected)
  
 if __name__ == '__main__':
     unittest.main()

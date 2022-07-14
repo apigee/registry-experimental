@@ -18,5 +18,55 @@
       "parameters":  [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ]
    }
     
-  ]
+  ], 
+
+  "test2": [ 
+	
+    { 
+         "name":"artifact1", 
+         "schemas":     [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+         "properties" : [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+         "operations" : [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+         "parameters":  [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ]
+      }
+
+     
+   ],
+   "test3": [ 
+	
+    { 
+         "name":"artifact1", 
+         "schemas":     [],
+         "properties" : [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+         "operations" : [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ],
+         "parameters":  [{"word": "ab", "count":2}, {"word": "bc", "count":1},{"word": "cd", "count":1} ]
+      }
+
+     
+   ],
+   "test4": [ 
+	
+    { 
+         "name":"artifact1", 
+         "schemas":     [],
+         "properties" : [],
+         "operations" : [],
+         "parameters":  []
+      }
+
+     
+   ],
+   "test5": [ 
+	
+    { 
+         "name":"artifact1", 
+         "schemas":     null,
+         "properties" : null,
+         "operations" : null,
+         "parameters":  null
+      }
+
+     
+   ]
+   
 }

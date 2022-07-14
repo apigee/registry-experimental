@@ -18,8 +18,8 @@ import (
 	"context"
 
 	"github.com/apigee/registry/cmd/registry/core"
-	"github.com/apigee/registry/connection"
 	"github.com/apigee/registry/log"
+	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
 )
@@ -62,7 +62,7 @@ const (
 )
 
 type deleteResourceTask struct {
-	client connection.Client
+	client connection.RegistryClient
 	name   string
 	kind   ResourceKind
 }
@@ -98,7 +98,7 @@ func (task *deleteResourceTask) Run(ctx context.Context) error {
 	return nil
 }
 
-func wipeoutProject(ctx context.Context, registryClient connection.Client, taskQueue chan<- core.Task, project string) {
+func wipeoutProject(ctx context.Context, registryClient connection.RegistryClient, taskQueue chan<- core.Task, project string) {
 	wipeoutArtifacts(ctx, registryClient, taskQueue, project+"/apis/-/versions/-/specs/-")
 	wipeoutArtifacts(ctx, registryClient, taskQueue, project+"/apis/-/versions/-")
 	wipeoutArtifacts(ctx, registryClient, taskQueue, project+"/apis/-/deployments/-")
@@ -111,7 +111,7 @@ func wipeoutProject(ctx context.Context, registryClient connection.Client, taskQ
 	wipeoutApis(ctx, registryClient, taskQueue, project)
 }
 
-func wipeoutArtifacts(ctx context.Context, registryClient connection.Client, taskQueue chan<- core.Task, parent string) {
+func wipeoutArtifacts(ctx context.Context, registryClient connection.RegistryClient, taskQueue chan<- core.Task, parent string) {
 	it := registryClient.ListArtifacts(ctx, &rpc.ListArtifactsRequest{Parent: parent})
 	for artifact, err := it.Next(); err == nil; artifact, err = it.Next() {
 		taskQueue <- &deleteResourceTask{
@@ -122,7 +122,7 @@ func wipeoutArtifacts(ctx context.Context, registryClient connection.Client, tas
 	}
 }
 
-func wipeoutApiDeployments(ctx context.Context, registryClient connection.Client, taskQueue chan<- core.Task, parent string) {
+func wipeoutApiDeployments(ctx context.Context, registryClient connection.RegistryClient, taskQueue chan<- core.Task, parent string) {
 	it := registryClient.ListApiDeployments(ctx, &rpc.ListApiDeploymentsRequest{Parent: parent})
 	for deployment, err := it.Next(); err == nil; deployment, err = it.Next() {
 		taskQueue <- &deleteResourceTask{
@@ -133,7 +133,7 @@ func wipeoutApiDeployments(ctx context.Context, registryClient connection.Client
 	}
 }
 
-func wipeoutApiSpecs(ctx context.Context, registryClient connection.Client, taskQueue chan<- core.Task, parent string) {
+func wipeoutApiSpecs(ctx context.Context, registryClient connection.RegistryClient, taskQueue chan<- core.Task, parent string) {
 	it := registryClient.ListApiSpecs(ctx, &rpc.ListApiSpecsRequest{Parent: parent})
 	for spec, err := it.Next(); err == nil; spec, err = it.Next() {
 		taskQueue <- &deleteResourceTask{
@@ -144,7 +144,7 @@ func wipeoutApiSpecs(ctx context.Context, registryClient connection.Client, task
 	}
 }
 
-func wipeoutApiVersions(ctx context.Context, registryClient connection.Client, taskQueue chan<- core.Task, parent string) {
+func wipeoutApiVersions(ctx context.Context, registryClient connection.RegistryClient, taskQueue chan<- core.Task, parent string) {
 	it := registryClient.ListApiVersions(ctx, &rpc.ListApiVersionsRequest{Parent: parent})
 	for version, err := it.Next(); err == nil; version, err = it.Next() {
 		taskQueue <- &deleteResourceTask{
@@ -155,7 +155,7 @@ func wipeoutApiVersions(ctx context.Context, registryClient connection.Client, t
 	}
 }
 
-func wipeoutApis(ctx context.Context, registryClient connection.Client, taskQueue chan<- core.Task, parent string) {
+func wipeoutApis(ctx context.Context, registryClient connection.RegistryClient, taskQueue chan<- core.Task, parent string) {
 	it := registryClient.ListApis(ctx, &rpc.ListApisRequest{Parent: parent})
 	for api, err := it.Next(); err == nil; api, err = it.Next() {
 		taskQueue <- &deleteResourceTask{

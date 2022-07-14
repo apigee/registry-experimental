@@ -17,7 +17,7 @@ package graphql
 import (
 	"errors"
 
-	"github.com/apigee/registry/connection"
+	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/rpc"
 	"github.com/graphql-go/graphql"
 )

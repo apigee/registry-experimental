@@ -30,7 +30,7 @@ class ExtractWords:
             try:
                 vocabs.append(vocab.ParseFromString(contents.data))
             except Exception as e:
-                print(e, " Parsing contents for", artifact.name, "failed")
+                print(e, " Parsing contents for ", artifact.name, "failed")
                 continue
 
         if len(vocabs) < 1:

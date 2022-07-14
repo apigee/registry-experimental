@@ -30,8 +30,8 @@ class ExtractWords:
 
             try:
                 vocabs.append(vocab.ParseFromString(contents.data))
-            except contents.data.DecodeError:
-                print("Parsing failed ", failures, "times!")
+            except Exception as e:
+                print(e, " Parsing failed ", failures, "times!")
                 failures +=1
                 continue
 
@@ -45,7 +45,7 @@ class ExtractWords:
         vocabs = self.extract_vocabs(self)
         if vocabs is None:
              return None
-             
+
         words = []
         for vocab in vocabs:   
             for entry in vocab.schemas:

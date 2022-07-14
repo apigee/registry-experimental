@@ -19,8 +19,8 @@ import (
 	"fmt"
 
 	"github.com/apigee/registry/cmd/registry/core"
-	"github.com/apigee/registry/connection"
 	"github.com/apigee/registry/log"
+	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/rpc"
 	"github.com/apigee/registry/server/registry/names"
 	"github.com/spf13/cobra"
@@ -49,11 +49,12 @@ func indexCommand(ctx context.Context) *cobra.Command {
 			name := args[0]
 			if spec, err := names.ParseSpec(name); err == nil {
 				// Iterate through a collection of specs and summarize each.
-				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) {
+				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) error {
 					taskQueue <- &computeIndexTask{
 						client:   client,
 						specName: spec.Name,
 					}
+					return nil
 				})
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Fatal("Failed to list specs")
@@ -64,7 +65,7 @@ func indexCommand(ctx context.Context) *cobra.Command {
 }
 
 type computeIndexTask struct {
-	client   connection.Client
+	client   connection.RegistryClient
 	specName string
 }
 

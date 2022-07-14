@@ -9,11 +9,13 @@ from parameterized import parameterized
 class TestExtractWords(unittest.TestCase):
  
     @parameterized.expand([
-        ('test1', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*2),
-        ('test2', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]),
-        ('test3', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]),
-        ('test4', []), 
-        ('test5', [])
+        ('simple-multiple-artifacts', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*2),
+        ('simple-one-artifact', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]),
+        ('empty-schema', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]),
+        ('empty-artifact', []), 
+        ('null-artifact', []), 
+        ('no-return-values', [])
+
 
     ])
 
@@ -35,10 +37,7 @@ class TestExtractWords(unittest.TestCase):
         actual = extrct.get_vocabs()
  
         # ASSERT
-        if type(actual) == list and type(expected) == list:
-            self.assertListEqual(actual, expected)
-        else:
-            self.assertEqual(actual, expected)
+        self.assertListEqual(actual, expected)
  
 if __name__ == '__main__':
     unittest.main()

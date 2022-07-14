@@ -1,6 +1,6 @@
 {
 
-  "test1": [ 
+  "simple-multiple-artifacts": [ 
 	
    { 
         "name":"artifact1", 
@@ -20,7 +20,7 @@
     
   ], 
 
-  "test2": [ 
+  "simple-one-artifact": [ 
 	
     { 
          "name":"artifact1", 
@@ -32,7 +32,7 @@
 
      
    ],
-   "test3": [ 
+   "empty-schema": [ 
 	
     { 
          "name":"artifact1", 
@@ -44,7 +44,7 @@
 
      
    ],
-   "test4": [ 
+   "empty-artifact": [ 
 	
     { 
          "name":"artifact1", 
@@ -56,7 +56,7 @@
 
      
    ],
-   "test5": [ 
+   "null-artifact": [ 
 	
     { 
          "name":"artifact1", 
@@ -67,6 +67,14 @@
       }
 
      
-   ]
+   ], 
+   "no-return-values": [ 
+	
+      { 
+        }
+  
+       
+     ]
+
    
 }

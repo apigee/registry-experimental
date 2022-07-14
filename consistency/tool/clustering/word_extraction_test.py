@@ -9,7 +9,13 @@ from parameterized import parameterized
 class TestExtractWords(unittest.TestCase):
  
     @parameterized.expand([
-        ('test1', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*2)
+        ('simple-multiple-artifacts', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]*2),
+        ('simple-one-artifact', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]),
+        ('empty-schema', ["ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd", "ab", "ab", "bc", "cd"]),
+        ('empty-artifact', []), 
+        ('null-artifact', []), 
+        ('no-return-values', [])
+
     ])
 
     @patch.object(ExtractWords, 'extract_vocabs')
@@ -31,6 +37,26 @@ class TestExtractWords(unittest.TestCase):
  
         # ASSERT
         self.assertListEqual(actual, expected)
+
+    @parameterized.expand([
+        ('simple-None-test', None)
+    ])
+    @patch.object(ExtractWords, 'extract_vocabs')
+    def test_vocab_none(self, name, expected, mock_extract_vocabs):
+
+        # PATCH
+        # Construct mock_response
+        mock_response = None
+        mock_extract_vocabs.return_value = mock_response
+ 
+        #CALL
+        extrct = ExtractWords(stub = "stub")
+        actual = extrct.get_vocabs()
+ 
+        # ASSERT
+        self.assertEqual(actual, expected)
+
+    
  
 if __name__ == '__main__':
     unittest.main()

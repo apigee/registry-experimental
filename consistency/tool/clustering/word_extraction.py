@@ -15,11 +15,10 @@ class ExtractWords:
                     filter="name.contains(\"vocabulary\")"
                 ))
         except grpc.RpcError as rpc_error:
-            print(f"Received RPC error: code={rpc_error.code()} message={rpc_error.details()}") 
+            print(f"Failed to fetch vocabulary artifacts, RPC error: code={rpc_error.code()} message={rpc_error.details()}") 
             return None
 
         vocabs = []
-        failures = 0
         for artifact in response.artifacts:
             contents = stub.GetArtifactContents(
                 registry_service_pb2.GetArtifactContentsRequest(
@@ -31,15 +30,13 @@ class ExtractWords:
             try:
                 vocabs.append(vocab.ParseFromString(contents.data))
             except Exception as e:
-                print(e, " Parsing failed ", failures, "times!")
-                failures +=1
+                print(e, " Parsing contents for", artifact.name, "failed")
                 continue
 
         if len(vocabs) < 1:
             return None
 
         return vocabs
-
 
     def get_vocabs(self):
         vocabs = self.extract_vocabs(self)

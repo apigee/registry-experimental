@@ -68,8 +68,6 @@
 
      
    ], 
-   "no-return-values": [ 
-       
-     ]
+   "no-return-values": []
    
 }

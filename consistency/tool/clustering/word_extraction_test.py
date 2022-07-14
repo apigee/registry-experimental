@@ -16,7 +16,6 @@ class TestExtractWords(unittest.TestCase):
         ('null-artifact', []), 
         ('no-return-values', [])
 
-
     ])
 
     @patch.object(ExtractWords, 'extract_vocabs')
@@ -38,6 +37,26 @@ class TestExtractWords(unittest.TestCase):
  
         # ASSERT
         self.assertListEqual(actual, expected)
+
+    @parameterized.expand([
+        ('simple-None-test', None)
+    ])
+    @patch.object(ExtractWords, 'extract_vocabs')
+    def test_vocab_none(self, name, expected, mock_extract_vocabs):
+
+        # PATCH
+        # Construct mock_response
+        mock_response = None
+        mock_extract_vocabs.return_value = mock_response
+ 
+        #CALL
+        extrct = ExtractWords(stub = "stub")
+        actual = extrct.get_vocabs()
+ 
+        # ASSERT
+        self.assertEqual(actual, expected)
+
+    
  
 if __name__ == '__main__':
     unittest.main()

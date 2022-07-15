@@ -20,11 +20,11 @@ class TestClusterWords(unittest.TestCase):
         # PATCH
         # Construct mock_response
         
-        mock_get_words.return_value = ['abandon', 'abandoning', 'Abort', 'abort', 'aborted', 'About', 'about', 'Above',
+        mock_get_words.return_value = ['abandon',  'abandoning', 'Abort', 'abort', 'aborted', 'About', 'about', 'Above',
                                         'Absence', 'Absent', 'absentee', 'Absolute', 'absolutely', 'Abstain', 'Abuse',
                                         'abusive', 'Accelerator', 'accelerator', 'accelerators', 'Accelerators',
                                         'accept', 'acceptable', 'Accepted', 'accepts', 'Access', 'access', 'Accessed',
-                                        'Accesses', 'Accessibility', 'a']
+                                        'Accesses', 'Accessibility', 'a' ]
  
         #CALL
         clustr = ClusterWords(stub = "stub")

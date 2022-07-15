@@ -7,3 +7,7 @@ consistency/gnostic-protos
 third_party
 .vscode/
 my_env/
+consistency/tool/clustering/clustering.py
+consistency/tool/clustering/__pycache__/
+consistency/rpc/google/cloud/apigeeregistry/applications/v1alpha1/consistency/__pycache__/
+consistency/tool/clustering/work (1).ipynb

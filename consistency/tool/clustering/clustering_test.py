@@ -19,11 +19,7 @@ class TestClusterWords(unittest.TestCase):
 
 
     @parameterized.expand([
-        (names[0],{'abandon': ['abandon', 'abandoning'], 'Abort': ['Abort', 'abort', 'aborted'], 
-        'About': ['About', 'about'], 'Above': ['Above', 'Abstain', 'Abuse', 'Accepted', 'Accessibility', 'absentee', 'abusive'],
-        'Absence': ['Absence', 'Absent'], 'Absolute': ['Absolute', 'absolutely'],
-        'Accelerator': ['Accelerator', 'Accelerators', 'accelerator', 'accelerators'],
-        'accept': ['accept', 'acceptable', 'accepts'], 'Access': ['Access', 'Accessed', 'Accesses', 'access']})
+        (names[0],expected_values[0])
     ])
 
     @patch.object(ClusterWords, 'get_words')

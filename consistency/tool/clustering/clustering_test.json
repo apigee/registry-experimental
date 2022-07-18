@@ -1,17 +1,28 @@
 {
-    "simple-clustering": 
-        { 
-           "words": ["abandon", "abandoning", "Abort", "abort", "aborted", "About", "about", "Above",
-            "Absence","Absent", "absentee", "Absolute", "absolutely", "Abstain", "Abuse",
-            "abusive", "Accelerator", "accelerator", "accelerators", "Accelerators",
-            "accept", "acceptable", "Accepted", "accepts", "Access", "access", "Accessed",
-            "Accesses", "Accessibility"], 
-           "clusters":{"abandon": ["abandon", "abandoning"], "Abort": ["Abort", "abort", "aborted"], 
-            "About": ["About", "about"], "Above": ["Above", "Abstain", "Abuse", "Accepted", "Accessibility", "absentee", "abusive"],
-            "Absence": ["Absence", "Absent"], "Absolute": ["Absolute", "absolutely"],
-            "Accelerator": ["Accelerator", "Accelerators", "accelerator", "accelerators"],
-            "accept": ["accept", "acceptable", "accepts"], "Access": ["Access", "Accessed", "Accesses", "access"]}
-        }
+    "clean-words": {
+        "simple-test": { 
+            "words": ["abandon", "abandoning", "Abort"], 
+            "cleaned-words": ["abandon", "abandoning", "Abort"]
+         }, 
+         "int-test": { 
+            "words": [44, "747424200409"], 
+            "cleaned-words": ["747424200409"]
+         },
+         "short-test": { 
+            "words": [1, "1"], 
+            "cleaned-words": []
+         }, 
+         "None-test": { 
+            "words": null, 
+            "cleaned-words": null
+         }, 
+         "dot-test": { 
+            "words": ["ab.cd", "."], 
+            "cleaned-words": []
+         }
 
-     
-  }
+    }
+
+
+
+  } 

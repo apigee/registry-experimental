@@ -1,5 +1,5 @@
 {
-    "simple-clustering": [ 
+    "simple-clustering": 
         { 
            "words": ["abandon", "abandoning", "Abort", "abort", "aborted", "About", "about", "Above",
             "Absence","Absent", "absentee", "Absolute", "absolutely", "Abstain", "Abuse",
@@ -12,6 +12,6 @@
             "Accelerator": ["Accelerator", "Accelerators", "accelerator", "accelerators"],
             "accept": ["accept", "acceptable", "accepts"], "Access": ["Access", "Accessed", "Accesses", "access"]}
         }
-     ]
+
      
   }

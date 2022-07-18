@@ -15,32 +15,27 @@ class TestClusterWords(unittest.TestCase):
 
     for name in obj:
         names.append(name)
-        expected_values.append(obj[name][0]["clusters"])
+        expected_values.append(obj[name]["clusters"])
 
-
-
-    @parameterized.expand([
-        (names[0],expected_values[0])
-    ])
+    @parameterized.expand(zip(names, expected_values))
 
     @patch.object(ClusterWords, 'get_words')
     def test_clustering(self, name, expected, mock_get_words):
 
         # PATCH
         # Construct mock_response
-        
-        mock_get_words.return_value = ["abandon", "abandoning", "Abort", "abort", "aborted", "About", "about", "Above",
-            "Absence","Absent", "absentee", "Absolute", "absolutely", "Abstain", "Abuse",
-            "abusive", "Accelerator", "accelerator", "accelerators", "Accelerators",
-            "accept", "acceptable", "Accepted", "accepts", "Access", "access", "Accessed",
-            "Accesses", "Accessibility"]
- 
+        ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+        with open(os.path.join(ROOT_DIR, 'clustering', 'clustering_test.json'), 'r') as myfile:
+                data=myfile.read()
+        obj = json.loads(data)
+    
+        mock_get_words.return_value = obj[name]["words"]
+
         #CALL
         clustr = ClusterWords(stub = "stub")
         actual = clustr.create_word_groups()
-        print(actual)
+
         # ASSERT
-        
         self.assertDictEqual(dict(sorted(actual.items())), dict(sorted(expected.items())))
  
  

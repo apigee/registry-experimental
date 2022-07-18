@@ -3,10 +3,11 @@ import json
 from mock import patch
 from parameterized import parameterized
 from clustering import ClusterWords
-
+import os
 class TestClusterWords(unittest.TestCase):
+    ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 
-    with open('/home/gelaw/work-stuff/gocode/src/registry-experimental/consistency/tool/clustering/clustering_test.json', 'r') as myfile:
+    with open(os.path.join(ROOT_DIR, 'clustering', 'clustering_test.json'), 'r') as myfile:
             data=myfile.read()
     obj = json.loads(data)
     names = []

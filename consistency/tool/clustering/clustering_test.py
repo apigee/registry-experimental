@@ -7,7 +7,7 @@ import os
 class TestClusterWords(unittest.TestCase):
 
     @parameterized.expand(["simple-test", "int-test", "short-test", "None-test", "dot-test"])
-    
+
     def test_clustering(self, name):
 
         # PATCH
@@ -20,11 +20,11 @@ class TestClusterWords(unittest.TestCase):
         expected = obj['clean-words'][name]["cleaned-words"]
         #CALL
         clustr = ClusterWords(stub = "stub", words=mock_words)
-        actual = clustr.clean_words()
+        clustr.clean_words()
 
         # ASSERT
-        self.assertEqual(actual,  expected)
- 
- 
+        self.assertEqual(clustr.words,  expected)
+
+
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main() 

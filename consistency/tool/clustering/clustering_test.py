@@ -13,7 +13,7 @@ class TestClusterWords(unittest.TestCase):
         # PATCH
         # Construct mock_response
         ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
-        with open(os.path.join(ROOT_DIR, 'clustering', 'clustering_test.json'), 'r') as myfile:
+        with open('clustering_test.json', 'r') as myfile:
                 data=myfile.read()
         obj = json.loads(data)
         mock_words  = obj['clean-words'][name]["words"]

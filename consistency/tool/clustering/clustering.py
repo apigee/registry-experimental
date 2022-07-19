@@ -1,5 +1,3 @@
-
-from cmath import nan
 import numpy as np
 import pandas as pd
 from sklearn.cluster import dbscan

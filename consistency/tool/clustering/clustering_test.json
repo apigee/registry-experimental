@@ -23,11 +23,11 @@
 
     }, 
     "cluster-words": {
-      "warning-test1": { 
+      "less-than-3-words": { 
           "words": ["abandon", "abandoning"], 
           "clustered-words": null
        }, 
-       "warning-test2": { 
+       "null-words": { 
          "words": null, 
          "clustered-words": null
       }, 

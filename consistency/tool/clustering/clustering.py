@@ -43,16 +43,55 @@ class ClusterWords:
         data = np.arange(len(self.words)).reshape(-1, 1)
     
         try:
-            db = dbscan(data, metric=extract_indices_dice, eps=0.3, min_samples=2, algorithm='brute')
+            _, labels = dbscan(data, metric=extract_indices_dice, eps=0.3, min_samples=2, algorithm='brute')
         except Exception as e:
             print(e, " Word Clustering Failed!")
             return None
     
         #if all labels are -1, DBSCAN detected no possible clusters. 
-        if np.count_nonzero(db[1] == -1) == db[1].size:
+        if np.count_nonzero(labels == -1) == labels.size:
             warnings.warn("There were no clusters detected. All words are unique.")
     
-        return db[1]
+        return labels
+
+    def create_word_groups(self):
+        
+        labels = self.cluster()
+
+        if labels == None or labels.size == 0:
+            return None
+
+        _word_groups  = {}
+        for j in range(len(self.words)):
+            word_label = labels[j]
+    
+            if word_label in _word_groups:
+                _word_groups[word_label].append(self.words[j])
+                        
+            else:
+                _word_groups[word_label] = [self.words[j]]
+
+        word_groups = {}
+        def find_clusterID(similar_list):
+            if len(similar_list) == 0 or similar_list == None:
+                return None
+            counts = Counter(similar_list)
+            max_count = counts.most_common(1)[0][1]
+            most_freq_words = [value for value, count in counts.most_common() if count == max_count]
+            most_freq_words.sort() 
+            return most_freq_words[0]  
+
+        for k in _word_groups.keys():
+            if k == -1:
+                word_groups["NOISE_WORDS"] = _word_groups[k]
+            similar_words = _word_groups[k]
+            id = find_clusterID(similar_words)
+            word_groups[id] = similar_words
+
+            _word_groups.clear()
+            return word_groups
+
+
 
 
 

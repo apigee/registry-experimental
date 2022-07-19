@@ -24,7 +24,7 @@ class TestClusterWords(unittest.TestCase):
         self.assertEqual(clustr.words,  expected)
 
     #Simple Assertions test
-    @parameterized.expand(["warning-test1", "warning-test2"])
+    @parameterized.expand(["less-than-3-words",  "null-words"])
     def test_cluster_assertions(self, name):
 
         # PATCH
@@ -56,6 +56,7 @@ class TestClusterWords(unittest.TestCase):
         #CALL
         clustr = ClusterWords(stub= "stub", words=mock_words)
         labels = clustr.cluster()
+        print(labels)
         expected_labels = obj['cluster-words'][name]["labels"]
 
         #ASSERT

@@ -5,25 +5,26 @@ from clustering import ClusterWords
 import os
 class TestClusterWords(unittest.TestCase):
 
-    # @parameterized.expand(["simple-test", "int-test", "short-test", "None-test", "dot-test"])
+    @parameterized.expand(["simple-test", "int-test", "short-test", "None-test", "dot-test"])
 
-    # def test_clustering1(self, name):
+    def test_clustering1(self, name):
 
-    #     # PATCH
-    #     # Construct mock_response
-    #     ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
-    #     with open('clustering_test.json', 'r') as myfile:
-    #             data=myfile.read()
-    #     obj = json.loads(data)
-    #     mock_words  = obj['clean-words'][name]["words"]
-    #     expected = obj['clean-words'][name]["cleaned-words"]
-    #     #CALL
-    #     clustr = ClusterWords(stub = "stub", words=mock_words)
-    #     clustr.clean_words()
+        # PATCH
+        # Construct mock_response
+        ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+        with open('clustering_test.json', 'r') as myfile:
+                data=myfile.read()
+        obj = json.loads(data)
+        mock_words  = obj['clean-words'][name]["words"]
+        expected = obj['clean-words'][name]["cleaned-words"]
+        #CALL
+        clustr = ClusterWords(stub = "stub", words=mock_words)
+        clustr.clean_words()
 
-    #     # ASSERT
-    #     self.assertEqual(clustr.words,  expected)
+        # ASSERT
+        self.assertEqual(clustr.words,  expected)
 
+    #Simple Assertions test
     @parameterized.expand(["warning-test1", "warning-test2"])
     def test_cluster_assertions(self, name):
 
@@ -36,11 +37,30 @@ class TestClusterWords(unittest.TestCase):
 
         #CALL
         clustr = ClusterWords(stub= "stub", words=mock_words)
-        #labels = clustr.cluster()
 
         #ASSERT
         with self.assertRaises(AssertionError):
             clustr.cluster()
 
+    #Simple clustering labels test
+    @parameterized.expand(["warning-test3"])
+    def test_cluster_assertions(self, name):
+
+        # PATCH
+        # Construct mock_response
+        with open('clustering_test.json', 'r') as myfile:
+                data=myfile.read()
+        obj = json.loads(data)
+        mock_words  = obj['cluster-words'][name]["words"]
+
+
+        #CALL
+        clustr = ClusterWords(stub= "stub", words=mock_words)
+        #labels = clustr.cluster()
+        labels = clustr.cluster()
+        expected_labels = obj['cluster-words'][name]["labels"]
+
+        #ASSERT
+        self.assertListEqual(list(labels), expected_labels)
 if __name__ == '__main__':
     unittest.main() 

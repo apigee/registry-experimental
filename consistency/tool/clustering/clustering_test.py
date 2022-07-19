@@ -1,4 +1,3 @@
-from imghdr import tests
 import unittest
 import json
 from parameterized import parameterized

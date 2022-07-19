@@ -7,7 +7,7 @@ class TestClusterWords(unittest.TestCase):
 
     @parameterized.expand(["simple-test", "int-test", "short-test", "None-test", "dot-test"])
 
-    def test_clustering1(self, name):
+    def test_cleaning(self, name):
 
         # PATCH
         # Construct mock_response
@@ -43,8 +43,8 @@ class TestClusterWords(unittest.TestCase):
             clustr.cluster()
 
     #Simple clustering labels test
-    @parameterized.expand(["warning-test3"])
-    def test_cluster_assertions(self, name):
+    @parameterized.expand(["simple-test", "nonconvergence-test"])
+    def test_cluster_simple(self, name):
 
         # PATCH
         # Construct mock_response
@@ -56,7 +56,6 @@ class TestClusterWords(unittest.TestCase):
 
         #CALL
         clustr = ClusterWords(stub= "stub", words=mock_words)
-        #labels = clustr.cluster()
         labels = clustr.cluster()
         expected_labels = obj['cluster-words'][name]["labels"]
 

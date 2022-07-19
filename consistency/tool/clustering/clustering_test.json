@@ -21,6 +21,24 @@
             "cleaned-words": []
          }
 
-    }
+    }, 
+    "cluster-words": {
+      "warning-test1": { 
+          "words": ["abandon", "abandoning"], 
+          "clustered-words": null
+       }, 
+       "warning-test2": { 
+         "words": null, 
+         "clustered-words": null
+      }, 
+      "warning-test3": { 
+         "words": ["Abandon", "Abandon","abandon","abandoning","Abort",
+            "abort","aborted","About","about","Above","Absence",
+            "Absent","absentee","Absolute","absolutely","Abstain","Abuse"
+            ,"abusive","Accelerator","accelerator",
+            "accelerators","Accelerators","accept","acceptable"], 
+         "clustered-words": null
+      }
+  }
 
 }

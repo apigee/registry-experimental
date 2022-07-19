@@ -56,20 +56,20 @@ class ClusterWords:
 
     def create_word_groups(self):
         
-        labels = self.cluster()
 
-        if labels == None or labels.size == 0:
+        labels = np.array(self.cluster())
+
+        temp_dict  = {}
+        if not labels.size or not self.words:
             return None
-
-        _word_groups  = {}
         for j in range(len(self.words)):
             word_label = labels[j]
     
-            if word_label in _word_groups:
-                _word_groups[word_label].append(self.words[j])
+            if word_label in temp_dict:
+                temp_dict[word_label].append(self.words[j])
                         
             else:
-                _word_groups[word_label] = [self.words[j]]
+                temp_dict[word_label] = [self.words[j]]
 
         word_groups = {}
         def find_clusterID(similar_list):
@@ -81,15 +81,15 @@ class ClusterWords:
             most_freq_words.sort() 
             return most_freq_words[0]  
 
-        for k in _word_groups.keys():
+        for k in temp_dict.keys():
             if k == -1:
-                word_groups["NOISE_WORDS"] = _word_groups[k]
-            similar_words = _word_groups[k]
-            id = find_clusterID(similar_words)
-            word_groups[id] = similar_words
+                word_groups["NOISE_WORDS"] = temp_dict[k]
+            else:
+                similar_words = temp_dict[k]
+                id = find_clusterID(similar_words)
+                word_groups[id] = similar_words
 
-            _word_groups.clear()
-            return word_groups
+        return word_groups
 
 
 

@@ -44,6 +44,24 @@
          "words": ["Abandon", "Collaborative","Duplication","Environments","Stragified"], 
          "labels": [-1,-1,-1,-1,-1]
       }
-  }
+  }, 
+  "form-ids": {
+    "noise-words": { 
+      "words": ["Abandon", "Collaborative","Duplication","Environments","Stragified"], 
+      "labels": [-1,-1,-1,-1,-1],
+      "clustered-words": {"NOISE_WORDS": ["Abandon", "Collaborative","Duplication","Environments","Stragified"]}
+   }, 
+   "duplicate-words": { 
+      "words": ["a", "a", "b", "b", "c"], 
+      "labels": [1,1,1,1,-1],
+      "clustered-words": {"a":["a", "a", "b", "b"],"NOISE_WORDS": ["c"]}
+   }, 
 
+   "none-words": { 
+      "words": null, 
+      "labels": null,
+      "clustered-words": null
+   }
+}
+ 
 }

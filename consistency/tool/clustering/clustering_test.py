@@ -6,7 +6,6 @@ import os
 class TestClusterWords(unittest.TestCase):
 
     @parameterized.expand(["simple-test", "int-test", "short-test", "None-test", "dot-test"])
-
     def test_cleaning(self, name):
 
         # PATCH

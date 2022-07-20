@@ -62,17 +62,16 @@
                          }]
    }, 
    "duplicate-words": { 
-      "words": ["a", "a", "b", "b", "c"], 
+      "words": ["abc", "abc", "abb", "abb", "def"], 
       "labels": [1,1,1,1,-1],
-      "clustered-words": {"a":["a", "a", "b", "b"],"NOISE_WORDS": ["c"]},
-      "parsable-list": [{"id": "a",
+      "parsable-list": [{"id": "abb",
                          "kind": "WordGroup",
-                         "word_frequency": { "a":2, "b":2}
+                         "word_frequency": { "abc":2, "abb":2}
                         },
 
                         {"id": "NOISE_WORDS",
                          "kind": "WordGroup",
-                         "word_frequency": { "c":1}
+                         "word_frequency": { "def":1}
                         } 
                         ]
    }, 
@@ -82,6 +81,14 @@
       "labels": null,
       "clustered-words": null,
       "parsable-list":[]
+   }, 
+
+   "unique-most-freq": { 
+      "words": ["abc", "abc", "abc", "ghf"], 
+      "labels": [1, 1, 1, -1],
+      "clustered-words": null,
+      "parsable-list":[{"id": "abc", "kind":"WordGroup", "word_frequency":{"abc":3}},
+         {"id": "NOISE_WORDS", "kind":"WordGroup", "word_frequency":{"ghf":1}} ]
    }
 }
  

@@ -47,20 +47,41 @@
   }, 
   "form-ids": {
     "noise-words": { 
-      "words": ["Abandon", "Collaborative","Duplication","Environments","Stragified"], 
-      "labels": [-1,-1,-1,-1,-1],
-      "clustered-words": {"NOISE_WORDS": ["Abandon", "Collaborative","Duplication","Environments","Stragified"]}
+      "words": ["Abandon", "Collaborative", "Duplication","Environments","Stragified"], 
+      "labels": [-1,-1, -1, -1, -1],
+      "clustered-words": {"NOISE_WORDS": ["Abandon", "Collaborative", "Duplication","Environments","Stragified"]},
+      "parsable-list": [{"id": "NOISE_WORDS",
+                         "kind": "WordGroup",
+                         "word_frequency": {
+                                            "Abandon":1,
+                                            "Collaborative":1,
+                                             "Duplication":1,
+                                             "Environments":1,
+                                             "Stragified":1
+                                          }
+                         }]
    }, 
    "duplicate-words": { 
       "words": ["a", "a", "b", "b", "c"], 
       "labels": [1,1,1,1,-1],
-      "clustered-words": {"a":["a", "a", "b", "b"],"NOISE_WORDS": ["c"]}
+      "clustered-words": {"a":["a", "a", "b", "b"],"NOISE_WORDS": ["c"]},
+      "parsable-list": [{"id": "a",
+                         "kind": "WordGroup",
+                         "word_frequency": { "a":2, "b":2}
+                        },
+
+                        {"id": "NOISE_WORDS",
+                         "kind": "WordGroup",
+                         "word_frequency": { "c":1}
+                        } 
+                        ]
    }, 
 
    "none-words": { 
       "words": null, 
       "labels": null,
-      "clustered-words": null
+      "clustered-words": null,
+      "parsable-list":[]
    }
 }
  

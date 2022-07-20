@@ -5,6 +5,7 @@ from strsimpy.sorensen_dice import SorensenDice
 from sklearn.cluster import dbscan
 from collections import Counter
 import warnings
+from google.cloud.apigeeregistry.applications.v1alpha1.consistency import word_group_pb2 as wg
 class ClusterWords:
     def __init__(self, stub, words):
         self.stub = stub
@@ -71,7 +72,8 @@ class ClusterWords:
             else:
                 temp_dict[word_label] = [self.words[j]]
 
-        word_groups = {}
+        word_groups = []
+
         def find_clusterID(similar_list):
             if len(similar_list) == 0 or similar_list == None:
                 return None
@@ -79,15 +81,33 @@ class ClusterWords:
             max_count = counts.most_common(1)[0][1]
             most_freq_words = [value for value, count in counts.most_common() if count == max_count]
             most_freq_words.sort() 
+
             return most_freq_words[0]  
 
         for k in temp_dict.keys():
+            word_group = wg.WordGroup()
             if k == -1:
-                word_groups["NOISE_WORDS"] = temp_dict[k]
+                word_group.id = "NOISE_WORDS"
+                word_group.kind = "WordGroup"
+                map = dict(Counter(temp_dict[k]))
+                for k, v in map.items():
+                    word_group.word_frequency[k] = v
+                word_groups.append(word_group)
             else:
                 similar_words = temp_dict[k]
                 id = find_clusterID(similar_words)
-                word_groups[id] = similar_words
+
+                if id is None:
+                    continue
+                word_group.id = id
+                word_group.kind = "WordGroup"
+
+                map = dict(Counter(temp_dict[k]))
+                for k, v in map.items():
+                    word_group.word_frequency[k] = v
+
+                word_groups.append(word_group)
+
         temp_dict.clear()
         return word_groups
 

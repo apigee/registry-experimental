@@ -9,6 +9,8 @@ class ExtractWords:
 
     def extract_vocabs(self):
         stub = self.stub
+            # Get vocabulary artifacts
+        vocabs = []
         try:
             response = stub.ListArtifacts(
                 registry_service_pb2.ListArtifactsRequest(
@@ -27,21 +29,17 @@ class ExtractWords:
             contents = stub.GetArtifactContents(
                 registry_service_pb2.GetArtifactContentsRequest(name=artifact.name)
             )
+
             vocab = vocabulary_pb2.Vocabulary()
+            vocab.ParseFromString(contents.data)
+            vocabs.append(vocab)
+            return vocabs
 
-            try:
-                vocabs.append(vocab.ParseFromString(contents.data))
-            except Exception as e:
-                print(e, " Parsing contents for ", artifact.name, "failed")
-                continue
 
-        if len(vocabs) < 1:
-            return None
 
-        return vocabs
 
     def get_vocabs(self):
-        vocabs = self.extract_vocabs(self)
+        vocabs = self.extract_vocabs()
         if vocabs is None:
             return None
 

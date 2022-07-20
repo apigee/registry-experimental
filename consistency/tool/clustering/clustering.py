@@ -88,7 +88,7 @@ class ClusterWords:
                 similar_words = temp_dict[k]
                 id = find_clusterID(similar_words)
                 word_groups[id] = similar_words
-
+        temp_dict.clear()
         return word_groups
 
 

@@ -25,7 +25,7 @@ class TestClusterWords(unittest.TestCase):
 
 
 
-    # #Simple Assertions test
+    # # #Simple Assertions test
     # @parameterized.expand(["less-than-3-words",  "null-words"])
     # def test_cluster_assertions(self, name):
 
@@ -45,7 +45,7 @@ class TestClusterWords(unittest.TestCase):
 
 
 
-    # #Simple clustering labels test
+    # # #Simple clustering labels test
     # @parameterized.expand(["simple-test", "nonconvergence-test"])
     # def test_cluster_simple(self, name):
 
@@ -86,10 +86,7 @@ class TestClusterWords(unittest.TestCase):
         clustr = ClusterWords(stub= "stub", words=mock_words)
 
         actual = clustr.create_word_groups()
-        print(actual)
-        print("*****************************************************")
         expected_clusters = obj['form-ids'][name]["clustered-words"]
-        print(expected_clusters)
 
         #ASSERT
         self.assertDictEqual(actual, expected_clusters) 

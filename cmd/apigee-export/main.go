@@ -37,6 +37,7 @@ func main() {
 	}
 
 	cmd.AddCommand(exportApisCommand)
+	cmd.AddCommand(exportDeploymentsCommand)
 
 	ctx := context.Background()
 	if err := cmd.ExecuteContext(ctx); err != nil {

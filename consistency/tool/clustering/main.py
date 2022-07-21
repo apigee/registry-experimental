@@ -1,5 +1,4 @@
 import grpc
-from google.cloud.apigeeregistry.v1 import admin_service_pb2_grpc
 from google.cloud.apigeeregistry.v1 import registry_service_pb2_grpc
 from word_extraction import ExtractWords
 from clustering import ClusterWords
@@ -15,8 +14,8 @@ def main ():
  
    clustr = ClusterWords(stub = stub, words=words)
    try:
-       word_grups = clustr.create_word_groups()
-       print(word_grups)
+       clustr.clean_words()
+       word_groups = clustr.create_word_groups()
    except Exception as e:
                print(e, " \n Clustering words failed")
  

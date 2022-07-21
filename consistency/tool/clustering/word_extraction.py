@@ -33,7 +33,8 @@ class ExtractWords:
             vocab = vocabulary_pb2.Vocabulary()
             vocab.ParseFromString(contents.data)
             vocabs.append(vocab)
-            return vocabs
+            
+        return vocabs
 
 
 

@@ -4,15 +4,20 @@ from metrics import vocabulary_pb2
 
 
 class ExtractWords:
-    def __init__(self, stub):
+    def __init__(self, stub, project_name):
         self.stub = stub
+        self.project_name = project_name
 
     def extract_vocabs(self):
         stub = self.stub
+        # Get vocabulary artifacts
+        vocabs = []
         try:
             response = stub.ListArtifacts(
                 registry_service_pb2.ListArtifactsRequest(
-                    parent="projects/-/locations/global/apis/-/versions/-/specs/-",
+                    parent="projects/"
+                    + self.project_name
+                    + "/locations/global/apis/-/versions/-/specs/-",
                     filter='name.contains("vocabulary")',
                 )
             )
@@ -27,21 +32,15 @@ class ExtractWords:
             contents = stub.GetArtifactContents(
                 registry_service_pb2.GetArtifactContentsRequest(name=artifact.name)
             )
+
             vocab = vocabulary_pb2.Vocabulary()
-
-            try:
-                vocabs.append(vocab.ParseFromString(contents.data))
-            except Exception as e:
-                print(e, " Parsing contents for ", artifact.name, "failed")
-                continue
-
-        if len(vocabs) < 1:
-            return None
+            vocab.ParseFromString(contents.data)
+            vocabs.append(vocab)
 
         return vocabs
 
     def get_vocabs(self):
-        vocabs = self.extract_vocabs(self)
+        vocabs = self.extract_vocabs()
         if vocabs is None:
             return None
 

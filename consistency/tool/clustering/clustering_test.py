@@ -90,8 +90,6 @@ class TestClusterWords(unittest.TestCase):
             wrd_grp = wg.WordGroup()
             expected.append(ParseDict(word_group, wrd_grp))
         # ASSERT
-        if name == "duplicate-words":
-            print(actual)
         self.assertListEqual(actual, expected)
 
         # ID forming labels test

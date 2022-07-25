@@ -89,7 +89,7 @@ class TestExtractWords(unittest.TestCase):
         mock_extract_vocabs.return_value = mock_response
 
         # CALL
-        extrct = ExtractWords(stub="stub")
+        extrct = ExtractWords(stub="stub", project_name="-")
         actual = extrct.get_vocabs()
 
         # ASSERT
@@ -105,7 +105,7 @@ class TestExtractWords(unittest.TestCase):
         mock_extract_vocabs.return_value = mock_response
 
         # CALL
-        extrct = ExtractWords(stub="stub")
+        extrct = ExtractWords(stub="stub", project_name="-")
         actual = extrct.get_vocabs()
 
         # ASSERT

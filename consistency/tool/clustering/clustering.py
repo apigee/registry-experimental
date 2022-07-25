@@ -10,6 +10,7 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
 )
 import timeit
 
+
 class ClusterWords:
     def __init__(self, stub, words):
         self.stub = stub
@@ -32,7 +33,7 @@ class ClusterWords:
         # We need a minimum of 3 words to form a cluster.
         if words_length < 3:
             print(words_length, " words found. Forming clusters not possible.")
-            
+
         self.words = valid_words
 
     def cluster(self):

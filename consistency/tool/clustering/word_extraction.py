@@ -10,12 +10,14 @@ class ExtractWords:
 
     def extract_vocabs(self):
         stub = self.stub
-            # Get vocabulary artifacts
+        # Get vocabulary artifacts
         vocabs = []
         try:
             response = stub.ListArtifacts(
                 registry_service_pb2.ListArtifactsRequest(
-                    parent="projects/" + self.project_name + "/locations/global/apis/-/versions/-/specs/-",
+                    parent="projects/"
+                    + self.project_name
+                    + "/locations/global/apis/-/versions/-/specs/-",
                     filter='name.contains("vocabulary")',
                 )
             )
@@ -34,11 +36,8 @@ class ExtractWords:
             vocab = vocabulary_pb2.Vocabulary()
             vocab.ParseFromString(contents.data)
             vocabs.append(vocab)
-            
+
         return vocabs
-
-
-
 
     def get_vocabs(self):
         vocabs = self.extract_vocabs()

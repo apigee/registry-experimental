@@ -16,7 +16,6 @@ class ClusterWords:
         self.words = words
 
     def clean_words(self):
-        start = timeit.timeit()
         words = self.words
         valid_words = []
 
@@ -33,13 +32,10 @@ class ClusterWords:
         # We need a minimum of 3 words to form a cluster.
         if words_length < 3:
             print(words_length, " words found. Forming clusters not possible.")
-
-        end = timeit.timeit()
-        print("cleaning time",end - start)
+            
         self.words = valid_words
 
     def cluster(self):
-        start = timeit.timeit()
         assert (
             self.words != None and len(self.words) >= 3
         ), "No clusters formed. Not enough words detected."
@@ -69,12 +65,10 @@ class ClusterWords:
         if np.count_nonzero(labels == -1) == labels.size:
             warnings.warn("There were no clusters detected. All words are unique.")
 
-        end = timeit.timeit()
-        print("clustering time", end - start)
         return labels
 
     def create_word_groups(self):
-        start = timeit.timeit()
+
         labels = np.array(self.cluster())
 
         temp_dict = {}
@@ -123,6 +117,4 @@ class ClusterWords:
             word_groups.append(word_group)
 
         temp_dict.clear()
-        end = timeit.timeit()
-        print("word-grouping time", end - start)
         return word_groups

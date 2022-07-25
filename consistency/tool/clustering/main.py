@@ -1,11 +1,9 @@
 import grpc
 from google.cloud.apigeeregistry.v1 import registry_service_pb2_grpc
-<<<<<<< HEAD
 from google.cloud.apigeeregistry.v1 import registry_models_pb2 as rm
 from google.cloud.apigeeregistry.v1 import registry_service_pb2 as rs 
 from word_extraction import ExtractWords
 from clustering import ClusterWords 
-from datetime import datetime 
 import argparse
 
 def main ():
@@ -28,7 +26,7 @@ def main ():
     except Exception as e:
                 print(e, " \n Getting words failed")
 
-    clustr = ClusterWords(stub = stub, words=words[1:100])
+    clustr = ClusterWords(stub = stub, words=words)
 
     try:
             clustr.clean_words()
@@ -80,27 +78,3 @@ def main ():
 
 if __name__ == '__main__':
     main()
-=======
-from word_extraction import ExtractWords
-from clustering import ClusterWords
-def main ():
-   # Creating registry client
-   channel = grpc.insecure_channel('localhost:8080')
-   stub = registry_service_pb2_grpc.RegistryStub(channel)
-   extrct = ExtractWords(stub=stub)
-   try:
-       words = extrct.get_vocabs()
-   except Exception as e:
-               print(e, " \n Getting words failed")
- 
-   clustr = ClusterWords(stub = stub, words=words)
-   try:
-       clustr.clean_words()
-       word_groups = clustr.create_word_groups()
-   except Exception as e:
-               print(e, " \n Clustering words failed")
- 
- 
-if __name__ == '__main__':
- main()
->>>>>>> 76159e15d0139e64522fd8c16d3dd8851080f91b

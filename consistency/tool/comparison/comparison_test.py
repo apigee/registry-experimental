@@ -3,14 +3,20 @@ import json
 from mock import patch
 from comparison import Comparison
 from parameterized import parameterized
+from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
+    word_group_pb2 as wg,
+)
+from google.protobuf.json_format import ParseDict
 
 
 class TestComparison(unittest.TestCase):
     @parameterized.expand(
-        ["simple", "none-ids", "none-words", "unique-terms", "both-null"]
+        ["simple", "none-wordgroups", "none-words"]  # , "unique-terms", "both-null"]
     )
-    @patch.object(Comparison, "get_word_group_ids")
-    def test_find_word_groups(self, name, mock_get_word_group_ids):
+    def test_find_word_groups(
+        self,
+        name,
+    ):
 
         # PATCH
         # Construct mock_response
@@ -18,15 +24,26 @@ class TestComparison(unittest.TestCase):
             data = myfile.read()
         obj = json.loads(data)
         test_suite = obj[name]
-        ids = test_suite["ids"]
-        new_words = test_suite["words"]
-        expected = test_suite["closest_word_groups"]
-
-        mock_get_word_group_ids.return_value = ids
+        input_wordgroups = []
+        if test_suite["wordgroups"] == None or test_suite["words"] == None:
+            return None
+        for i in test_suite["wordgroups"]:
+            wrd_grp = wg.WordGroup()
+            if i != None:
+                input_wordgroups.append(ParseDict(i, wrd_grp))
+            else:
+                input_wordgroups.append(None)
 
         # CALL
-        cmprsn = Comparison(stub="stub", new_words=new_words)
-        actual = cmprsn.find_word_groups()
+        cmprsn = Comparison(
+            stub="stub", new_words=test_suite["words"], word_groups=input_wordgroups
+        )
+        actual = cmprsn.find_closest_word_groups()
+        expected = {}
+        for word, comparison_info in test_suite["expected"].items():
+            wrd_grp = wg.WordGroup()
+            ParseDict(comparison_info[0], wrd_grp)
+            expected[word] = [wrd_grp, comparison_info[1]]
 
         # ASSERT
         self.assertEqual(actual, expected)

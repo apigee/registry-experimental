@@ -1,24 +1,55 @@
 {
     "simple":{
-        "ids": [ "google", "apigee", "Gcloud"],
+        "wordgroups": [
+            {"id": "google",
+            "kind": "WordGroup",
+            "word_frequency": {"abc":2, "abb":2}
+           },
+
+           {"id":  "apigee", 
+            "kind": "WordGroup",
+            "word_frequency": {"abc":2, "abb":2}
+           }, 
+           {"id": "Gcloud",
+            "kind": "WordGroup",
+            "word_frequency": {"abc":2, "abb":2}
+           }
+           ],
         "words": [ "Google", "apigees", "gcloud"],
-        "closest_word_groups": {"Google":["google", 0.19999999999999996], 
-                                "apigees":["apigee", 0.09090909090909094],
-                                "gcloud":["Gcloud", 0.19999999999999996]    
+        
+        "expected": {"Google":[            
+                                {"id": "google",
+                                "kind": "WordGroup",
+                                "word_frequency": {"abc":2, "abb":2}
+                                },
+                             0.19999999999999996], 
+                    "apigees":[           
+                        {"id":  "apigee", 
+                        "kind": "WordGroup",
+                        "word_frequency": {"abc":2, "abb":2}
+                       },
+                        0.09090909090909094],
+                    "gcloud":[           
+                        {"id": "Gcloud",
+                        "kind": "WordGroup",
+                        "word_frequency": {"abc":2, "abb":2}
+                       },
+                        0.19999999999999996]    
                                 }
     }, 
-    "none-ids":{
-        "ids": null,
+    "none-wordgroups":{
+        "wordgroups": null,
         "words": [ "Google", "apigees", "gcloud"],
-        "closest_word_groups": null
-    }, 
+        
+        "expected":null  
+    },
     "none-words":{
-        "ids": [ "google", "apigee", "Gcloud"],
+        "wordgroups": [ "google", "apigee", "Gcloud"],
         "words": null,
         "closest_word_groups": null
     }, 
     "unique-terms":{
-        "ids": [ "YouTube", "PlayStore", "Stadia"],
+        "wordgroups": [ "YouTube", "PlayStore", "Stadia"],
         "words": [ "Google", "apigees", "gcloud"],
         "closest_word_groups": {"Google":["UNIQUE_WORD", 1], 
                                 "apigees":["UNIQUE_WORD", 1],
@@ -26,7 +57,7 @@
                                 }
     }, 
     "both-null":{
-        "ids": null,
+        "wordgroups": null,
         "words": null,
         "closest_word_groups": null
     }

@@ -5,11 +5,11 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
 
 
 class Comparison:
-    def __init__(self, stub, new_words, word_groups=None, noise_words_index=None):
+    def __init__(self, stub, new_words, word_groups=None, noise_words_index = None):
         self.stub = stub
         self.new_words = new_words
-        self.word_groups = word_groups
-        self.noise_words_index = noise_words_index
+        self.word_groups=word_groups
+        self.noise_words_index  = noise_words_index 
 
     # format: {word : (cluster_id, distance)}
     def find_closest_word_groups(self):
@@ -40,27 +40,22 @@ class Comparison:
             closest_word_groups[word] = comparison_info
         return closest_word_groups
 
-    # def find_word_group(self):
-    #     # TODO: using the map returned by find_word_group,
-    #     # if the vocab has an associated ID, form a Variation object
-    #     # add this object into the current_variations list
-    #     # if not, check if the vocab is a NOISE_WORD, if not, add it the
-    #     # unique_terms list object. If there is a matching word, form a variation object
-    #     # from the match -> means creating a wordgroup instance at the dot.
-    #     # return the current variations object
+    def find_word_group(self):
 
-    #     if self.word_groups == None:
-    #         return None
-    #     unique_words = []
-    #     variations = []
-    #     closest_word_groups = self.find_closest_word_groups()
-
-    #     for word in closest_word_groups:
-    #         if closest_word_groups[word] == ["UNIQUE_WORD", 1] and word not in self.word_groups[self.noise_words_index]:
-    #             unique_words.append(word)
-    #         variation = cr.ConsistencyReport.Variation()
-    #         variation.term = word
-    #         variation.cluster = 0
+        
+        if self.word_groups == None:
+            return None
+        unique_words = []
+        variations = []
+        closest_word_groups = self.find_closest_word_groups()
+        
+        for word in closest_word_groups:
+            if closest_word_groups[word] == ["UNIQUE_WORD", 1] and word not in self.word_groups[self.noise_words_index]:
+                unique_words.append(word)
+            variation = cr.ConsistencyReport.Variation()
+            variation.term = word
+            variation.cluster = 0
+            
 
     #     return
 

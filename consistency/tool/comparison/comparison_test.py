@@ -11,7 +11,7 @@ from google.protobuf.json_format import ParseDict
 
 class TestComparison(unittest.TestCase):
     @parameterized.expand(
-        ["simple", "none-wordgroups", "none-words"]  # , "unique-terms", "both-null"]
+        ["simple", "none-wordgroups", "none-words", "both-null"]  # , "unique-terms", "both-null"]
     )
     def test_find_word_groups(
         self,
@@ -46,7 +46,40 @@ class TestComparison(unittest.TestCase):
             expected[word] = [wrd_grp, comparison_info[1]]
 
         # ASSERT
-        self.assertEqual(actual, expected)
+        self.assertDictEqual(actual, expected)
+
+
+    @parameterized.expand(
+        ["unique-terms"]  # , "unique-terms", "both-null"]
+    )
+    def test_find_word_groups_unique(
+        self,
+        name,
+    ):
+
+        # PATCH
+        # Construct mock_response
+        with open("comparison_test.json", "r") as myfile:
+            data = myfile.read()
+        obj = json.loads(data)
+        test_suite = obj[name]
+        input_wordgroups = []
+        if test_suite["wordgroups"] == None or test_suite["words"] == None:
+            return None
+        for i in test_suite["wordgroups"]:
+            wrd_grp = wg.WordGroup()
+            if i != None:
+                input_wordgroups.append(ParseDict(i, wrd_grp))
+            else:
+                input_wordgroups.append(None)
+
+        # CALL
+        cmprsn = Comparison(
+            stub="stub", new_words=test_suite["words"], word_groups=input_wordgroups
+        )
+        actual = cmprsn.find_closest_word_groups()
+        expected = test_suite["expected"]
+        self.assertDictEqual(actual, expected)
 
 
 if __name__ == "__main__":

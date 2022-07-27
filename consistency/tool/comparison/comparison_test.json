@@ -63,9 +63,9 @@
             "word_frequency": {"abc":2, "abb":2}
            }],
         "words": [ "Google", "apigees", "gcloud"],
-        "expected": {"Google":["POSSIBLE_UNIQUE_WORD", 1], 
-                                "apigees":["POSSIBLE_UNIQUE_WORD", 1],
-                                "gcloud":["POSSIBLE_UNIQUE_WORD", 1]    
+        "expected": {"Google":[null, 1], 
+                                "apigees":[null, 1],
+                                "gcloud":[null, 1]    
                                 }
     }, 
     "both-null":{

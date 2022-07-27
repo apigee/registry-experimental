@@ -53,25 +53,24 @@ class Comparison:
         unique_words = []
 
         for word in closest_word_groups:
-            if closest_word_groups[word][0] == self.noise_words and word not in self.noise_words:
-                unique_words.append(word)
-            else:
-                if word not in list(closest_word_groups[word][0].word_frequency):
-                    unique_words.append(word)
-                else:
+
+            # Construct variation
+            # Check that closest_word_group is not a noise cluster
+            if closest_word_groups[word][1] != 1: 
                     variation = cr.ConsistencyReport.Variation()
                     variation.term = word
                     variation.cluster = closest_word_groups[word][0]
                     current_variations.append(variation)
+            
+            # Construct unique terms
+            if word not in closest_word_groups[word][0].word_frequency:
+                    unique_words.append(word) 
 
         report.id = datetime.datetime.now()
         report.kind = "Comparison"
         report.current_variations = current_variations
 
-        def find_past_variations(self):
-            return []
-            
-        report.past_variations = find_past_variations()
+        report.past_variations = past_variations
         report.unique_terms = unique_words
 
         return report

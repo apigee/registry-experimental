@@ -67,7 +67,12 @@ class Comparison:
         report.id = datetime.datetime.now()
         report.kind = "Comparison"
         report.current_variations = current_variations
-        report.past_variations = past_variations
+
+        def find_past_variations(self):
+            return []
+            
+        report.past_variations = find_past_variations()
         report.unique_terms = unique_words
 
         return report
+    

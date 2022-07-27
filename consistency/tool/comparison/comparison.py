@@ -41,7 +41,7 @@ class Comparison:
         return closest_word_groups
 
     # format: {word : [wordgroup, distance]}
-    def find_word_group(self):
+    def generate_consistency_report(self):
 
         if self.word_groups == None:
             return None

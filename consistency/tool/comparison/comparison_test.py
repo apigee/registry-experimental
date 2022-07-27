@@ -11,7 +11,12 @@ from google.protobuf.json_format import ParseDict
 
 class TestComparison(unittest.TestCase):
     @parameterized.expand(
-        ["simple", "none-wordgroups", "none-words", "both-null"]  # , "unique-terms", "both-null"]
+        [
+            "simple",
+            "none-wordgroups",
+            "none-words",
+            "both-null",
+        ]  # , "unique-terms", "both-null"]
     )
     def test_find_word_groups(
         self,
@@ -48,10 +53,7 @@ class TestComparison(unittest.TestCase):
         # ASSERT
         self.assertDictEqual(actual, expected)
 
-
-    @parameterized.expand(
-        ["unique-terms"]  # , "unique-terms", "both-null"]
-    )
+    @parameterized.expand(["unique-terms"])  # , "unique-terms", "both-null"]
     def test_find_word_groups_unique(
         self,
         name,

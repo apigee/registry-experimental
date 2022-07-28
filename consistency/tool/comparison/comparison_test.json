@@ -136,7 +136,7 @@
                 "id": "Userid",
                 "kind":"WordGroup",
                 "word_frequency":{
-                    "Userid": 1
+                    "userid": 1
                 }
             }
 
@@ -145,7 +145,7 @@
                 "id": "NOISE_WORDS",
                 "kind":"WordGroup",
                 "word_frequency":{
-                    "userid": 1
+                    "Google": 1
                 }
             
         },
@@ -159,7 +159,7 @@
                         "id": "Userid",
                         "kind":"WordGroup",
                         "word_frequency":{
-                            "Userid": 1
+                            "userid": 1
                         }
                     }
          
@@ -234,5 +234,46 @@
             ],
             "unique_terms": ["userid"]
         }
-    }
+    }, 
+    "report-test-unqiue-existing":{
+        "words":["userid", "google"],
+                "wordgroups": [
+                    {
+                        "id": "Userid",
+                        "kind":"WordGroup",
+                        "word_frequency":{
+                            "Userid": 1,
+                            "userid": 1
+                        }
+                    }
+        
+                ], 
+                "noisegroup":{
+                        "id": "NOISE_WORDS",
+                        "kind":"WordGroup",
+                        "word_frequency":{
+                            "Google": 1
+                        }
+        
+                },
+                "expected_report":{
+                    "id": "consistency-report", 
+                    "kind": "ConsistencyReport",
+                    "current_variations":[
+                        {
+                            "term": "userid", 
+                            "cluster":{
+                                "id": "Userid",
+                                "kind":"WordGroup",
+                                "word_frequency":{
+                                    "Userid": 1,
+                                    "userid": 1 
+                                }
+                            }
+        
+                        }
+                    ],
+                    "unique_terms": ["google"]
+                }
+            }
 }

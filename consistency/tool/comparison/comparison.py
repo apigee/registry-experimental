@@ -45,19 +45,13 @@ class Comparison:
         if self.word_groups == None:
             return None
 
-        try:
-            closest_word_groups = self.find_closest_word_groups()
-        except Exception as e:
-            print(e)
+        closest_word_groups = self.find_closest_word_groups()
 
-        if closest_word_groups == None:
+        if closest_word_groups == None or len(closest_word_groups) < 1:
             return None
         report = cr.ConsistencyReport()
         current_variations = []
         unique_words = []
-
-        if closest_word_groups == None or len(closest_word_groups) < 1:
-            return None
         for word in closest_word_groups:
 
             # Construct variation
@@ -69,15 +63,9 @@ class Comparison:
                 current_variations.append(variation)
 
             # Construct unique terms
-            if self.noise_words != None:
-                if (
-                    word not in closest_word_groups[word][0].word_frequency
-                    and word not in self.noise_words.word_frequency
-                ):
-                    unique_words.append(word)
-            else:
-                if word not in closest_word_groups[word][0].word_frequency:
-                    unique_words.append(word)
+            if closest_word_groups[word][0] != None and word not in closest_word_groups[word][0].word_frequency:
+               unique_words.append(word)
+
 
         report.id = "consistency-report"
         report.kind = "ConsistencyReport"

@@ -78,7 +78,7 @@ class TestComparison(unittest.TestCase):
         self.assertIsNone(actual)
 
     # Comparison Report simple tests
-    @parameterized.expand(["report-test-with-no-unqiue", "report-test-with-unqiue"])
+    @parameterized.expand(["report-test-with-unqiue", "report-test-with-no-unqiue"])
     @patch.object(Comparison, "find_closest_word_groups")
     def test_report_simple(self, name, mock_find_closest_word_groups):
 
@@ -179,6 +179,45 @@ class TestComparison(unittest.TestCase):
         mock_find_closest_word_groups.return_value = {
             words[0]: [wordgroups[0], dice.distance(words[0], wordgroups[0].id)]
         }
+
+        # CALL
+        rprt = Comparison(
+            stub="stub",
+            new_words=words,
+            word_groups=wordgroups,
+            noise_words=noise_words,
+        )
+        actual = rprt.generate_consistency_report()
+
+        # ASSERT
+        self.assertEqual(actual, expected)
+
+    # Comparison report with ujique and existing. 
+    @parameterized.expand(["report-test-unqiue-existing"])
+    @patch.object(Comparison, "find_closest_word_groups")
+    def test_report_simple(self, name, mock_find_closest_word_groups):
+
+        dice = SorensenDice(2)
+        # PATCH
+        # Construct mock_response
+        with open("comparison_test.json", "r") as myfile:
+            data = myfile.read()
+        test_suite = json.loads(data)[name]
+        words = test_suite["words"]
+        wordgroups_unparsed = test_suite["wordgroups"]
+        wordgroups = []
+        for wordgroup in wordgroups_unparsed:
+            wrd_grp = wg.WordGroup()
+            wordgroups.append(ParseDict(wordgroup, wrd_grp))
+
+        noise_words = None
+        report_unparsed = test_suite["expected_report"]
+        expected = cr.ConsistencyReport()
+        ParseDict(report_unparsed, expected)
+        closest_word_groups = {}
+        for i in range(len(words)):
+            closest_word_groups[words[i]] = [wordgroups[0], dice.distance(words[i], wordgroups[0].id)]
+        mock_find_closest_word_groups.return_value = closest_word_groups
 
         # CALL
         rprt = Comparison(

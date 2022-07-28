@@ -72,5 +72,13 @@
         "wordgroups": null,
         "words": null,
         "expected": null
+    },
+
+    "simple-report-test":{
+        "words":[],
+        "wordgroups": [], 
+        "noisegroup":{},
+        "expected_report":{}
     }
+
 }

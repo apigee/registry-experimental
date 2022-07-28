@@ -66,7 +66,7 @@ class Comparison:
             if word not in closest_word_groups[word][0].word_frequency:
                     unique_words.append(word) 
 
-        report.id = datetime.datetime.now()
+        report.id = "1"#datetime.datetime.now()
         report.kind = "Comparison"
         report.current_variations = current_variations
 

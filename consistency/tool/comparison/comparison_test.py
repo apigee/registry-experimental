@@ -11,41 +11,33 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
 )
 from google.protobuf.json_format import ParseDict
 from strsimpy import SorensenDice
-class TestComparison(unittest.TestCase):
-    @parameterized.expand(
-        [
-            "simple",
-            "none-wordgroups",
-            "none-words",
-            "both-null",
-        ]  # , "unique-terms", "both-null"]
-    )
-    def test_find_word_groups(
-        self,
-        name,
-    ):
 
+
+class TestComparison(unittest.TestCase):
+    @parameterized.expand(["simple", "unique-terms"])
+    def test_find_word_groups(self, name):
         # PATCH
-        # Construct mock_response
+        # Construct inputs
         with open("comparison_test.json", "r") as myfile:
             data = myfile.read()
-        obj = json.loads(data)
-        test_suite = obj[name]
+        test_suite = json.loads(data)[name]
         input_wordgroups = []
-        if test_suite["wordgroups"] == None or test_suite["words"] == None:
-            return None
         for i in test_suite["wordgroups"]:
             wrd_grp = wg.WordGroup()
-            if i != None:
-                input_wordgroups.append(ParseDict(i, wrd_grp))
-            else:
-                input_wordgroups.append(None)
+            input_wordgroups.append(ParseDict(i, wrd_grp))
+
+        noise_group = wg.WordGroup()
+        ParseDict(test_suite["noisewordgroup"], noise_group)
 
         # CALL
         cmprsn = Comparison(
-            stub="stub", new_words=test_suite["words"], word_groups=input_wordgroups
+            stub="stub",
+            new_words=test_suite["words"],
+            word_groups=input_wordgroups,
+            noise_words=noise_group,
         )
         actual = cmprsn.find_closest_word_groups()
+
         expected = {}
         for word, comparison_info in test_suite["expected"].items():
             wrd_grp = wg.WordGroup()
@@ -55,44 +47,82 @@ class TestComparison(unittest.TestCase):
         # ASSERT
         self.assertDictEqual(actual, expected)
 
-    @parameterized.expand(["unique-terms"])  # , "unique-terms", "both-null"]
-    def test_find_word_groups_unique(
-        self,
-        name,
-    ):
+    @parameterized.expand(
+        [
+            "none-wordgroups",
+            "none-words",
+            "both-null",
+        ]
+    )
+    def test_find_word_groups_none(self, name):
 
+        # PATCH
+        # Construct inputs
+        with open("comparison_test.json", "r") as myfile:
+            data = myfile.read()
+        test_suite = json.loads(data)[name]
+        input_wordgroups = []
+        if test_suite["wordgroups"] is not None:
+            input_wordgroups.append(
+                ParseDict(i, wg.WordGroup()) for i in test_suite["wordgroups"]
+            )
+
+        # CALL
+        cmprsn = Comparison(
+            stub="stub",
+            new_words=test_suite["words"],
+            word_groups=input_wordgroups,
+            noise_words=None,
+        )
+        actual = cmprsn.find_closest_word_groups()
+        self.assertIsNone(actual)
+
+    # Comparison Report simple tests
+    @parameterized.expand(["report-test-with-no-unqiue", "report-test-with-unqiue"])
+    @patch.object(Comparison, "find_closest_word_groups")
+    def test_report_simple(self, name, mock_find_closest_word_groups):
+
+        dice = SorensenDice(2)
         # PATCH
         # Construct mock_response
         with open("comparison_test.json", "r") as myfile:
             data = myfile.read()
-        obj = json.loads(data)
-        test_suite = obj[name]
-        input_wordgroups = []
-        if test_suite["wordgroups"] == None or test_suite["words"] == None:
-            return None
-        for i in test_suite["wordgroups"]:
+        test_suite = json.loads(data)[name]
+        words = test_suite["words"]
+        wordgroups_unparsed = test_suite["wordgroups"]
+        wordgroups = []
+        for wordgroup in wordgroups_unparsed:
             wrd_grp = wg.WordGroup()
-            if i != None:
-                input_wordgroups.append(ParseDict(i, wrd_grp))
-            else:
-                input_wordgroups.append(None)
+            wordgroups.append(ParseDict(wordgroup, wrd_grp))
+
+        noise_words = ParseDict(test_suite["noisegroup"], wg.WordGroup())
+        report_unparsed = test_suite["expected_report"]
+        expected = cr.ConsistencyReport()
+        ParseDict(report_unparsed, expected)
+
+        mock_find_closest_word_groups.return_value = {
+            words[0]: [wordgroups[0], dice.distance(words[0], wordgroups[0].id)]
+        }
 
         # CALL
-        cmprsn = Comparison(
-            stub="stub", new_words=test_suite["words"], word_groups=input_wordgroups
+        rprt = Comparison(
+            stub="stub",
+            new_words=words,
+            word_groups=wordgroups,
+            noise_words=noise_words,
         )
-        actual = cmprsn.find_closest_word_groups()
-        expected = test_suite["expected"]
-        self.assertDictEqual(actual, expected)
+        actual = rprt.generate_consistency_report()
 
+        # ASSERT
+        self.assertEqual(actual, expected)
 
-    # Compparison Report test
-    @parameterized.expand(["simple-report-test"])
+    # Comparison Report test with none words and wordgroups
+    @parameterized.expand(
+        ["report-test-with-none-words", "report-test-with-none-wordgroups"]
+    )
     @patch.object(Comparison, "find_closest_word_groups")
-    def test_report_simple(self, name, mock_find_closest_word_groups):
-        
+    def test_report_none(self, name, mock_find_closest_word_groups):
 
-        dice = SorensenDice(2)
         # PATCH
         # Construct mock_response
         with open("comparison_test.json", "r") as myfile:
@@ -101,32 +131,67 @@ class TestComparison(unittest.TestCase):
         test_suite = obj[name]
         words = test_suite["words"]
         wordgroups_unparsed = test_suite["wordgroups"]
-        
-        wordgroups = []
+        wordgroups = None
+        if wordgroups_unparsed != None:
+            wordgroups = []
+            for wordgroup in wordgroups_unparsed:
+                wrd_grp = wg.WordGroup()
+                wordgroups.append(ParseDict(wordgroup, wrd_grp))
 
+        noise_words = ParseDict(test_suite["noisegroup"], wg.WordGroup())
+        mock_find_closest_word_groups.return_value = None
+
+        # CALL
+        rprt = Comparison(
+            stub="stub",
+            new_words=words,
+            word_groups=wordgroups,
+            noise_words=noise_words,
+        )
+        actual = rprt.generate_consistency_report()
+
+        # ASSERT
+        self.assertIsNone(actual)
+
+    # Comparison Report none noise_words test
+    @parameterized.expand(["report-test-with-none-noise-words"])
+    @patch.object(Comparison, "find_closest_word_groups")
+    def test_report_simple(self, name, mock_find_closest_word_groups):
+
+        dice = SorensenDice(2)
+        # PATCH
+        # Construct mock_response
+        with open("comparison_test.json", "r") as myfile:
+            data = myfile.read()
+        test_suite = json.loads(data)[name]
+        words = test_suite["words"]
+        wordgroups_unparsed = test_suite["wordgroups"]
+        wordgroups = []
         for wordgroup in wordgroups_unparsed:
             wrd_grp = wg.WordGroup()
             wordgroups.append(ParseDict(wordgroup, wrd_grp))
-        
 
-
-        noisegroup = test_suite["noisegroup"]
-        noise_grp = wg.WordGroup()
-        ParseDict(noisegroup, noise_grp)
-
+        noise_words = None
         report_unparsed = test_suite["expected_report"]
-        rprt = cr.ConsistencyReport()
-        ParseDict(report_unparsed, rprt)
+        expected = cr.ConsistencyReport()
+        ParseDict(report_unparsed, expected)
 
-        print(rprt)
-        mock_find_closest_word_groups.return_value = {words[0]:[wordgroups[0], dice.distance(words[0], wordgroups[0].id)]}
-        rprt = Comparison(stub="stub", new_words=words, word_groups=wordgroups, noise_words=None)
-        actual = rprt.generate_consistency_report()
+        mock_find_closest_word_groups.return_value = {
+            words[0]: [wordgroups[0], dice.distance(words[0], wordgroups[0].id)]
+        }
+
         # CALL
+        rprt = Comparison(
+            stub="stub",
+            new_words=words,
+            word_groups=wordgroups,
+            noise_words=noise_words,
+        )
+        actual = rprt.generate_consistency_report()
 
-  
         # ASSERT
-        #self.assertEqual(actual, rprt)
+        self.assertEqual(actual, expected)
+
 
 if __name__ == "__main__":
     unittest.main()

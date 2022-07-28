@@ -2,16 +2,16 @@ from strsimpy.sorensen_dice import SorensenDice
 from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
     consistency_report_pb2 as cr,
 )
-import datetime
+
 
 class Comparison:
-    def __init__(self, stub, new_words, word_groups=None, noise_words=None):
+    def __init__(self, stub, new_words, word_groups, noise_words):
         self.stub = stub
         self.new_words = new_words
         self.word_groups = word_groups
         self.noise_words = noise_words
 
-    # format: {word : (wordgroup, distance)}
+    # format: {word : [wordgroup, distance]}
     def find_closest_word_groups(self):
 
         # the maximum possible score for dice distance is 1, signifying complete dissimilarity.
@@ -29,7 +29,7 @@ class Comparison:
             for word_group in self.word_groups:
                 distance = dice.distance(word, word_group.id)
 
-                # our dice maximal threshold for considering words to be close is ep3 = 0.3
+                # our dice maximal threshold for considering words to be close is eps = 0.3
                 if distance < comparsion_info[1] and distance < 0.3:
                     comparsion_info = [word_group, distance]
             return comparsion_info
@@ -40,38 +40,48 @@ class Comparison:
             closest_word_groups[word] = comparison_info
         return closest_word_groups
 
-    # format: {word : [wordgroup, distance]}
     def generate_consistency_report(self):
 
         if self.word_groups == None:
             return None
 
-        closest_word_groups = self.find_closest_word_groups()
+        try:
+            closest_word_groups = self.find_closest_word_groups()
+        except Exception as e:
+            print(e)
+
+        if closest_word_groups == None:
+            return None
         report = cr.ConsistencyReport()
         current_variations = []
-        past_variations = []
         unique_words = []
 
+        if closest_word_groups == None or len(closest_word_groups) < 1:
+            return None
         for word in closest_word_groups:
 
             # Construct variation
             # Check that closest_word_group is not a noise cluster
-            if closest_word_groups[word][1] != 1: 
-                    variation = cr.ConsistencyReport.Variation()
-                    variation.term = word
-                    variation.cluster.CopyFrom(closest_word_groups[word][0]) 
-                    current_variations.append(variation)
-            
+            if closest_word_groups[word][1] != 1:
+                variation = cr.ConsistencyReport.Variation()
+                variation.term = word
+                variation.cluster.CopyFrom(closest_word_groups[word][0])
+                current_variations.append(variation)
+
             # Construct unique terms
-            if word not in closest_word_groups[word][0].word_frequency:
-                    unique_words.append(word) 
+            if self.noise_words != None:
+                if (
+                    word not in closest_word_groups[word][0].word_frequency
+                    and word not in self.noise_words.word_frequency
+                ):
+                    unique_words.append(word)
+            else:
+                if word not in closest_word_groups[word][0].word_frequency:
+                    unique_words.append(word)
 
-        report.id = "1"#datetime.datetime.now()
-        report.kind = "Comparison"
+        report.id = "consistency-report"
+        report.kind = "ConsistencyReport"
         report.current_variations.extend(current_variations)
-
-        report.past_variations.extend(past_variations)
         report.unique_terms.extend(unique_words)
 
         return report
-    

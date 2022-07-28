@@ -5,7 +5,7 @@
             "kind": "WordGroup",
             "word_frequency": {"abc":2, "abb":2}
            },
-
+ 
            {"id":  "apigee", 
             "kind": "WordGroup",
             "word_frequency": {"abc":2, "abb":2}
@@ -15,6 +15,11 @@
             "word_frequency": {"abc":2, "abb":2}
            }
            ],
+        "noisewordgroup": {
+            "id": "noise",
+            "kind": "WordGroup",
+            "word_frequency": {"some":2, "noise":2}
+        },
         "words": [ "Google", "apigees", "gcloud"],
         
         "expected": {"Google":[            
@@ -37,17 +42,6 @@
                         0.19999999999999996]    
                                 }
     }, 
-    "none-wordgroups":{
-        "wordgroups": null,
-        "words": [ "Google", "apigees", "gcloud"],
-        
-        "expected":null  
-    },
-    "none-words":{
-        "wordgroups": [ "google", "apigee", "Gcloud"],
-        "words": null,
-        "expected": null
-    }, 
     "unique-terms":{
         "wordgroups": [            
             {"id": "YouTube", 
@@ -62,19 +56,41 @@
             "kind": "WordGroup",
             "word_frequency": {"abc":2, "abb":2}
            }],
+        "noisewordgroup": {
+            "id": "noise",
+            "kind": "WordGroup",
+            "word_frequency": {"some":2, "noise":2}
+        },
         "words": [ "Google", "apigees", "gcloud"],
-        "expected": {"Google":[null, 1], 
-                                "apigees":[null, 1],
-                                "gcloud":[null, 1]    
-                                }
-    }, 
+        "expected": {
+            "Google":[{"id": "noise",
+                       "kind": "WordGroup",
+                       "word_frequency": {"some":2, "noise":2}}, 1], 
+            "apigees":[{"id": "noise",
+                        "kind": "WordGroup",
+                        "word_frequency": {"some":2, "noise":2}}, 1],
+            "gcloud":[{"id": "noise",
+                       "kind": "WordGroup",
+                       "word_frequency": {"some":2, "noise":2}}, 1]}
+    },
+    "none-wordgroups":{
+        "wordgroups": null,
+        "words": [ "Google", "apigees", "gcloud"],
+        
+        "expected":null  
+    },
+    "none-words":{
+        "wordgroups": [ "google", "apigee", "Gcloud"],
+        "words": null,
+        "expected": null
+    },  
     "both-null":{
         "wordgroups": null,
         "words": null,
         "expected": null
     },
 
-    "simple-report-test":{
+    "report-test-with-unqiue":{
         "words":["userid"],
         "wordgroups": [
             {
@@ -86,10 +102,17 @@
             }
 
         ], 
-        "noisegroup":{},
+        "noisegroup":{
+                "id": "NOISE_WORDS",
+                "kind":"WordGroup",
+                "word_frequency":{
+                    "Google": 1
+                }
+            
+        },
         "expected_report":{
-            "id": "1", 
-            "kind": "Comparison",
+            "id": "consistency-report", 
+            "kind": "ConsistencyReport",
             "current_variations":[
                 {
                     "term": "userid", 
@@ -103,8 +126,113 @@
          
                 }
             ],
-            "past_variations":[]
+            "unique_terms": ["userid"]
+        }
+    }, 
+    "report-test-with-no-unqiue":{
+        "words":["userid"],
+        "wordgroups": [
+            {
+                "id": "Userid",
+                "kind":"WordGroup",
+                "word_frequency":{
+                    "Userid": 1
+                }
+            }
+
+        ], 
+        "noisegroup":{
+                "id": "NOISE_WORDS",
+                "kind":"WordGroup",
+                "word_frequency":{
+                    "userid": 1
+                }
+            
+        },
+        "expected_report":{
+            "id": "consistency-report", 
+            "kind": "ConsistencyReport",
+            "current_variations":[
+                {
+                    "term": "userid", 
+                    "cluster":{
+                        "id": "Userid",
+                        "kind":"WordGroup",
+                        "word_frequency":{
+                            "Userid": 1
+                        }
+                    }
+         
+                }
+            ],
+            "unique_terms": []
+        }
+    },
+    "report-test-with-none-words":{
+        "words":null,
+        "wordgroups": [
+            {
+                "id": "Userid",
+                "kind":"WordGroup",
+                "word_frequency":{
+                    "Userid": 1
+                }
+            }
+
+        ], 
+        "noisegroup":{
+                "id": "NOISE_WORDS",
+                "kind":"WordGroup",
+                "word_frequency":{
+                    "userid": 1
+                }
+            
+        },
+        "expected_report":null
+    }, 
+    "report-test-with-none-wordgroups":{
+        "words":["userid"],
+        "wordgroups": null, 
+        "noisegroup":{
+                "id": "NOISE_WORDS",
+                "kind":"WordGroup",
+                "word_frequency":{
+                    "userid": 1
+                }
+            
+        },
+        "expected_report": null
+    }, 
+    "report-test-with-none-noise-words":{
+        "words":["userid"],
+        "wordgroups": [
+            {
+                "id": "Userid",
+                "kind":"WordGroup",
+                "word_frequency":{
+                    "Userid": 1
+                }
+            }
+
+        ], 
+        "noisegroup":null,
+        "expected_report":{
+            "id": "consistency-report", 
+            "kind": "ConsistencyReport",
+            "current_variations":[
+                {
+                    "term": "userid", 
+                    "cluster":{
+                        "id": "Userid",
+                        "kind":"WordGroup",
+                        "word_frequency":{
+                            "Userid": 1
+                        }
+                    }
+         
+                }
+            ],
+            "unique_terms": ["userid"]
         }
     }
-
 }

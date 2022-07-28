@@ -192,7 +192,7 @@ class TestComparison(unittest.TestCase):
         # ASSERT
         self.assertEqual(actual, expected)
 
-    # Comparison report with ujique and existing. 
+    # Comparison report with unique and existing. 
     @parameterized.expand(["report-test-unqiue-existing"])
     @patch.object(Comparison, "find_closest_word_groups")
     def test_report_simple(self, name, mock_find_closest_word_groups):

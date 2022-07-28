@@ -75,10 +75,36 @@
     },
 
     "simple-report-test":{
-        "words":[],
-        "wordgroups": [], 
+        "words":["userid"],
+        "wordgroups": [
+            {
+                "id": "Userid",
+                "kind":"WordGroup",
+                "word_frequency":{
+                    "Userid": 1
+                }
+            }
+
+        ], 
         "noisegroup":{},
-        "expected_report":{}
+        "expected_report":{
+            "id": "1", 
+            "kind": "Comparison",
+            "current_variations":[
+                {
+                    "term": "userid", 
+                    "cluster":{
+                        "id": "Userid",
+                        "kind":"WordGroup",
+                        "word_frequency":{
+                            "Userid": 1
+                        }
+                    }
+         
+                }
+            ],
+            "past_variations":[]
+        }
     }
 
 }

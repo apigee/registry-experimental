@@ -100,16 +100,33 @@ class TestComparison(unittest.TestCase):
         obj = json.loads(data)
         test_suite = obj[name]
         words = test_suite["words"]
-        wordgroups = test_suite["wordgroups"]
+        wordgroups_unparsed = test_suite["wordgroups"]
+        
+        wordgroups = []
+
+        for wordgroup in wordgroups_unparsed:
+            wrd_grp = wg.WordGroup()
+            wordgroups.append(ParseDict(wordgroup, wrd_grp))
+        
+
+
         noisegroup = test_suite["noisegroup"]
+        noise_grp = wg.WordGroup()
+        ParseDict(noisegroup, noise_grp)
 
-    
+        report_unparsed = test_suite["expected_report"]
+        rprt = cr.ConsistencyReport()
+        ParseDict(report_unparsed, rprt)
 
+        print(rprt)
+        mock_find_closest_word_groups.return_value = {words[0]:[wordgroups[0], dice.distance(words[0], wordgroups[0].id)]}
+        rprt = Comparison(stub="stub", new_words=words, word_groups=wordgroups, noise_words=None)
+        actual = rprt.generate_consistency_report()
         # CALL
 
   
         # ASSERT
-        #self.assertEqual(actual, expected)
+        #self.assertEqual(actual, rprt)
 
 if __name__ == "__main__":
     unittest.main()

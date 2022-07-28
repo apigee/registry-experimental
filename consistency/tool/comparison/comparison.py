@@ -59,7 +59,7 @@ class Comparison:
             if closest_word_groups[word][1] != 1: 
                     variation = cr.ConsistencyReport.Variation()
                     variation.term = word
-                    variation.cluster = closest_word_groups[word][0]
+                    variation.cluster.CopyFrom(closest_word_groups[word][0]) 
                     current_variations.append(variation)
             
             # Construct unique terms
@@ -68,10 +68,10 @@ class Comparison:
 
         report.id = "1"#datetime.datetime.now()
         report.kind = "Comparison"
-        report.current_variations = current_variations
+        report.current_variations.extend(current_variations)
 
-        report.past_variations = past_variations
-        report.unique_terms = unique_words
+        report.past_variations.extend(past_variations)
+        report.unique_terms.extend(unique_words)
 
         return report
     

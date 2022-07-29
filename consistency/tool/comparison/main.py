@@ -139,6 +139,5 @@ def main():
                     f"Received RPC error: code= {err} message= {rpc_error.details()}"
                 )
 
-
 if __name__ == "__main__":
     main()

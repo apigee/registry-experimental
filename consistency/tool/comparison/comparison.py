@@ -66,7 +66,6 @@ class Comparison:
             if closest_word_groups[word][0] != None and word not in closest_word_groups[word][0].word_frequency:
                unique_words.append(word)
 
-
         report.id = "consistency-report"
         report.kind = "ConsistencyReport"
         report.current_variations.extend(current_variations)

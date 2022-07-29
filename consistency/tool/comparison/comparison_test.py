@@ -210,13 +210,15 @@ class TestComparison(unittest.TestCase):
             wrd_grp = wg.WordGroup()
             wordgroups.append(ParseDict(wordgroup, wrd_grp))
 
-        noise_words = None
+        
         report_unparsed = test_suite["expected_report"]
         expected = cr.ConsistencyReport()
         ParseDict(report_unparsed, expected)
         closest_word_groups = {}
-        for i in range(len(words)):
-            closest_word_groups[words[i]] = [wordgroups[0], dice.distance(words[i], wordgroups[0].id)]
+        closest_word_groups[words[0]] = [wordgroups[0], dice.distance(words[0], wordgroups[0].id)]
+        
+        noise_words = ParseDict(test_suite["noisegroup"],wg.WordGroup())
+        closest_word_groups[words[1]] = [noise_words, dice.distance(words[1], noise_words.id)]
         mock_find_closest_word_groups.return_value = closest_word_groups
 
         # CALL

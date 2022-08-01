@@ -192,7 +192,7 @@ class TestComparison(unittest.TestCase):
         # ASSERT
         self.assertEqual(actual, expected)
 
-    # Comparison report with unique and existing. 
+    # Comparison report with unique and existing.
     @parameterized.expand(["report-test-unqiue-existing"])
     @patch.object(Comparison, "find_closest_word_groups")
     def test_report_simple(self, name, mock_find_closest_word_groups):
@@ -210,15 +210,20 @@ class TestComparison(unittest.TestCase):
             wrd_grp = wg.WordGroup()
             wordgroups.append(ParseDict(wordgroup, wrd_grp))
 
-        
         report_unparsed = test_suite["expected_report"]
         expected = cr.ConsistencyReport()
         ParseDict(report_unparsed, expected)
         closest_word_groups = {}
-        closest_word_groups[words[0]] = [wordgroups[0], dice.distance(words[0], wordgroups[0].id)]
-        
-        noise_words = ParseDict(test_suite["noisegroup"],wg.WordGroup())
-        closest_word_groups[words[1]] = [noise_words, dice.distance(words[1], noise_words.id)]
+        closest_word_groups[words[0]] = [
+            wordgroups[0],
+            dice.distance(words[0], wordgroups[0].id),
+        ]
+
+        noise_words = ParseDict(test_suite["noisegroup"], wg.WordGroup())
+        closest_word_groups[words[1]] = [
+            noise_words,
+            dice.distance(words[1], noise_words.id),
+        ]
         mock_find_closest_word_groups.return_value = closest_word_groups
 
         # CALL

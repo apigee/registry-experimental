@@ -8,6 +8,8 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
     word_group_pb2 as wg,
 )
 from google.cloud.apigeeregistry.v1 import registry_models_pb2 as rm
+
+
 def main():
     # Creating registry client
     channel = grpc.insecure_channel("localhost:8080")
@@ -39,12 +41,14 @@ def main():
     try:
         response = stub.ListArtifacts(
             rs.ListArtifactsRequest(
-                parent=spec_name,
-                filter="name.contains(\"vocabulary\")"
-            ))
+                parent=spec_name, filter='name.contains("vocabulary")'
+            )
+        )
     except grpc.RpcError as rpc_error:
-        print(f"Received RPC error: code={rpc_error.code()} message={rpc_error.details()}")
-    
+        print(
+            f"Received RPC error: code={rpc_error.code()} message={rpc_error.details()}"
+        )
+
     new_words = []
     for artifact in response.artifacts:
         contents = stub.GetArtifactContents(
@@ -55,19 +59,35 @@ def main():
         vocab = vocabulary_pb2.Vocabulary()
         vocab.ParseFromString(contents.data)
         for entry in vocab.schemas:
-            if type(entry.word) == str and "." not in entry.word and len(entry.word) > 2:
+            if (
+                type(entry.word) == str
+                and "." not in entry.word
+                and len(entry.word) > 2
+            ):
                 new_words.append(entry.word)
         for entry in vocab.properties:
-            if type(entry.word) == str and "." not in entry.word and len(entry.word) > 2:
+            if (
+                type(entry.word) == str
+                and "." not in entry.word
+                and len(entry.word) > 2
+            ):
                 new_words.append(entry.word)
         for entry in vocab.operations:
-            if type(entry.word) == str and "." not in entry.word and len(entry.word) > 2:
+            if (
+                type(entry.word) == str
+                and "." not in entry.word
+                and len(entry.word) > 2
+            ):
                 new_words.append(entry.word)
         for entry in vocab.parameters:
-            if type(entry.word) == str and "." not in entry.word and len(entry.word) > 2:
+            if (
+                type(entry.word) == str
+                and "." not in entry.word
+                and len(entry.word) > 2
+            ):
                 new_words.append(entry.word)
 
-    # get wordgroups and noise_words to compare against and generate a report. 
+    # get wordgroups and noise_words to compare against and generate a report.
     try:
         response = stub.ListArtifacts(
             rs.ListArtifactsRequest(
@@ -98,12 +118,13 @@ def main():
         word_groups.append(wrdgrp)
 
     # call the comparison class
-    cmprsn = Comparison(stub = stub, new_words=new_words, word_groups=word_groups, noise_words=noise_words)
+    cmprsn = Comparison(
+        stub=stub, new_words=new_words, word_groups=word_groups, noise_words=noise_words
+    )
 
     # generate a consistency report
     report = cmprsn.generate_consistency_report()
     print(report)
-
 
     ## upload the report
     artifact = rm.Artifact(
@@ -135,9 +156,8 @@ def main():
 
             except grpc.RpcError as rpc_error:
                 err = rpc_error.code()
-                print(
-                    f"Received RPC error: code= {err} message= {rpc_error.details()}"
-                )
+                print(f"Received RPC error: code= {err} message= {rpc_error.details()}")
+
 
 if __name__ == "__main__":
     main()

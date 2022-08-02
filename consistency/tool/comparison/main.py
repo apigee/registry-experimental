@@ -35,9 +35,9 @@ def main():
 
     spec_name = args.spec_name
     project_name = args.project_name
-    print(spec_name, project_name)
 
     # Get vocabulary artifacts to generate new spec words
+    print("Getting vocabulary artifacts to generate new words...")
     try:
         response = stub.ListArtifacts(
             rs.ListArtifactsRequest(
@@ -88,13 +88,12 @@ def main():
                 new_words.append(entry.word)
 
     # get wordgroups and noise_words to compare against and generate a report.
+    print("Getting computed WordGroups...")
     try:
         response = stub.ListArtifacts(
             rs.ListArtifactsRequest(
-                parent="projects/"
-                + project_name
-                + "/locations/global/apis/-/versions/-/specs/-",
-                filter='name.contains("ConsistencyReport")',
+                parent="projects/" + project_name + "/locations/global",
+                filter='mime_type.contains("WordGroup")',
             )
         )
     except grpc.RpcError as rpc_error:
@@ -118,25 +117,27 @@ def main():
         word_groups.append(wrdgrp)
 
     # call the comparison class
+    print("Generating comparison report...")
     cmprsn = Comparison(
         stub=stub, new_words=new_words, word_groups=word_groups, noise_words=noise_words
     )
 
     # generate a consistency report
     report = cmprsn.generate_consistency_report()
-    print(report)
+    if report == None:
+        print("No comparison report formed.")
+        return None
 
     ## upload the report
+    print("Uploading the comparison artifact...")
     artifact = rm.Artifact(
-        name="projects/"
-        + project_name
-        + "/locations/global/artifacts/consistency-report",
-        mime_type="application/octet-stream;type=google.cloud.apigeeregistry.applications.v1alpha1.consistency.WordGroup",
+        name=spec_name + "/artifacts/consistency-report",
+        mime_type="application/octet-stream;type=google.cloud.apigeeregistry.applications.v1alpha1.consistency.ConsistencyReport",
         contents=report.SerializeToString(),
     )
 
     createArtifactRequest = rs.CreateArtifactRequest(
-        parent="projects/" + project_name + "/locations/global",
+        parent=spec_name,
         artifact=artifact,
         artifact_id=report.id,
     )

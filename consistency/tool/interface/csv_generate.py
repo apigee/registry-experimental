@@ -43,7 +43,6 @@ def generate_csv():
     path = args.path
     name = args.csv_name
 
-    # get wordgroups and noise_words to compare against and generate a report.
     try:
         response = stub.ListArtifacts(
             rs.ListArtifactsRequest(
@@ -58,27 +57,25 @@ def generate_csv():
             f"Failed to fetch Consistency Reports artifacts, RPC error: code={rpc_error.code()} message={rpc_error.details()}"
         )
         return None
-    consistency_reports = []
 
+    df = pd.DataFrame(
+        columns=["new_word", "closest_wordgroup_id", "wordgroup", "artifact_name"]
+    )
+    csv_file_name = name + ".csv"
+    path = os.path.join(path, csv_file_name)
     for artifact in response.artifacts:
         contents = stub.GetArtifactContents(
             rs.GetArtifactContentsRequest(name=artifact.name)
         )
         report = cr.ConsistencyReport()
         report.ParseFromString(contents.data)
-        consistency_reports.append(report)
-
-    df = pd.DataFrame(columns=["new_word", "closest_cluster_id", "cluster_words"])
-    csv_file_name = name + ".csv"
-    path = os.path.join(path, csv_file_name)
-    for i in range(len(consistency_reports)):
-        report = consistency_reports[i]
         report.current_variations.sort(key=lambda x: x.term)
         for variation in report.current_variations:
             df.loc[len(df)] = [
                 variation.term,
                 variation.cluster.id,
                 list(variation.cluster.word_frequency.keys()),
+                artifact.name,
             ]
 
     df.to_csv(path)

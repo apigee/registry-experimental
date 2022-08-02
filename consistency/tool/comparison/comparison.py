@@ -3,7 +3,6 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
     consistency_report_pb2 as cr,
 )
 
-
 class Comparison:
     def __init__(self, stub, new_words, word_groups, noise_words):
         self.stub = stub

@@ -3,7 +3,6 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
     consistency_report_pb2 as cr,
 )
 
-
 class Comparison:
     def __init__(self, stub, new_words, word_groups, noise_words):
         self.stub = stub
@@ -63,8 +62,11 @@ class Comparison:
                 current_variations.append(variation)
 
             # Construct unique terms
-            if closest_word_groups[word][0] != None and word not in closest_word_groups[word][0].word_frequency:
-               unique_words.append(word)
+            if (
+                closest_word_groups[word][0] != None
+                and word not in closest_word_groups[word][0].word_frequency
+            ):
+                unique_words.append(word)
 
         report.id = "consistency-report"
         report.kind = "ConsistencyReport"

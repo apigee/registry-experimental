@@ -9,7 +9,6 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
     word_group_pb2 as wg,
 )
 
-
 class ClusterWords:
     def __init__(self, stub, words):
         self.stub = stub

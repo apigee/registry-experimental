@@ -9,7 +9,6 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
     consistency_report_pb2 as cr,
 )
 
-
 def generate_csv():
 
     channel = grpc.insecure_channel("localhost:8080")
@@ -79,7 +78,6 @@ def generate_csv():
             ]
 
     df.to_csv(path)
-
 
 if __name__ == "__main__":
     generate_csv()

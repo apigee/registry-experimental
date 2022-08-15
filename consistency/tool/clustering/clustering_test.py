@@ -8,7 +8,6 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
     word_group_pb2 as wg,
 )
 
-
 class TestClusterWords(unittest.TestCase):
     @parameterized.expand(
         ["simple-test", "int-test", "short-test", "None-test", "dot-test"]
@@ -92,8 +91,7 @@ class TestClusterWords(unittest.TestCase):
         # ASSERT
         self.assertListEqual(actual, expected)
 
-        # ID forming labels test
-
+    # ID forming labels test
     @parameterized.expand(["none-words"])
     @patch.object(ClusterWords, "cluster")
     def test_cluster_simple(self, name, mock_cluster):
@@ -113,7 +111,6 @@ class TestClusterWords(unittest.TestCase):
         actual = clustr.create_word_groups()
         # ASSERT
         self.assertEqual(actual, None)
-
 
 if __name__ == "__main__":
     unittest.main()

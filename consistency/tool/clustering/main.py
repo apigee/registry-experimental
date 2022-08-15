@@ -6,7 +6,6 @@ from word_extraction import ExtractWords
 from clustering import ClusterWords
 import argparse
 
-
 def main():
     # Creating registry client
     channel = grpc.insecure_channel("localhost:8080")
@@ -41,7 +40,6 @@ def main():
         print(e, " \n Clustering words failed")
 
     # upload the wordGroups to the server
-
     for word_group in word_groups:
 
         id = "".join(filter(str.isalnum, word_group.id.lower()))
@@ -79,7 +77,6 @@ def main():
                     print(
                         f"Received RPC error: code= {err} message= {rpc_error.details()}"
                     )
-
 
 if __name__ == "__main__":
     main()

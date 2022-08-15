@@ -2,7 +2,6 @@ import grpc
 from google.cloud.apigeeregistry.v1 import registry_service_pb2
 from metrics import vocabulary_pb2
 
-
 class ExtractWords:
     def __init__(self, stub, project_name):
         self.stub = stub

@@ -16,7 +16,7 @@
 
 import * as express from 'express';
 import * as cors from 'cors';
-import {RegistryClient} from '@giteshk-org/apigeeregistry';
+import {RegistryClient} from '@google-cloud/apigee-registry';
 import {ClientOptions} from 'google-gax';
 import {credentials} from '@grpc/grpc-js';
 const Yaml = require('js-yaml');

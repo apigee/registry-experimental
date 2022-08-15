@@ -6,6 +6,7 @@ from metrics import vocabulary_pb2
 from google.protobuf.json_format import ParseDict
 from parameterized import parameterized
 
+
 class TestExtractWords(unittest.TestCase):
     @parameterized.expand(
         [
@@ -109,6 +110,7 @@ class TestExtractWords(unittest.TestCase):
 
         # ASSERT
         self.assertEqual(actual, expected)
+
 
 if __name__ == "__main__":
     unittest.main()

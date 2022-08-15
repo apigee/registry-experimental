@@ -12,6 +12,7 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
 from google.protobuf.json_format import ParseDict
 from strsimpy import SorensenDice
 
+
 class TestComparison(unittest.TestCase):
     @parameterized.expand(["simple", "unique-terms"])
     def test_find_word_groups(self, name):
@@ -236,6 +237,7 @@ class TestComparison(unittest.TestCase):
 
         # ASSERT
         self.assertEqual(actual, expected)
+
 
 if __name__ == "__main__":
     unittest.main()

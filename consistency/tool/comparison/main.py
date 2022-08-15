@@ -9,6 +9,7 @@ from google.cloud.apigeeregistry.applications.v1alpha1.consistency import (
 )
 from google.cloud.apigeeregistry.v1 import registry_models_pb2 as rm
 
+
 def main():
     # Creating registry client
     channel = grpc.insecure_channel("localhost:8080")
@@ -157,6 +158,7 @@ def main():
             except grpc.RpcError as rpc_error:
                 err = rpc_error.code()
                 print(f"Received RPC error: code= {err} message= {rpc_error.details()}")
+
 
 if __name__ == "__main__":
     main()

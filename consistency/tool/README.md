@@ -58,8 +58,54 @@ to install dependencies required by the tool from the tool folder.
 ### Example
 
 * How to run the program
-* Step-by-step bullets
+* First, set up a registry server running and start a project named `google` following the instructions here. Also make the protos defined in the `registry-experimental` folder from your virtual environment. To do so, run `make py-protos` from the root of `registry-experimental`
+
+* from the root of `registry`, run 
 ```
-code blocks for commands
+PROJECT=google
+registry rpc admin create-project --project_id $PROJECT --json
+```
+* save the `openapi-directory/APIs/googleapis.com ` folder somwhere
+* uplaoding the specs in the saved folder into the server using 
+```
+registry upload bulk openapi  --project-id $PROJECT {PATH TO FOLDER}         --base-uri https://github.com/APIs-guru/openapi-directory/blob/$COMMIT/APIs 
+
+```
+* Compute the vocabulary in the project using 
+```
+registry compute vocabulary projects/$PROJECT/locations/global/apis/-/versions/-/specs/-
+```
+* Now, to form WordGRoups, go to `tool/clustering` and run 
+```
+python3 main.py --project_name=google
+```
+Note, this will take a while as the project has more than 1000 words in it. If you are just interested in checking out how the tool runs e2e change `line 53` of `clustering.py` from `self.words = valid_words` into something like `self.words = valid_words[1:1000]`. Adjust the number of words as needed. 
+
+* Put the specs we have in the project into a path of you choice using 
+
+```
+registry list {YOUR PATH}/specs.txt
 ```
 
+* From `tool/comparison` create a comparsion report for a spec of your choice using 
+
+```
+python3 main.py --project_name=google --spec_name={SPEC NAME OF YOUR CHOICE}
+```
+If you just want to have a quick report use `python3 main.py --project_name=google --spec_name=projects/google/locations/global/apis/alertcenter/versions/v1beta1/specs/openapi.yaml`
+
+* Generate a .csv file of the reports using
+
+```
+python3 csv_generate.py --project_name=google --path={YOUR PATH HERE} --csv_name=google-report
+```
+* Now we can use a shell script to query and give all the spec names we have to the report generator. Go to `tool/comparsion` and run 
+```
+xargs -a {YOUR PATH TO spec.txt} -I{} -d'\n' python3 main.py --spec_name={} --project_name=google
+```
+This will generate a report for all the specs one by one. 
+
+* Finally generate the report using
+```
+python3 csv_generate.py --project_name=google --path={YOUR PATH} --csv_name=google-report
+```

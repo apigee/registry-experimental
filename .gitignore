@@ -7,3 +7,6 @@ consistency/gnostic-protos
 third_party
 .vscode/
 my_env/
+consistency/tool/interface/__pycache__
+consistency/tool/comparison/__pycache__
+consistency/tool/clustering/__pycache__

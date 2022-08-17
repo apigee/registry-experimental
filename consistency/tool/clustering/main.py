@@ -26,6 +26,7 @@ def main():
 
     extrct = ExtractWords(stub=stub, project_name=project_name)
     try:
+        print("Extracting words in the project...")
         words = extrct.get_vocabs()
 
     except Exception as e:
@@ -35,11 +36,13 @@ def main():
 
     try:
         clustr.clean_words()
+        print("Forming Word Groups...")
         word_groups = clustr.create_word_groups()
     except Exception as e:
         print(e, " \n Clustering words failed")
 
     # upload the wordGroups to the server
+    print("Uploading Word Groups...")
     for word_group in word_groups:
 
         id = "".join(filter(str.isalnum, word_group.id.lower()))

@@ -14,7 +14,7 @@ Example: user_id, UserID, userid, USERID, etc are inconsistent usages of the sam
 3 main parts for the tool:
 ### Computing word groups:
 
-Word groups are flavors of the same vocabulary. For example, user_id, UserID, userid, and USERID are word groups. There is a data struture to store inconsistent usages of vocabularies. The formal WordGroup definition and meaning terms can be found [here](https://github.com/apigee/registry-experimental/blob/main/google/cloud/apigeeregistry/applications/v1alpha1/consistency/word_group.proto).
+Word groups are flavors of the same vocabulary. For example, user_id, UserID, userid, and USERID terms of the same word group. There is a data struture to store inconsistent usages of vocabularies. The formal WordGroup definition and meaning terms can be found [here](https://github.com/apigee/registry-experimental/blob/main/google/cloud/apigeeregistry/applications/v1alpha1/consistency/word_group.proto).
 
 ```
 message WordGroup {
@@ -55,9 +55,9 @@ pip install -r requirements.txt
 ```
 to install dependencies required by the tool from the root tool folder.
 
-### Example usage
+* First, set up a registry server running following the instructions [here](https://github.com/apigee/registry/blob/main/tests/demo/walkthrough.sh). Also make the protos defined in the `registry-experimental` folder from your [virtual environment](https://cloud.google.com/python/docs/setup#installing_python). To do so, run `make py-protos` from the root of `registry-experimental`.
 
-* First, set up a registry server running following the instructions [here](https://github.com/apigee/registry/blob/main/tests/demo/walkthrough.sh). Also make the protos defined in the `registry-experimental` folder from your virtual environment. To do so, run `make py-protos` from the root of `registry-experimental`.
+### Example usage
 
 * from the root of `registry`, run 
 ```

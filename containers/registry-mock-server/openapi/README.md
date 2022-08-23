@@ -29,5 +29,6 @@ gcloud compute instances create-with-container registry-mock-server-instance \
 	--machine-type=e2-micro  --tags=registry-mock-service,http-server \
 	--scopes=https://www.googleapis.com/auth/cloud-platform \
 	--restart-on-failure --service-account=registry-viewer@$REGISTRY_PROJECT_IDENTIFIER.iam.gserviceaccount.com\
-    --container-image ghcr.io/apigee/registry-prism-mock-server:main
+	--zone=us-central1-a \
+    --container-image ghcr.io/giteshk-org/registry-prism-mock-server:main
 ```

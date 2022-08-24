@@ -16,7 +16,10 @@
 
 import * as express from 'express';
 import * as cors from 'cors';
-import {RegistryClient} from '@giteshk-org/apigeeregistry';
+import * as fs from 'fs';
+import * as path from 'path';
+
+import {RegistryClient} from '@google-cloud/apigee-registry';
 import {ClientOptions} from 'google-gax';
 import {credentials} from '@grpc/grpc-js';
 const Yaml = require('js-yaml');
@@ -109,59 +112,83 @@ function processMockRequest(req: Request, res: Response) {
     res.end();
     return;
   }
-
-  client.getApiSpecContents(
-    {
-      name: spec_url,
-    },
-    (err, response) => {
-      if (err) {
-        return _sendError(err, res);
-      } else {
-        if (response && response.data) {
-          const {data} = response;
-          const specString = <string>data;
-          let specObj: Object;
-          try {
-            specObj = JSON.parse(specString);
-          } catch (e) {
-            specObj = Yaml.load(specString);
+  //Used cached version of the file if it exists.
+  const spec_local_path = '/tmp/' + spec_url;
+  fs.readFile(spec_local_path, (err, contents) => {
+    if (!err && contents) {
+      processMockPrismRequest(contents.toString(), req, res);
+    } else {
+      client.getApiSpecContents(
+        {
+          name: spec_url,
+        },
+        (err, response) => {
+          if (err) {
+            return _sendError(err, res);
+          } else {
+            if (response && response.data) {
+              const {data} = response;
+              const specString = <string>data;
+              fs.mkdirSync(path.dirname(spec_local_path), {recursive: true});
+              fs.writeFileSync(spec_local_path, specString);
+              processMockPrismRequest(specString, req, res);
+            } else {
+              return _sendError(new Error('Spec not found'), res);
+            }
           }
-          // fs.writeFileSync(specObj, JSON.stringify(specObj));
-          getHttpOperationsFromSpec(specObj)
-            .then((operations: IHttpOperation[]) => {
-              const prism = createClientFromOperations(operations, {
-                // logger: createLogger('TestLogger'),
-                mock: {dynamic: false},
-              });
-              prism
-                .request(
-                  res.locals.apiPath,
-                  req
-                  // operations
-                )
-                .then((output: any) => {
-                  Object.keys(output.headers).forEach(key => {
-                    res.setHeader(key, output.headers[key]);
-                  });
-
-                  res.status(output.status);
-                  res.send(output.data);
-                  res.end();
-                })
-                .catch((err: Error) => {
-                  return _sendError(err, res);
-                });
-            })
-            .catch((err: Error) => {
-              return _sendError(err, res);
-            });
-        } else {
-          return _sendError(new Error('Spec not found'), res);
         }
-      }
+      );
     }
-  );
+  });
+}
+
+/**
+ * Process request using prism
+ *
+ * @param specString
+ * @param req
+ * @param res
+ */
+function processMockPrismRequest(
+  specString: string,
+  req: express.Request,
+  res: express.Response
+) {
+  let specObj: Object;
+  try {
+    specObj = JSON.parse(specString);
+  } catch (e) {
+    specObj = Yaml.load(specString);
+  }
+
+  getHttpOperationsFromSpec(specObj)
+    .then((operations: IHttpOperation[]) => {
+      const prism = createClientFromOperations(operations, {
+        // logger: createLogger('TestLogger'),
+        mock: {dynamic: false},
+      });
+      prism
+        .request(
+          res.locals.apiPath,
+          req
+          // operations
+        )
+        .then((output: any) => {
+          Object.keys(output.headers).forEach(key => {
+            res.setHeader(key, output.headers[key]);
+          });
+
+          res.status(output.status);
+          res.send(output.data);
+          res.end();
+        })
+        .catch((err: Error) => {
+          return _sendError(err, res);
+        });
+    })
+    .catch((err: Error) => {
+      return _sendError(err, res);
+    });
 }
 
 function processParams(req: Request, res: Response) {

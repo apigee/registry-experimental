@@ -1,0 +1,236 @@
+{
+   "clean-words": {
+      "simple-test": {
+         "words": [
+            "abandon",
+            "abandoning",
+            "Abort"
+         ],
+         "cleaned-words": [
+            "abandon",
+            "abandoning",
+            "Abort"
+         ]
+      },
+      "int-test": {
+         "words": [
+            44,
+            "747424200409"
+         ],
+         "cleaned-words": [
+            "747424200409"
+         ]
+      },
+      "short-test": {
+         "words": [
+            1,
+            "1"
+         ],
+         "cleaned-words": []
+      },
+      "None-test": {
+         "words": null,
+         "cleaned-words": null
+      },
+      "dot-test": {
+         "words": [
+            "ab.cd",
+            "."
+         ],
+         "cleaned-words": []
+      }
+   },
+   "cluster-words": {
+      "less-than-3-words": {
+         "words": [
+            "abandon",
+            "abandoning"
+         ],
+         "clustered-words": null
+      },
+      "null-words": {
+         "words": null,
+         "clustered-words": null
+      },
+      "simple-test": {
+         "words": [
+            "Abandon",
+            "Abandon",
+            "abandon",
+            "abandoning",
+            "Abort",
+            "abort",
+            "aborted",
+            "About",
+            "about",
+            "Above",
+            "Absence",
+            "Absent",
+            "absentee",
+            "Absolute",
+            "absolutely",
+            "Abstain",
+            "Abuse",
+            "abusive",
+            "Accelerator",
+            "accelerator",
+            "accelerators",
+            "Accelerators",
+            "accept",
+            "acceptable"
+         ],
+         "labels": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            2,
+            2,
+            -1,
+            3,
+            3,
+            -1,
+            4,
+            4,
+            -1,
+            -1,
+            -1,
+            5,
+            5,
+            5,
+            5,
+            6,
+            6
+         ]
+      },
+      "nonconvergence-test": {
+         "words": [
+            "Abandon",
+            "Collaborative",
+            "Duplication",
+            "Environments",
+            "Stragified"
+         ],
+         "labels": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+         ]
+      }
+   },
+   "form-ids": {
+      "noise-words": {
+         "words": [
+            "Abandon",
+            "Collaborative",
+            "Duplication",
+            "Environments",
+            "Stragified"
+         ],
+         "labels": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+         ],
+         "clustered-words": {
+            "NOISE_WORDS": [
+               "Abandon",
+               "Collaborative",
+               "Duplication",
+               "Environments",
+               "Stragified"
+            ]
+         },
+         "parsable-list": [
+            {
+               "id": "NOISE_WORDS",
+               "kind": "WordGroup",
+               "word_frequency": {
+                  "Abandon": 1,
+                  "Collaborative": 1,
+                  "Duplication": 1,
+                  "Environments": 1,
+                  "Stragified": 1
+               }
+            }
+         ]
+      },
+      "duplicate-words": {
+         "words": [
+            "abc",
+            "abc",
+            "abb",
+            "abb",
+            "def"
+         ],
+         "labels": [
+            1,
+            1,
+            1,
+            1,
+            -1
+         ],
+         "parsable-list": [
+            {
+               "id": "abb",
+               "kind": "WordGroup",
+               "word_frequency": {
+                  "abc": 2,
+                  "abb": 2
+               }
+            },
+            {
+               "id": "NOISE_WORDS",
+               "kind": "WordGroup",
+               "word_frequency": {
+                  "def": 1
+               }
+            }
+         ]
+      },
+      "none-words": {
+         "words": null,
+         "labels": null,
+         "clustered-words": null,
+         "parsable-list": []
+      },
+      "unique-most-freq": {
+         "words": [
+            "abc",
+            "abc",
+            "abc",
+            "ghf"
+         ],
+         "labels": [
+            1,
+            1,
+            1,
+            -1
+         ],
+         "clustered-words": null,
+         "parsable-list": [
+            {
+               "id": "abc",
+               "kind": "WordGroup",
+               "word_frequency": {
+                  "abc": 3
+               }
+            },
+            {
+               "id": "NOISE_WORDS",
+               "kind": "WordGroup",
+               "word_frequency": {
+                  "ghf": 1
+               }
+            }
+         ]
+      }
+   }
+}

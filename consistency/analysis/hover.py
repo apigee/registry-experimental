@@ -1,20 +1,15 @@
-
-
-
-### the followign code gets 300 manually tagged words from Google's API, uses dbscan clustering to generate labels,
-# and reveals the words corresponding to each point as you hover. Words in the same cluster colored the same. 
+# The following code gets 300 manually tagged words from Google's API, uses dbscan clustering to generate labels,
+# and reveals the words corresponding to each point as you hover. Words in the same cluster are colored the same. 
 # If needed, remove the noises ( points with -1) just to plot words with defined clusters. 
 # Intended for visualization of the algorithm we used for clustering.  
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt 
 from sklearn.cluster import dbscan
 from strsimpy.sorensen_dice import SorensenDice
-from sklearn.metrics.cluster import homogeneity_score
-from sklearn.metrics.cluster import completeness_score 
-from sklearn.metrics.cluster import v_measure_score
 from sklearn.cluster import dbscan
 
-tagged_df = pd.read_csv (r'/home/gelaw/work-stuff/gocode/src/registry-experimental/consistency/rpc/google/cloud/apigeeregistry/v1/similarity/analysis/vocab1000.csv')
+tagged_df = pd.read_csv ('consistency/analysis/vocab1000.csv')
 tagged_df = tagged_df.drop(tagged_df.index[300:])
 word_labels = tagged_df.iloc[:, 0]
 word_labels = word_labels.to_numpy()
@@ -48,6 +43,7 @@ def calculate_dissimilarity_matrix(api_strings, pairwise_dissimilarity_measure):
                 dissimilarity = pairwise_dissimilarity_measure(string1, string2)
                 inconsistency_matrix[i][j] = dissimilarity
     inconsistency_matrix = inconsistency_matrix + inconsistency_matrix.T - np.diag(np.diag(inconsistency_matrix))
+
     return inconsistency_matrix
 
 inconsistency_matrix = calculate_dissimilarity_matrix(data, dice.distance)
@@ -58,8 +54,6 @@ fitted_strings = embedding.fit_transform(inconsistency_matrix)
 x = fitted_strings[:,0]
 y = fitted_strings[:,1]
 
-
-import matplotlib.pyplot as plt 
 names = tagged_words
 c=db[1]
 
@@ -83,7 +77,6 @@ def update_annot(ind):
     annot.set_text(text)
     annot.get_bbox_patch().set_facecolor(cmap(norm(c[ind["ind"][0]])))
     annot.get_bbox_patch().set_alpha(0.4)
-
 
 def hover(event):
     vis = annot.get_visible()

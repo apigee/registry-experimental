@@ -6,18 +6,6 @@ data:
   displayName: ""
   description: ""
   generatedResources:
-    - pattern: apis/-/versions/-/specs/-/artifacts/complexity
-      filter: ""
-      dependencies:
-        - pattern: $resource.spec
-          filter: ""
-      action: registry compute complexity $resource.spec
-    - pattern: apis/-/versions/-/specs/-/artifacts/vocabulary
-      filter: ""
-      dependencies:
-        - pattern: $resource.spec
-          filter: ""
-      action: registry compute vocabulary $resource.spec
     - pattern: apis/-/versions/-/specs/-/artifacts/conformance-receipt
       filter: ""
       receipt: true

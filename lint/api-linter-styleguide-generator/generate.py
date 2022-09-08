@@ -14,7 +14,7 @@ class StyleGuideGenerator(object):
         guideline_id_to_guideline = defaultdict(lambda: {
             "id": "",
             "rules": [],
-            "status": "ACTIVE",
+            "state": "ACTIVE",
         })
 
         rules_path = "./api-linter/docs/rules"
@@ -71,20 +71,26 @@ class StyleGuideGenerator(object):
                     pass
 
         return {
-            "id": "api-linter-styleguide",
-            "mime_types": [
-                "application/x.protobuf+zip",
-            ],
-            "guidelines": [
-                guideline_id_to_guideline[guideline_id] 
-                for guideline_id in guideline_id_to_guideline
-            ],
-            "linters": [
-                {
-                    "name": "api-linter",
-                    "uri": "https://github.com/googleapis/api-linter",
-                }
-            ],
+            "apiVersion": "apigeeregistry/v1",
+            "kind": "StyleGuide",
+            "metadata": {
+                "name": "apihub-styleguide",
+            },
+            "data": {
+                "mime_types": [
+                    "application/x.protobuf+zip",
+                ],
+                "guidelines": [
+                    guideline_id_to_guideline[guideline_id]
+                    for guideline_id in guideline_id_to_guideline
+                ],
+                "linters": [
+                    {
+                        "name": "api-linter",
+                        "uri": "https://github.com/googleapis/api-linter",
+                    }
+                ],
+            },
         }
         
 

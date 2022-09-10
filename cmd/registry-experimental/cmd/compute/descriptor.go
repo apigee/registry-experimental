@@ -17,6 +17,11 @@ package compute
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
 
 	"github.com/apigee/registry/cmd/registry/core"
 	"github.com/apigee/registry/log"
@@ -29,6 +34,7 @@ import (
 	discovery "github.com/google/gnostic/discovery"
 	oas2 "github.com/google/gnostic/openapiv2"
 	oas3 "github.com/google/gnostic/openapiv3"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func descriptorCommand(ctx context.Context) *cobra.Command {
@@ -42,12 +48,12 @@ func descriptorCommand(ctx context.Context) *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")
 			}
 
-			client, err := connection.NewClient(ctx)
+			client, err := connection.NewRegistryClient(ctx)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := core.WorkerPool(ctx, 64)
+			taskQueue, wait := core.WorkerPool(ctx, 1)
 			defer wait()
 			// Generate tasks.
 			name := args[0]
@@ -112,6 +118,13 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
+	} else if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
+		typeURL = "google.protobuf.FileDescriptorSet"
+		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
+		document, err = descriptorFromZippedProtos(spec.Name, data)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Warnf("error processing protos: %s", spec.Name)
+		}
 	} else {
 		return fmt.Errorf("unable to generate descriptor for style %s", spec.GetMimeType())
 	}
@@ -127,4 +140,61 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 		Contents: messageData,
 	}
 	return core.SetArtifact(ctx, task.client, artifact)
+}
+
+// descriptorFromZippedProtos runs protoc and returns the results.
+func descriptorFromZippedProtos(name string, b []byte) (*descriptorpb.FileDescriptorSet, error) {
+	// create a tmp directory
+	root, err := ioutil.TempDir("", "registry-protos-")
+	if err != nil {
+		return nil, err
+	}
+	// whenever we finish, delete the tmp directory
+	defer os.RemoveAll(root)
+	// unzip the protos to the temp directory
+	_, err = core.UnzipArchiveToPath(b, root+"/protos")
+	if err != nil {
+		return nil, err
+	}
+	return generateDescriptorForDirectory(name, root)
+}
+
+func generateDescriptorForDirectory(name string, root string) (*descriptorpb.FileDescriptorSet, error) {
+	// run protoc on all of the protos in the main directory
+	protos := []string{}
+	err := filepath.Walk(root+"/protos",
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if strings.HasSuffix(path, ".proto") {
+				protos = append(protos, strings.TrimPrefix(path, root+"/"))
+			}
+			return nil
+		})
+	if err != nil {
+		return nil, err
+	}
+	parts := []string{}
+	parts = append(parts, protos...)
+	parts = append(parts, "-I")
+	parts = append(parts, "protos")
+	parts = append(parts, "-oproto.pb")
+	cmd := exec.Command("protoc", parts...)
+	cmd.Dir = root
+	fmt.Printf("running %+v\n", cmd)
+	data, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("error %+v\n", err)
+		return nil, err
+	}
+	fmt.Printf("protoc output: %s\n", string(data))
+	// attempt to read the compiler output
+	bytes, err := ioutil.ReadFile(root + "/proto.pb")
+	if err != nil {
+		return nil, err
+	}
+	var s descriptorpb.FileDescriptorSet
+	err = proto.Unmarshal(bytes, &s)
+	return &s, err
 }

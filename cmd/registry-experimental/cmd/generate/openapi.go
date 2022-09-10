@@ -25,7 +25,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/apigee/registry/cmd/registry/core"
-	"github.com/apigee/registry/connection"
+	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/rpc"
 	"github.com/apigee/registry/server/registry/names"
 	"github.com/spf13/cobra"
@@ -44,7 +44,7 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")
 			}
 
-			client, err := connection.NewClient(ctx)
+			client, err := connection.NewRegistryClient(ctx)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
@@ -56,12 +56,13 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 			name := args[0]
 			if spec, err := names.ParseSpec(name); err == nil {
 				// Iterate through a collection of specs and evaluate each.
-				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) {
+				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) error {
 					taskQueue <- &generateOpenAPITask{
 						client:    client,
 						specName:  spec.Name,
 						newSpecID: specID,
 					}
+					return nil
 				})
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Fatal("Failed to list specs")
@@ -74,7 +75,7 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 }
 
 type generateOpenAPITask struct {
-	client    connection.Client
+	client    connection.RegistryClient
 	specName  string
 	newSpecID string
 }
@@ -154,32 +155,10 @@ func openAPIFromZippedProtos(name string, b []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// unpack api-common-protos in the temp directory
-	cmd := exec.Command("git", "clone", "https://github.com/googleapis/api-common-protos")
-	cmd.Dir = root
-	err = cmd.Run()
-	if err != nil {
-		return "", err
-	}
-	// run on each proto file in the archive
-	lint, err := generateOpenAPIForDirectory(name, root)
-	if err == nil {
-		return lint, nil
-	}
-	// if we had errors, add googleapis to the temp directory and retry
-	cmd = exec.Command("git", "clone", "https://github.com/googleapis/googleapis")
-	cmd.Dir = root
-	err = cmd.Run()
-	if err != nil {
-		return "", err
-	}
-	// rerun with the extra googleapis protos
 	return generateOpenAPIForDirectory(name, root)
 }
 
 func generateOpenAPIForDirectory(name string, root string) (string, error) {
-	lint := &rpc.Lint{}
-	lint.Name = name
 	// run protoc on all of the protos in the main directory
 	protos := []string{}
 	err := filepath.Walk(root+"/protos",
@@ -199,10 +178,6 @@ func generateOpenAPIForDirectory(name string, root string) (string, error) {
 	parts = append(parts, protos...)
 	parts = append(parts, "-I")
 	parts = append(parts, "protos")
-	parts = append(parts, "-I")
-	parts = append(parts, "api-common-protos")
-	parts = append(parts, "-I")
-	parts = append(parts, "googleapis")
 	parts = append(parts, "--openapi_out=.")
 	cmd := exec.Command("protoc", parts...)
 	cmd.Dir = root
@@ -212,7 +187,7 @@ func generateOpenAPIForDirectory(name string, root string) (string, error) {
 		fmt.Printf("error %+v\n", err)
 		return "", err
 	}
-	fmt.Printf("output: %s\n", string(data))
+	fmt.Printf("protoc output: %s\n", string(data))
 	// attempt to read an openapi.yaml file
 	bytes, err := ioutil.ReadFile(root + "/openapi.yaml")
 	if err != nil {

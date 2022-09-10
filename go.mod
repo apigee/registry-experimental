@@ -7,7 +7,8 @@ require (
 	cloud.google.com/go/cloudtasks v1.0.0
 	cloud.google.com/go/pubsub v1.17.1
 	github.com/GoogleCloudPlatform/cloudsql-proxy v1.26.0
-	github.com/apigee/registry v0.5.4
+	github.com/apex/log v1.9.0
+	github.com/apigee/registry v0.5.6
 	github.com/blevesearch/bleve v1.0.14
 	github.com/envoyproxy/go-control-plane v0.9.10-0.20210907150352-cf90f659a021
 	github.com/gogo/googleapis v1.4.1
@@ -34,7 +35,6 @@ require (
 require (
 	github.com/RoaringBitmap/roaring v0.4.23 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20210930093333-01de314d7883 // indirect
-	github.com/apex/log v1.9.0 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/mmap-go v1.0.2 // indirect
 	github.com/blevesearch/segment v0.9.0 // indirect

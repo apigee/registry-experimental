@@ -69,7 +69,7 @@ func representationForAPI(api *rpc.Api) map[string]interface{} {
 
 func resolveAPIs(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewRegistryClient(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func resolveAPIs(p graphql.ResolveParams) (interface{}, error) {
 
 func resolveAPI(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewRegistryClient(ctx)
 	if err != nil {
 		return nil, err
 	}

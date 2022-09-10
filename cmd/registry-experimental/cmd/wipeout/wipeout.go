@@ -31,7 +31,7 @@ func Command(ctx context.Context) *cobra.Command {
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := context.Background()
-			registryClient, err := connection.NewClient(ctx)
+			registryClient, err := connection.NewRegistryClient(ctx)
 			if err != nil {
 				log.Fatalf(ctx, "Failed to create client: %+v", err)
 			}

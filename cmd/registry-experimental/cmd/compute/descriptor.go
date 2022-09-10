@@ -121,7 +121,7 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	} else if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
 		typeURL = "google.protobuf.FileDescriptorSet"
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
-		document, err = descriptorFromZippedProtos(spec.Name, data)
+		document, err = descriptorFromZippedProtos(ctx, spec.Name, data)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warnf("error processing protos: %s", spec.Name)
 		}
@@ -143,7 +143,7 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 }
 
 // descriptorFromZippedProtos runs protoc and returns the results.
-func descriptorFromZippedProtos(name string, b []byte) (*descriptorpb.FileDescriptorSet, error) {
+func descriptorFromZippedProtos(ctx context.Context, name string, b []byte) (*descriptorpb.FileDescriptorSet, error) {
 	// create a tmp directory
 	root, err := ioutil.TempDir("", "registry-protos-")
 	if err != nil {
@@ -156,10 +156,10 @@ func descriptorFromZippedProtos(name string, b []byte) (*descriptorpb.FileDescri
 	if err != nil {
 		return nil, err
 	}
-	return generateDescriptorForDirectory(name, root)
+	return generateDescriptorForDirectory(ctx, name, root)
 }
 
-func generateDescriptorForDirectory(name string, root string) (*descriptorpb.FileDescriptorSet, error) {
+func generateDescriptorForDirectory(ctx context.Context, name string, root string) (*descriptorpb.FileDescriptorSet, error) {
 	// run protoc on all of the protos in the main directory
 	protos := []string{}
 	err := filepath.Walk(root+"/protos",
@@ -182,13 +182,13 @@ func generateDescriptorForDirectory(name string, root string) (*descriptorpb.Fil
 	parts = append(parts, "-oproto.pb")
 	cmd := exec.Command("protoc", parts...)
 	cmd.Dir = root
-	fmt.Printf("running %+v\n", cmd)
+	log.FromContext(ctx).Debugf("running %+v\n", cmd)
 	data, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Printf("error %+v\n", err)
+		log.FromContext(ctx).Errorf("error %+v\n", err)
 		return nil, err
 	}
-	fmt.Printf("protoc output: %s\n", string(data))
+	log.FromContext(ctx).Debugf("protoc output: %s\n", string(data))
 	// attempt to read the compiler output
 	bytes, err := ioutil.ReadFile(root + "/proto.pb")
 	if err != nil {

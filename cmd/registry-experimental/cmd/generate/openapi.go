@@ -23,8 +23,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/apex/log"
 	"github.com/apigee/registry/cmd/registry/core"
+	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/rpc"
 	"github.com/apigee/registry/server/registry/names"
@@ -49,7 +49,7 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := core.WorkerPool(ctx, 16)
+			taskQueue, wait := core.WorkerPool(ctx, 1)
 			defer wait()
 
 			// Generate tasks.
@@ -102,15 +102,15 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	var openapi string
 	if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
-		openapi, err = openAPIFromZippedProtos(spec.Name, data)
+		openapi, err = openAPIFromZippedProtos(ctx, spec.Name, data)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Warnf("error processing protos: %s", spec.Name)
+			log.FromContext(ctx).WithError(err).Errorf("error processing protos: %s", spec.Name)
 		}
 	} else if core.IsDiscovery(spec.GetMimeType()) {
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromDiscovery(spec.Name, data)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Warnf("error processing protos: %s", spec.Name)
+			log.FromContext(ctx).WithError(err).Errorf("error processing protos: %s", spec.Name)
 		}
 	} else {
 		log.FromContext(ctx).Infof("we don't know how to generate OpenAPI for %s", spec.Name)
@@ -120,7 +120,7 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	messageData := []byte(openapi)
 	messageData, err = core.GZippedBytes(messageData)
 	if err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to compress generated OpenAPI")
+		log.FromContext(ctx).WithError(err).Errorf("Failed to compress generated OpenAPI")
 		return nil
 	}
 	newSpec := &rpc.ApiSpec{
@@ -142,7 +142,7 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 // This uses protoc and https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
 // which can be installed using
 //   go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
-func openAPIFromZippedProtos(name string, b []byte) (string, error) {
+func openAPIFromZippedProtos(ctx context.Context, name string, b []byte) (string, error) {
 	// create a tmp directory
 	root, err := ioutil.TempDir("", "registry-protos-")
 	if err != nil {
@@ -155,10 +155,10 @@ func openAPIFromZippedProtos(name string, b []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return generateOpenAPIForDirectory(name, root)
+	return generateOpenAPIForDirectory(ctx, name, root)
 }
 
-func generateOpenAPIForDirectory(name string, root string) (string, error) {
+func generateOpenAPIForDirectory(ctx context.Context, name string, root string) (string, error) {
 	// run protoc on all of the protos in the main directory
 	protos := []string{}
 	err := filepath.Walk(root+"/protos",
@@ -181,13 +181,13 @@ func generateOpenAPIForDirectory(name string, root string) (string, error) {
 	parts = append(parts, "--openapi_out=.")
 	cmd := exec.Command("protoc", parts...)
 	cmd.Dir = root
-	fmt.Printf("running %+v\n", cmd)
+	log.FromContext(ctx).Debugf("running %+v\n", cmd)
 	data, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Printf("error %+v\n", err)
+		log.FromContext(ctx).Errorf("error %+v\n", err)
 		return "", err
 	}
-	fmt.Printf("protoc output: %s\n", string(data))
+	log.FromContext(ctx).Debugf("protoc output: %s\n", string(data))
 	// attempt to read an openapi.yaml file
 	bytes, err := ioutil.ReadFile(root + "/openapi.yaml")
 	if err != nil {

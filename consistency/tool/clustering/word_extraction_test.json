@@ -1,0 +1,250 @@
+{
+   "simple-multiple-artifacts": [
+      {
+         "name": "artifact1",
+         "schemas": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "properties": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "operations": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "parameters": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ]
+      },
+      {
+         "name": "artifact2",
+         "schemas": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "properties": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "operations": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "parameters": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ]
+      }
+   ],
+   "simple-one-artifact": [
+      {
+         "name": "artifact1",
+         "schemas": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "properties": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "operations": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "parameters": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ]
+      }
+   ],
+   "empty-schema": [
+      {
+         "name": "artifact1",
+         "schemas": [],
+         "properties": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "operations": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ],
+         "parameters": [
+            {
+               "word": "ab",
+               "count": 2
+            },
+            {
+               "word": "bc",
+               "count": 1
+            },
+            {
+               "word": "cd",
+               "count": 1
+            }
+         ]
+      }
+   ],
+   "empty-artifact": [
+      {
+         "name": "artifact1",
+         "schemas": [],
+         "properties": [],
+         "operations": [],
+         "parameters": []
+      }
+   ],
+   "null-artifact": [
+      {
+         "name": "artifact1",
+         "schemas": null,
+         "properties": null,
+         "operations": null,
+         "parameters": null
+      }
+   ],
+   "no-return-values": []
+}

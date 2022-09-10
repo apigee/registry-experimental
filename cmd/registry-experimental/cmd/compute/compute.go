@@ -26,9 +26,10 @@ func Command(ctx context.Context) *cobra.Command {
 		Short: "Compute properties of resources in the API Registry",
 	}
 
+	cmd.AddCommand(descriptorCommand(ctx))
+	cmd.AddCommand(indexCommand(ctx))
 	cmd.AddCommand(searchIndexCommand(ctx))
 
 	cmd.PersistentFlags().String("filter", "", "Filter selected resources")
-	cmd.PersistentFlags().String("something", "", "desc")
 	return cmd
 }

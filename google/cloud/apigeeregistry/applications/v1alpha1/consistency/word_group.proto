@@ -1,0 +1,31 @@
+// Copyright 2022 Google LLC. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+// Stores words labeled into the same group.
+
+syntax = "proto3";
+
+package google.cloud.apigeeregistry.applications.v1alpha1.consistency;
+import "google/api/field_behavior.proto";
+
+// WordGroup stores the group of words detected by the clustering algorithm to be similar. 
+// The most frequent or alphabetically the first word is used to ID the entire group. 
+message WordGroup {
+    string id = 1 [ (google.api.field_behavior) = REQUIRED ];
+    string kind = 2 [ (google.api.field_behavior) = REQUIRED ];
+
+    // Stores the frequency of a word in the group
+    map<string, int32> word_frequency = 3 [ (google.api.field_behavior) = REQUIRED ];
+}

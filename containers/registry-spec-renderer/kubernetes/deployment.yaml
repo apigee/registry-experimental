@@ -1,3 +1,17 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,9 +37,30 @@ spec:
           value: "8080"
         - name: "GOOGLE_APPLICATION_CREDENTIALS"
           value: "/var/run/secret/cloud.google.com/service-account.json"
+        - name: "MOCK_ENDPOINT_ARTIFACT_NAME"
+          value: "mock-endpoint"
         volumeMounts:
         - name: "service-account"
           mountPath: "/var/run/secret/cloud.google.com"
+        ports:
+        - name: renderer-port
+          containerPort: 8080
+        readinessProbe:
+          httpGet:
+            port: renderer-port
+            path: /healthz
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 10
+        livenessProbe:
+          httpGet:
+            port: renderer-port
+            path: /healthz
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 10
       volumes:
       - name: "service-account"
         secret:
@@ -36,9 +71,42 @@ kind: Service
 metadata:
   name: registry-spec-renderer-lb
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
-  - port: 80
+  - port: 8080
     targetPort: 8080
   selector:
     app: registry-spec-renderer
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: registry-spec-renderer-frontend
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: "301"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: registry-spec-renderer-ingress
+  annotations:
+    networking.gke.io/v1beta1.FrontendConfig: registry-spec-renderer-frontend
+    kubernetes.io/ingress.global-static-ip-name: registry-spec-renderer-static-ip
+    networking.gke.io/managed-certificates: registry-spec-renderer-cert
+    kubernetes.io/ingress.class: "gce"
+spec:
+  defaultBackend:
+    service:
+      name:  registry-spec-renderer-lb
+      port:
+        number: 8080
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: registry-spec-renderer-cert
+spec:
+  domains:
+  - 5-4-3-2.sslip.io

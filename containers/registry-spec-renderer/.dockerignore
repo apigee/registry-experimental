@@ -1,2 +1,4 @@
-node_modules
-kubernetes
+node_modules/
+kubernetes/
+package-lock.json
+README.md

@@ -42,6 +42,8 @@ spec:
               key: GOOGLE_SIGNIN_CLIENTID
         - name: REGISTRY_SERVICE
           value: "/"
+        - name: SPEC_RENDERER_SERVICE
+          value: "/render"
         ports:
         - name: app-port
           containerPort: 8888

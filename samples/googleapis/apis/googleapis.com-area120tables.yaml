@@ -1,0 +1,18 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: googleapis.com-area120tables
+data:
+  displayName: googleapis.com-area120tables
+  description: Area120 Tables API
+  versions:
+    - metadata:
+        name: v1alpha1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/area120tables/v1alpha1/openapi.yaml

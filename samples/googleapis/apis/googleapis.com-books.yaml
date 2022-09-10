@@ -1,0 +1,18 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: googleapis.com-books
+data:
+  displayName: googleapis.com-books
+  description: Books API
+  versions:
+    - metadata:
+        name: v1
+      data:
+        specs:
+          - metadata:
+              name: openapi.yaml
+            data:
+              filename: openapi.yaml
+              mimeType: application/x.openapi+gzip;version=3
+              sourceURI: https://raw.githubusercontent.com/APIs-guru/openapi-directory/754babf60fe7fae589c43afea8ff31c44cfb48e9/APIs/googleapis.com/books/v1/openapi.yaml

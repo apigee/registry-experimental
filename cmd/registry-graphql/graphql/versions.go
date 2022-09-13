@@ -67,7 +67,7 @@ func representationForVersion(version *rpc.ApiVersion) map[string]interface{} {
 }
 func resolveVersions(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewRegistryClient(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func resolveVersions(p graphql.ResolveParams) (interface{}, error) {
 
 func resolveVersion(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewRegistryClient(ctx)
 	if err != nil {
 		return nil, err
 	}

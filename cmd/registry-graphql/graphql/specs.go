@@ -83,7 +83,7 @@ func representationForSpec(spec *rpc.ApiSpec) map[string]interface{} {
 
 func resolveSpecs(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewRegistryClient(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func resolveSpecs(p graphql.ResolveParams) (interface{}, error) {
 
 func resolveSpec(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewRegistryClient(ctx)
 	if err != nil {
 		return nil, err
 	}

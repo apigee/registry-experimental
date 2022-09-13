@@ -49,7 +49,7 @@ func representationForArtifact(artifact *rpc.Artifact) map[string]interface{} {
 
 func resolveArtifacts(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewRegistryClient(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func resolveArtifacts(p graphql.ResolveParams) (interface{}, error) {
 
 func resolveArtifact(p graphql.ResolveParams) (interface{}, error) {
 	ctx := p.Context
-	c, err := connection.NewClient(ctx)
+	c, err := connection.NewRegistryClient(ctx)
 	if err != nil {
 		return nil, err
 	}

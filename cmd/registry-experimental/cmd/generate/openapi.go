@@ -181,7 +181,7 @@ func generateOpenAPIForDirectory(ctx context.Context, name string, root string) 
 	parts = append(parts, "--openapi_out=.")
 	cmd := exec.Command("protoc", parts...)
 	cmd.Dir = root
-	log.FromContext(ctx).Debugf("running %+v\n", cmd)
+	log.FromContext(ctx).Debugf("Running %+v\n", cmd)
 	data, err := cmd.CombinedOutput()
 	if err != nil {
 		log.FromContext(ctx).Errorf("error %+v\n", err)

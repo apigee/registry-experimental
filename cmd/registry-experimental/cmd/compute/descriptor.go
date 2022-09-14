@@ -182,7 +182,7 @@ func generateDescriptorForDirectory(ctx context.Context, name string, root strin
 	parts = append(parts, "-oproto.pb")
 	cmd := exec.Command("protoc", parts...)
 	cmd.Dir = root
-	log.FromContext(ctx).Debugf("running %+v\n", cmd)
+	log.FromContext(ctx).Debugf("Running %+v\n", cmd)
 	data, err := cmd.CombinedOutput()
 	if err != nil {
 		log.FromContext(ctx).Errorf("error %+v\n", err)

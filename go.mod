@@ -34,6 +34,7 @@ require (
 require (
 	github.com/RoaringBitmap/roaring v0.4.23 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20210930093333-01de314d7883 // indirect
+	github.com/apex/log v1.9.0 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/mmap-go v1.0.2 // indirect
 	github.com/blevesearch/segment v0.9.0 // indirect

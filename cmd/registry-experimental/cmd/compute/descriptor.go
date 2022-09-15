@@ -141,16 +141,13 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	return core.SetArtifact(ctx, task.client, artifact)
 }
 
-// descriptorFromZippedProtos runs protoc and returns the results.
+// descriptorFromZippedProtos runs protoc on a collection of protos and returns a file descriptor set.
 func descriptorFromZippedProtos(ctx context.Context, name string, b []byte) (*descriptorpb.FileDescriptorSet, error) {
-	// create a tmp directory
 	root, err := ioutil.TempDir("", "registry-protos-")
 	if err != nil {
 		return nil, err
 	}
-	// whenever we finish, delete the tmp directory
 	defer os.RemoveAll(root)
-	// unzip the protos to the temp directory
 	_, err = core.UnzipArchiveToPath(b, root+"/protos")
 	if err != nil {
 		return nil, err
@@ -183,7 +180,6 @@ func generateDescriptorForDirectory(ctx context.Context, name string, root strin
 	log.FromContext(ctx).Debugf("Running %+v", cmd)
 	data, err := cmd.CombinedOutput()
 	if err != nil {
-		log.FromContext(ctx).Errorf("%+v", err)
 		return nil, err
 	}
 	log.FromContext(ctx).Debugf("Output: %s", string(data))

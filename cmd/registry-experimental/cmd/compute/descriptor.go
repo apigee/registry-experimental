@@ -17,6 +17,11 @@ package compute
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
 
 	"github.com/apigee/registry/cmd/registry/core"
 	"github.com/apigee/registry/log"
@@ -29,13 +34,14 @@ import (
 	discovery "github.com/google/gnostic/discovery"
 	oas2 "github.com/google/gnostic/openapiv2"
 	oas3 "github.com/google/gnostic/openapiv3"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 func descriptorCommand(ctx context.Context) *cobra.Command {
 	return &cobra.Command{
 		Use:   "descriptor",
 		Short: "Compute descriptors of API specs",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			filter, err := cmd.Flags().GetString("filter")
 			if err != nil {
@@ -47,7 +53,7 @@ func descriptorCommand(ctx context.Context) *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := core.WorkerPool(ctx, 64)
+			taskQueue, wait := core.WorkerPool(ctx, 1)
 			defer wait()
 			// Generate tasks.
 			name := args[0]
@@ -86,7 +92,7 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	}
 	name := spec.GetName()
 	relation := "descriptor"
-	log.Debugf(ctx, "Computing %s/artifacts/%s", name, relation)
+	log.Infof(ctx, "Computing %s/artifacts/%s", name, relation)
 	data, err := core.GetBytesForSpec(ctx, task.client, spec)
 	if err != nil {
 		return nil
@@ -112,6 +118,12 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
+	} else if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
+		typeURL = "google.protobuf.FileDescriptorSet"
+		document, err = descriptorFromZippedProtos(ctx, spec.Name, data)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Warnf("error processing protos: %s", spec.Name)
+		}
 	} else {
 		return fmt.Errorf("unable to generate descriptor for style %s", spec.GetMimeType())
 	}
@@ -127,4 +139,56 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 		Contents: messageData,
 	}
 	return core.SetArtifact(ctx, task.client, artifact)
+}
+
+// descriptorFromZippedProtos runs protoc on a collection of protos and returns a file descriptor set.
+func descriptorFromZippedProtos(ctx context.Context, name string, b []byte) (*descriptorpb.FileDescriptorSet, error) {
+	root, err := ioutil.TempDir("", "registry-protos-")
+	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(root)
+	_, err = core.UnzipArchiveToPath(b, root+"/protos")
+	if err != nil {
+		return nil, err
+	}
+	return generateDescriptorForDirectory(ctx, name, root)
+}
+
+func generateDescriptorForDirectory(ctx context.Context, name string, root string) (*descriptorpb.FileDescriptorSet, error) {
+	// run protoc on all of the protos in the main directory
+	protos := []string{}
+	err := filepath.Walk(root+"/protos",
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if strings.HasSuffix(path, ".proto") {
+				protos = append(protos, strings.TrimPrefix(path, root+"/"))
+			}
+			return nil
+		})
+	if err != nil {
+		return nil, err
+	}
+	args := []string{}
+	args = append(args, protos...)
+	args = append(args, "--proto_path=protos")
+	args = append(args, "--descriptor_set_out=proto.pb")
+	cmd := exec.Command("protoc", args...)
+	cmd.Dir = root
+	log.FromContext(ctx).Debugf("Running %+v", cmd)
+	data, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, err
+	}
+	log.FromContext(ctx).Debugf("Output: %s", string(data))
+	// attempt to read the compiler output
+	bytes, err := ioutil.ReadFile(root + "/proto.pb")
+	if err != nil {
+		return nil, err
+	}
+	var s descriptorpb.FileDescriptorSet
+	err = proto.Unmarshal(bytes, &s)
+	return &s, err
 }

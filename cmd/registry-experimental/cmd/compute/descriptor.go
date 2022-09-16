@@ -41,7 +41,7 @@ func descriptorCommand(ctx context.Context) *cobra.Command {
 	return &cobra.Command{
 		Use:   "descriptor",
 		Short: "Compute descriptors of API specs",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			filter, err := cmd.Flags().GetString("filter")
 			if err != nil {
@@ -92,7 +92,7 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	}
 	name := spec.GetName()
 	relation := "descriptor"
-	log.Debugf(ctx, "Computing %s/artifacts/%s", name, relation)
+	log.Infof(ctx, "Computing %s/artifacts/%s", name, relation)
 	data, err := core.GetBytesForSpec(ctx, task.client, spec)
 	if err != nil {
 		return nil
@@ -120,7 +120,6 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 		}
 	} else if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
 		typeURL = "google.protobuf.FileDescriptorSet"
-		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		document, err = descriptorFromZippedProtos(ctx, spec.Name, data)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warnf("error processing protos: %s", spec.Name)
@@ -142,16 +141,13 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	return core.SetArtifact(ctx, task.client, artifact)
 }
 
-// descriptorFromZippedProtos runs protoc and returns the results.
+// descriptorFromZippedProtos runs protoc on a collection of protos and returns a file descriptor set.
 func descriptorFromZippedProtos(ctx context.Context, name string, b []byte) (*descriptorpb.FileDescriptorSet, error) {
-	// create a tmp directory
 	root, err := ioutil.TempDir("", "registry-protos-")
 	if err != nil {
 		return nil, err
 	}
-	// whenever we finish, delete the tmp directory
 	defer os.RemoveAll(root)
-	// unzip the protos to the temp directory
 	_, err = core.UnzipArchiveToPath(b, root+"/protos")
 	if err != nil {
 		return nil, err
@@ -175,20 +171,18 @@ func generateDescriptorForDirectory(ctx context.Context, name string, root strin
 	if err != nil {
 		return nil, err
 	}
-	parts := []string{}
-	parts = append(parts, protos...)
-	parts = append(parts, "-I")
-	parts = append(parts, "protos")
-	parts = append(parts, "-oproto.pb")
-	cmd := exec.Command("protoc", parts...)
+	args := []string{}
+	args = append(args, protos...)
+	args = append(args, "--proto_path=protos")
+	args = append(args, "--descriptor_set_out=proto.pb")
+	cmd := exec.Command("protoc", args...)
 	cmd.Dir = root
-	log.FromContext(ctx).Debugf("Running %+v\n", cmd)
+	log.FromContext(ctx).Debugf("Running %+v", cmd)
 	data, err := cmd.CombinedOutput()
 	if err != nil {
-		log.FromContext(ctx).Errorf("error %+v\n", err)
 		return nil, err
 	}
-	log.FromContext(ctx).Debugf("protoc output: %s\n", string(data))
+	log.FromContext(ctx).Debugf("Output: %s", string(data))
 	// attempt to read the compiler output
 	bytes, err := ioutil.ReadFile(root + "/proto.pb")
 	if err != nil {

@@ -1,0 +1,21 @@
+apiVersion: apigeeregistry/v1
+kind: ScoreDefinition
+metadata:
+  name: apihub-lint-157
+data:
+  displayName: Lint Errors
+  description: Number of lint errors found for AIP-157 in conformance report
+  uri: https://linter.aip.dev/157
+  uriDisplayName: AIP-157 rules
+  targetResource:
+    pattern: apis/-/versions/-/specs/-
+    filter: ""
+  scoreFormula:
+    artifact:
+      pattern: $resource.spec/artifacts/conformance-apihub-styleguide
+      filter: ""
+    scoreExpression: 'has(guidelineReportGroups[2].guidelineReports) ? sum(guidelineReportGroups[2].guidelineReports.filter(g, g.guidelineId == "aip157").map(r, has(r.ruleReportGroups[1].ruleReports) ? size(r.ruleReportGroups[1].ruleReports) : 0)) : 0'
+    referenceId: ""
+  integer:
+    minValue: 0
+    thresholds: []

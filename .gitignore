@@ -4,3 +4,13 @@ consistency/rpc/build
 consistency/rpc/google_cloud_apigeeregistry.egg-info
 consistency/registry-protos
 third_party
+
+# VSCode
+.vscode/
+
+# IntelliJ
+.idea/
+*.iml
+
+# gofmt
+*.grc.bk

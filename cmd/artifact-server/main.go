@@ -95,8 +95,8 @@ func handleRequest(w http.ResponseWriter, req *http.Request) {
 	}
 	accept := req.Header["Accept"]
 	if slices.Contains(accept, "text/json") {
-		fmt.Fprint(w, protojson.Format(message))
-		fmt.Fprint(w, "\n")
+		// The protojson formatting doesn't include a final newline.
+		fmt.Fprintln(w, protojson.Format(message))
 		return
 	}
 	if slices.Contains(accept, "text/yaml") {
@@ -107,9 +107,9 @@ func handleRequest(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprint(w, prototext.Format(message))
 		return
 	}
-	// default return format is JSON
-	fmt.Fprint(w, protojson.Format(message))
-	fmt.Fprint(w, "\n")
+	// Default return format is JSON.
+	// As noted above, the protojson formatting doesn't include a final newline.
+	fmt.Fprintln(w, protojson.Format(message))
 }
 
 func yamlFormat(message proto.Message) string {

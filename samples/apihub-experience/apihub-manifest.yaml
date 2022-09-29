@@ -1,0 +1,20 @@
+apiVersion: apigeeregistry/v1
+kind: Manifest
+metadata:
+  name: apihub-manifest
+data:
+  generated_resources:
+  - pattern: "apis/-/versions/-/specs/-/artifacts/conformance-receipt"
+    receipt: true
+    dependencies:
+    - pattern: "$resource.spec"
+    - pattern: "artifacts/apihub-styleguide"
+    action: "registry compute conformance $resource.spec"
+  - pattern: "apis/-/versions/-/specs/-/artifacts/score-receipt"
+    receipt: true
+    refresh: 300s
+    action: "registry compute score $resource.spec"
+  - pattern: "apis/-/versions/-/specs/-/artifacts/scorecard-receipt"
+    receipt: true
+    refresh: 300s
+    action: "registry compute scorecard $resource.spec"

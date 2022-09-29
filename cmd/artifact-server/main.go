@@ -75,7 +75,7 @@ func handleRequest(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if contents.GetContentType() == "text/plain" {
-		fmt.Fprintf(w, "%s\n", string(contents.GetData()))
+		fmt.Fprintf(w, "%s\n", contents.GetData())
 		return
 	}
 	messageType, err := core.MessageTypeForMimeType(contents.GetContentType())

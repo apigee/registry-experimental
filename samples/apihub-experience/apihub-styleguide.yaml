@@ -1,0 +1,274 @@
+apiVersion: apigeeregistry/v1
+kind: StyleGuide
+metadata:
+  name: apihub-styleguide
+data:
+  mime_types:
+  - application/x.openapi+gzip;version=3
+  - application/x.openapi;version=3
+  - application/x.openapi+gzip;version=2
+  - application/x.openapi;version=2
+  - application/x.openapi+gzip
+  - application/x.openapi
+  guidelines:
+  - id: operation
+    display_name: Govern properties of Operations
+    rules:
+    - id: operation-success-response
+      description: >
+        Operation must have at least one 2xx or 3xx response.
+        Any API operation (endpoint) can fail, but presumably
+        it is also meant to do something constructive at some point.
+      linter: spectral
+      linter_rulename: operation-success-response
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#operation-success-response
+    - id: operation-operationId-unique
+      description: Every operation must have a unique operationId.
+      linter: spectral
+      linter_rulename: operation-operationId-unique
+      severity: ERROR
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#operation-operationid-unique
+    - id: operation-parameters
+      description: >
+        Operation parameters are unique and non-repeating.
+        1. Operations must have unique name + in parameters.
+        2. Operation cannot have both in: body and in: formData parameters. (OpenAPI v2.0)
+        3. Operation must have only one in: body parameter. (OpenAPI v2.0)
+      linter: spectral
+      linter_rulename: operation-parameters
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#operation-parameters
+    - id: operation-description
+      description: Operation "description" must be present and non-empty string.
+      linter: spectral
+      linter_rulename: operation-description
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#operation-description
+    - id: operation-operationId
+      description: Operation must have "operationId"."
+      linter: spectral
+      linter_rulename: operation-operationId
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#operation-operationid
+    - id: operation-operationId-valid-in-url
+      description: >
+        Seeing as operationId is often used for unique URLs in
+        documentation systems, it's a good idea to avoid non-URL
+        safe characters."
+      linter: spectral
+      linter_rulename: operation-operationId-valid-in-url
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#operation-operationid-valid-in-url
+    - id: operation-singular-tag
+      description: >
+        Use just one tag for an operation, which is helpful for
+        some documentation systems which use tags to avoid duplicate content.
+      linter: spectral
+      linter_rulename: operation-singular-tag
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#operation-singular-tag
+    - id: operation-tags
+      description: Operation should have non-empty tags array.
+      linter: spectral
+      linter_rulename: operation-tags
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#operation-tags
+    - id: operation-tag-defined
+      description: Operation tags should be defined in global tags.
+      linter: spectral
+      linter_rulename: operation-tag-defined
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#operation-tag-defined
+    state: ACTIVE
+  - id: info
+    display_name: Govern properties of Info
+    rules:
+    - id: info-contact
+      description: >
+        Info object must have "contact" object.
+        Hopefully your API description document is so good that nobody ever
+        needs to contact you with questions, but that is rarely the case.
+        The contact object has a few different options for contact details.
+      linter: spectral
+      linter_rulename: info-contact
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#info-contact
+    - id: info-description
+      description: >
+        OpenAPI object info description must be present and non-empty string.
+        Examples can contain Markdown so you can really go to town with them,
+        implementing getting started information like where to find authentication
+        keys, and how to use them.
+      linter: spectral
+      linter_rulename: info-description
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#info-description
+    - id: info-license
+      description: >
+        The info object should have a license key.
+        It can be hard to pick a license, so if you don't have a lawyer around
+        you can use TLDRLegal and Choose a License to help give you an idea.
+        How useful this is in court is not entirely known, but having a license
+        is better than not having a license.
+      linter: spectral
+      linter_rulename: info-license
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#info-license
+    - id: license-url
+      description: >
+        Mentioning a license is only useful if people know what the license means,
+        so add a link to the full text for those who need it.
+      linter: spectral
+      linter_rulename: license-url
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#license-url
+    state: ACTIVE
+  - id: markdown
+    display_name: Govern properties of Markdown
+    rules:
+    - id: no-eval-in-markdown
+      description: >
+        Markdown descriptions must not have "eval(".
+        This rule protects against an edge case, for anyone bringing in description
+        documents from third parties and using the parsed content rendered in HTML/JS.
+        If one of those third parties does something shady like inject eval() JavaScript
+        statements, it could lead to an XSS attack.
+      linter: spectral
+      linter_rulename: no-eval-in-markdown
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#no-eval-in-markdown
+    - id: no-script-tags-in-markdown
+      description: >
+        Markdown descriptions must not have "<script>" tags.
+        This rule protects against a potential hack, for anyone bringing in description
+        documents from third parties then generating HTML documentation. If one of those
+        third parties does something shady like inject <script> tags, they could easily
+        execute arbitrary code on your domain, which if it's the same as your main
+        application could be all sorts of terrible.
+      linter: spectral
+      linter_rulename: no-script-tags-in-markdown
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#no-script-tags-in-markdown
+    state: ACTIVE
+  - id: path
+    display_name: Govern properties of Paths
+    rules:
+    - id: path-params
+      description: >
+        Path parameters are correct and valid.
+        1. For every parameters referenced in the path string (i.e: /users/{userId}),
+          the parameter must be defined in either path.parameters, or operation.parameters objects
+          (Non standard HTTP operations will be silently ignored.)
+        2. every path.parameters and operation.parameters parameter must be used in the path string.
+      linter: spectral
+      linter_rulename: path-params
+      severity: ERROR
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#path-params
+    - id: path-keys-no-trailing-slash
+      description: >
+        Keep trailing slashes off of paths, as it can cause some confusion. Some web
+        tooling (like mock servers, real servers, code generators, application frameworks, etc.)
+        will treat example.com/foo and example.com/foo/ as the same thing, but other
+        tooling will not. Avoid any confusion by just documenting them without the slash,
+        and maybe some tooling will let people shove a / on there when they're using it
+        or maybe not, but at least the docs are suggesting how it should be done properly.
+      linter: spectral
+      linter_rulename: path-keys-no-trailing-slash
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#path-keys-no-trailing-slash
+    - id: path-declarations-must-exist
+      description: Path parameter declarations cannot be empty, ex./given/{} is invalid.
+      linter: spectral
+      linter_rulename: path-declarations-must-exist
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#path-declarations-must-exist
+    - id: path-not-include-query
+      description: >
+        Don't put query string items in the path, they belong in parameters with in: query.
+      linter: spectral
+      linter_rulename: path-not-include-query
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#path-not-include-query
+    state: ACTIVE
+  - id: enum
+    display_name: Govern properties of Enums
+    rules:
+    - id: typed-enum
+      description: Enum values should respect the type specifier.
+      linter: spectral
+      linter_rulename: typed-enum
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#typed-enum
+    - id: duplicated-entry-in-enum
+      description: Each value of an enum must be different from one another.
+      linter: spectral
+      linter_rulename: duplicated-entry-in-enum
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#duplicated-entry-in-enum
+    state: ACTIVE
+  - id: metadata
+    display_name: Governs properties of additional metadata
+    rules:
+    - id: contact-properties
+      description: >
+        The info-contact rule will ask you to put in a contact object, and this rule will make sure
+        it's full of the most useful properties: name, url and email.
+      linter: spectral
+      linter_rulename: contact-properties
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#contact-properties
+    - id: tag-description
+      description: >
+        Tags alone are not very descriptive. Give folks a bit more information to work with.
+      linter: spectral
+      linter_rulename: tag-description
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#tag-description
+    state: ACTIVE
+  - id: openapi
+    display_name: Govern properties of OpenAPI objects
+    rules:
+    - id: openapi-tags-alphabetical
+      description: OpenAPI object should have alphabetical tags. This will be sorted by the name property.
+      linter: spectral
+      linter_rulename: openapi-tags-alphabetical
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#openapi-tags-alphabetical
+    - id: openapi-tags-uniqueness
+      description: OpenAPI object must not have duplicated tag names (identifiers).
+      linter: spectral
+      linter_rulename: openapi-tags-uniqueness
+      severity: ERROR
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#openapi-tags-uniqueness
+    - id: openapi-tags
+      description: OpenAPI object should have non-empty tags array.
+      linter: spectral
+      linter_rulename: openapi-tags
+      severity: WARNING
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#openapi-tags
+    state: ACTIVE
+  - id: openapiv2
+    display_name: Rules applied to OpenAPI v2.0 documents
+    rules:
+    - id: oas2-schema
+      description: Validate structure of OpenAPI v2 specification.
+      linter: spectral
+      linter_rulename: oas2-schema
+      severity: ERROR
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#oas2-schema
+    state: ACTIVE
+  - id: openapiv3
+    display_name: Rules applied to OpenAPI v3.0 documents
+    rules:
+    - id: oas3-schema
+      description: Validate structure of OpenAPI v3 specification.
+      linter: spectral
+      linter_rulename: oas3-schema
+      severity: ERROR
+      doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#oas3-schema
+    state: ACTIVE
+  
+linters:
+  - name: spectral
+    uri: https://github.com/stoplightio/spectral

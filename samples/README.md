@@ -3,6 +3,12 @@
 Each subdirectory contains a sample project that can be uploaded using the
 `registry` tool, e.g.
 
+## apihub-experience
+This directory contains the configurations which are offered in the API Hub experience as part of the default sample implementations.
+
+## googleapis-protos
+This directory contains sample configurations and scripts which can be used to evaluate the conformance of Googleapis (or any proto based API collection) with the [AIPs](https://google.aip.dev/general).
+
 ## googleapis-openapi
 
 This directory contains yamls which will upload ~60 APIs to the registry, along

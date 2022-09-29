@@ -31,17 +31,17 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 	"gopkg.in/yaml.v3"
 
-	gnostic_metrics_v1 "github.com/google/gnostic/metrics"
-	openapi_v2 "github.com/google/gnostic/openapiv2"
-	openapi_v3 "github.com/google/gnostic/openapiv3"
+	metrics "github.com/google/gnostic/metrics"
+	oas2 "github.com/google/gnostic/openapiv2"
+	oas3 "github.com/google/gnostic/openapiv3"
 )
 
 var messageTypes map[string]proto.Message = map[string]proto.Message{
-	"gnostic.metrics.Complexity":                                   &gnostic_metrics_v1.Complexity{},
-	"gnostic.metrics.VersionHistory":                               &gnostic_metrics_v1.VersionHistory{},
-	"gnostic.metrics.Vocabulary":                                   &gnostic_metrics_v1.Vocabulary{},
-	"gnostic.openapiv2.Document":                                   &openapi_v2.Document{},
-	"gnostic.openapiv3.Document":                                   &openapi_v3.Document{},
+	"gnostic.metrics.Complexity":                                   &metrics.Complexity{},
+	"gnostic.metrics.VersionHistory":                               &metrics.VersionHistory{},
+	"gnostic.metrics.Vocabulary":                                   &metrics.Vocabulary{},
+	"gnostic.openapiv2.Document":                                   &oas2.Document{},
+	"gnostic.openapiv3.Document":                                   &oas3.Document{},
 	"google.cloud.apigeeregistry.applications.v1alpha1.Index":      &rpc.Index{},
 	"google.cloud.apigeeregistry.applications.v1alpha1.Lint":       &rpc.Lint{},
 	"google.cloud.apigeeregistry.applications.v1alpha1.LintStats":  &rpc.LintStats{},

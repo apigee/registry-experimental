@@ -10,3 +10,5 @@ my_env/
 consistency/tool/interface/__pycache__
 consistency/tool/comparison/__pycache__
 consistency/tool/clustering/__pycache__
+/containers/registry-mock-server/graphql/dist/
+/containers/registry-mock-server/openapi/dist/

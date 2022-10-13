@@ -20,7 +20,7 @@
     ></script>
 
     <script>
-      const fetcher = GraphiQL.createFetcher({ url: '{{{specUrl}}}' });
+      const fetcher = GraphiQL.createFetcher({ url: '{{{apiEndpoint}}}' });
 
       ReactDOM.render(
         React.createElement(GraphiQL, { fetcher: fetcher }),

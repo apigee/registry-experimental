@@ -1,6 +1,9 @@
 # Registry Spec renderer
 This container allows for rendering of specs from the API Registry.
 
+Consider running the mock servers for OpenAPI and GraphQL , also setting those 
+endpoints in environment variables (OPENAPI_MOCK_ENDPOINT, GRAPHQL_MOCK_ENDPOINT).
+
 ### To run this service on a GCE instance run the following command:
 ```
 export REGISTRY_PROJECT_IDENTIFIER=$(gcloud config list --format 'value(core.project)')

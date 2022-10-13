@@ -16,11 +16,11 @@
 const express = require('express')
 const fs = require("fs");
 const handlebars = require("handlebars");
-const {RegistryClient} = require("@giteshk-org/apigeeregistry");
+const {RegistryClient} = require("@google-cloud/apigee-registry");
 const {credentials} = require("@grpc/grpc-js");
 const jsYaml = require('js-yaml');
-const { parseURL } = require("whatwg-url");
-var cors = require('cors')
+const {parseURL} = require("whatwg-url");
+const cors = require('cors')
 
 var client_options = {};
 if (process.env.APG_REGISTRY_INSECURE
@@ -28,7 +28,8 @@ if (process.env.APG_REGISTRY_INSECURE
   client_options.sslCreds = credentials.createInsecure();
 }
 
-const MOCK_ENDPOINT = process.env.MOCK_ENDPOINT;
+const OPENAPI_MOCK_ENDPOINT = process.env.OPENAPI_MOCK_ENDPOINT;
+const GRAPHQL_MOCK_ENDPOINT = process.env.GRAPHQL_MOCK_ENDPOINT;
 
 if (process.env.APG_REGISTRY_ADDRESS) {
   items = process.env.APG_REGISTRY_ADDRESS.split(":");
@@ -46,6 +47,7 @@ const async_template = fs.readFileSync("renderers/async-ui.html.template");
 
 const app = express();
 app.use(cors())
+app.use(express.json());
 
 //Serve static assets for openapi renderer
 app.use('/renderer/openapi',
@@ -66,27 +68,35 @@ app.use('/renderer/graphql', express.static('node_modules/graphiql'))
 
 function renderTemplate(res, apiFormat, spec_name) {
   var renderer_template = "";
+  var api_endpoint = res.locals.endpoint_uri ? res.locals.endpoint_uri : "";
   switch (apiFormat) {
     case "openapi":
       renderer_template = swagger_ui_template.toString();
+      if (!api_endpoint && OPENAPI_MOCK_ENDPOINT) {
+        api_endpoint = OPENAPI_MOCK_ENDPOINT + "/" + spec_name;
+      }
       break;
     case "asyncapi":
       renderer_template = async_template.toString();
       break;
     case "graphql":
       renderer_template = graphiql_template.toString();
+      if (!api_endpoint && GRAPHQL_MOCK_ENDPOINT) {
+        api_endpoint = GRAPHQL_MOCK_ENDPOINT + "/" + spec_name
+      }
       break;
     default:
       renderer_template = "spec_file"
       break;
   }
-  specUrl = "/spec/" + apiFormat + "/" + spec_name;
+  spec_url = "/spec/" + apiFormat + "/" + spec_name + (api_endpoint
+      ? "?endpoint_uri=" + encodeURI(api_endpoint) : "");
   if (renderer_template != "spec_file") {
     res.setHeader("content-type", "text/html; charset=UTF-8");
     hbstemplate = handlebars.compile(renderer_template);
-    res.send(hbstemplate({specUrl: specUrl}));
+    res.send(hbstemplate({specUrl: spec_url, apiEndpoint: api_endpoint}));
   } else {
-    res.redirect(specUrl);
+    res.redirect(spec_url);
   }
   res.end();
 }
@@ -129,7 +139,13 @@ app.get(
           res.sendStatus(500);
           res.end();
         } else {
-          res.redirect(302, "/render/" + deployment.apiSpecRevision);
+          let queryString = "";
+          if (deployment.endpointUri) {
+            queryString += "endpoint_uri=" + encodeURI(deployment.endpointUri);
+          }
+          res.redirect(302,
+              "/render/" + deployment.apiSpecRevision + (queryString ? "?"
+                  + queryString : ""));
         }
       })
     });
@@ -145,7 +161,9 @@ app.get(
           + req.params.locationId + "/apis/" + req.params.apiId;
       spec_name = api_name + "/versions/"
           + req.params.versionId + "/specs/" + req.params.specId;
-
+      if (req.query.endpoint_uri) {
+        res.locals.endpoint_uri = decodeURI(req.query.endpoint_uri);
+      }
       client.getApiSpec({
         name: spec_name
       }, (err, response) => {
@@ -154,8 +172,10 @@ app.get(
           res.sendStatus(500);
           res.end();
         } else {
+
           apiFormat = getAPIFormat(response.mimeType);
-          if (apiFormat == '') {
+
+          if (!apiFormat) {
             client.getApi({
               name: api_name
             }, (err, response2) => {
@@ -164,6 +184,7 @@ app.get(
                 res.sendStatus(500);
                 res.end();
               } else {
+
                 apiFormat = '';
                 if (response2.labels['apihub-style']) {
                   apiFormat = getAPIFormat(
@@ -190,16 +211,19 @@ app.all(
         res.end();
         return;
       }
-
+      if (req.query.endpoint_uri) {
+        res.locals.endpoint_uri = decodeURI(req.query.endpoint_uri);
+      }
       let spec_url = "projects/" + req.params.projectId + "/locations/"
           + req.params.locationId + "/apis/" + req.params.apiId + "/versions/"
           + req.params.versionId + "/specs/" + req.params.specId;
       let api_url = "projects/" + req.params.projectId + "/locations/"
           + req.params.locationId + "/apis/" + req.params.apiId;
+
       client.getApiSpecContents(
           {
             name: spec_url
-          }, (err, response) => {
+          }, async (err, response) => {
             if (err) {
               console.error(err);
               res.sendStatus(500);
@@ -222,6 +246,7 @@ app.all(
             }
           })
     });
+
 /**
  * Filter the list of deployments with the matching spec revision.
  *
@@ -246,28 +271,38 @@ function addMockAddressForOpenAPI(openAPISpecObj, spec_url, api_url, res) {
       console.error(err);
     }
 
-    if(!deployments) {
+    if (!deployments) {
       deployments = [];
     }
 
-    if (MOCK_ENDPOINT) {
+    if (OPENAPI_MOCK_ENDPOINT) {
       deployments.push({
-        endpointUri: MOCK_ENDPOINT + "/" + spec_url,
+        endpointUri: OPENAPI_MOCK_ENDPOINT + "/" + spec_url,
         displayName: "Mock Service"
       });
     }
 
+    /**
+     * Handle OpenAPI 2.0 specs
+     */
+    if (openAPISpecObj.swagger && openAPISpecObj.swagger.startsWith("2")) {
+      let endpoint = deployments.length > 0 ? deployments[0].endpointUri : "";
+      if (res.locals.endpoint_uri) {
+        endpoint = res.locals.endpoint_uri;
+      }
+      if (endpoint) {
+        let parsedUrl = parseURL(endpoint);
+        openAPISpecObj.host = parsedUrl.host + (parsedUrl.port ? ":"
+            + parsedUrl.port : "");
+        openAPISpecObj.basePath = "/" + parsedUrl.path.join("/");
+        openAPISpecObj.schemes = [parsedUrl.scheme];
+      }
+    }
     deployments.forEach(deployment => {
       if (!deployment.endpointUri) {
         return;
       }
-      if (openAPISpecObj.swagger && openAPISpecObj.swagger.startsWith("2")
-          && !openAPISpecObj.host) {
-        let parsedUrl = parseURL(deployment.endpointUri);
-        openAPISpecObj.host = parsedUrl.host;
-        openAPISpecObj.basePath = "/" + parsedUrl.path.join("/");
-        openAPISpecObj.schemes = [parsedUrl.scheme];
-      } else if (openAPISpecObj.openapi &&
+      if (openAPISpecObj.openapi &&
           openAPISpecObj.openapi.startsWith("3")) {
         openAPISpecObj = openAPISpecObj || {
           servers: []
@@ -279,7 +314,6 @@ function addMockAddressForOpenAPI(openAPISpecObj, spec_url, api_url, res) {
             });
       }
     })
-
 
     res.json(openAPISpecObj);
     res.end();

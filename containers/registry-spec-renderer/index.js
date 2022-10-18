@@ -46,25 +46,26 @@ const graphiql_template = fs.readFileSync("renderers/graphiql.html.template");
 const async_template = fs.readFileSync("renderers/async-ui.html.template");
 
 const app = express();
+app.set('trust proxy', true);
 app.use(cors())
 app.use(express.json());
 
 //Serve static assets for openapi renderer
-app.use('/renderer/openapi',
+app.use('/swagger-ui',
     express.static(require('swagger-ui-dist').absolutePath()))
 
 //Serve static assets for asyncapi renderer
-app.use('/renderer/async',
+app.use('/asyncapi/webcomponents/webcomponentsjs',
     express.static('node_modules/@webcomponents/webcomponentsjs'))
-app.use('/renderer/async',
+app.use('/asyncapi/web-component',
     express.static('node_modules/@asyncapi/web-component'))
-app.use('/renderer/async',
+app.use('/asyncapi/react-component',
     express.static('node_modules/@asyncapi/react-component'))
 
 //Serve static assets for graphql renderer
-app.use('/renderer/graphql', express.static('node_modules/react'))
-app.use('/renderer/graphql', express.static('node_modules/react-dom'))
-app.use('/renderer/graphql', express.static('node_modules/graphiql'))
+app.use('/graphql/react', express.static('node_modules/react'))
+app.use('/graphql/react-dom', express.static('node_modules/react-dom'))
+app.use('/graphql/graphiql', express.static('node_modules/graphiql'))
 
 function renderTemplate(res, apiFormat, spec_name) {
   var renderer_template = "";
@@ -320,7 +321,7 @@ function addMockAddressForOpenAPI(openAPISpecObj, spec_url, api_url, res) {
   });
 }
 
-app.get('/healthz', (req, res) => {
+app.get('/', (req, res) => {
   res.sendStatus(200);
   res.end();
 });

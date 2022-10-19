@@ -7,6 +7,9 @@ For a registry spec 'projects/openapi/locations/global/apis/benchtest-1/versions
 The mock service will be available at
 http://localhost:3000/projects/openapi/locations/global/apis/benchtest-1/versions/v1/specs/spec-1
 
+### Running this service on Cloud Run
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?dir=containers/registry-mock-server/openapi)
+
 ### To run this service on a GCE instance run the following command:
 ```
 export REGISTRY_PROJECT_IDENTIFIER=$(gcloud config list --format 'value(core.project)')

@@ -8,6 +8,9 @@ projects/example/locations/global/apis/api-1/versions/v1/specs/spec-1' The mock
 service will be available at
 http://localhost:3000/projects/example/locations/global/apis/api-1/versions/v1/specs/spec-1
 
+### Running this service on Cloud Run
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?dir=containers/registry-mock-server/graphql)
+
 ### To run this service on a GCE instance run the following command:
 
 ```

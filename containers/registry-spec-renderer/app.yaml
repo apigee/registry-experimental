@@ -1,0 +1,9 @@
+runtime: nodejs16
+env_variables:
+  OPENAPI_MOCK_ENDPOINT : https://prism-mock-server-url
+  GRAPHQL_MOCK_ENDPOINT : https://graphql-mock-server-url
+handlers:
+- url: /.*
+  secure: always
+  redirect_http_response_code: 301
+  script: auto

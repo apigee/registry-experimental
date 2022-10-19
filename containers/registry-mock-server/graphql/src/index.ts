@@ -113,8 +113,7 @@ function processMockRequest(req: Request, res: Response) {
             return _sendError(err, res);
           } else {
             if (response && response.data) {
-              const {data} = response;
-              const specString = <string>data;
+              const specString = response.data.toString();
               fs.mkdirSync(path.dirname(spec_local_path), {recursive: true});
               fs.writeFileSync(spec_local_path, specString);
               executeMockRequest(specString, req, res);
@@ -140,7 +139,6 @@ function executeMockRequest(
   req: express.Request,
   res: express.Response
 ) {
-  console.log(specString);
   const schema = makeExecutableSchema({typeDefs: specString});
 
   const mocks = {
@@ -222,11 +220,10 @@ app.all(
 /**
  * Health check for the service
  */
-app.get('/healthz', (req: Request, res: Response) => {
+app.get('/', (req: Request, res: Response) => {
   res.sendStatus(200);
   res.end();
 });
-
 app.listen(PORT, () =>
   console.log(`Server ready at: http://localhost:${PORT}`)
 );

@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: registry-custom
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: registry-admin-ksa
+  namespace: registry-custom
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: registry-protoc-gen-doc-controller
+  namespace: registry-custom
+spec:
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 100
+  suspend: false
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        app: registry-protoc-gen-doc-controller
+    spec:
+      template:
+        metadata:
+          labels:
+            app: registry-protoc-gen-doc-controller
+        spec:
+          serviceAccountName: registry-admin-ksa
+          nodeSelector:
+            iam.gke.io/gke-metadata-server-enabled: "true"
+          containers:
+          - name: registry-protoc-gen-doc
+            image: ghcr.io/apigee/registry-protoc-gen-doc:main
+            env:
+            - name: REGISTRY_ADDRESS
+              value: "apigeeregistry.googleapis.com:443"
+            args:
+            - bin/sh
+            - -c
+            - |
+              REGISTRY_PROJECT_NAME=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)
+              
+              TOKEN=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token | jq .access_token -r)
+
+              registry resolve projects/${REGISTRY_PROJECT_NAME}/locations/global/artifacts/registry-protoc-gen-doc \
+                --registry.token=$TOKEN --registry.address=${REGISTRY_ADDRESS}
+
+              rc=$(echo $?)
+              exit $rc
+          restartPolicy: Never
+      backoffLimit: 3

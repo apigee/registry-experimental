@@ -24,7 +24,7 @@ the generated markup to an artifact `grpc-documentation` on the spec object.
       
       gcloud projects add-iam-policy-binding $PROJECT_ID \
       --member "serviceAccount:registry-admin-gsa@${PROJECT_ID}.iam.gserviceaccount.com" \
-      --role "roles/storage.objectCreator"
+      --role "roles/storage.objectAdmin"
       ```
    3. Configure workload identity for the service account
          ```

@@ -17,6 +17,7 @@ FROM pseudomuto/protoc-gen-doc:1.5 as protoc-gen-doc
 FROM ghcr.io/apigee/registry-tools:latest
 COPY --from=protoc-gen-doc /usr/bin/protoc* /bin/
 
-COPY doc-gen.sh /doc-gen.sh
+COPY ./doc-gen.sh /
+RUN chmod +x /doc-gen.sh
 
 RUN git clone https://github.com/googleapis/api-common-protos /googleapis-common-protos

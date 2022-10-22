@@ -57,7 +57,7 @@ jobs:
             context: "."
             dockerfile: "containers/registry-linters/Dockerfile"
         -   image: ${{github.repository_owner}}/registry-grpc-doc-gen
-            context: "."
+            context: "containers/registry-grpc-doc-gen"
             dockerfile: "containers/registry-grpc-doc-gen/Dockerfile"
     steps:
     - name: Checkout repository

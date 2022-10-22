@@ -32,8 +32,8 @@ spec:
             app: registry-grpc-doc-gen-controller-cronjob
         spec:
           serviceAccountName: registry-admin-ksa
-          nodeSelector:
-            iam.gke.io/gke-metadata-server-enabled: "true"
+#          nodeSelector:
+#            iam.gke.io/gke-metadata-server-enabled: "true"
           containers:
           - name: registry-grpc-doc-gen
             image: ghcr.io/giteshk-org/registry-grpc-doc-gen:main
@@ -46,7 +46,7 @@ spec:
             - |
               REGISTRY_PROJECT_NAME=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)
               
-              TOKEN=$(curl -H "Metadata-Flavor: Google" http:///metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token | jq .access_token -r)
+              TOKEN=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token | jq .access_token -r)
 
               registry resolve projects/${REGISTRY_PROJECT_NAME}/locations/global/artifacts/registry-grpc-doc-gen \
                 --registry.token=$TOKEN --registry.address=${REGISTRY_ADDRESS}

@@ -37,7 +37,11 @@ fi
 
 find "$SPEC_PATH/protos" -type f -name "*.proto"  > "$SPEC_PATH/proto-files.txt"
 
-protoc @"$SPEC_PATH/proto-files.txt" --proto_path="$SPEC_PATH/protos" --proto_path="/tmp/googleapis-common-protos" --doc_out="$SPEC_PATH" --doc_opt=html,index.html
+protoc @"$SPEC_PATH/proto-files.txt" \
+  --proto_path="$SPEC_PATH/protos" \
+  --proto_path="/protoc/include" \
+  --proto_path="/tmp/googleapis-common-protos" \
+  --doc_out="$SPEC_PATH" --doc_opt=html,index.html
 
 DOC_HEX_STRING=$(cat "$SPEC_PATH/index.html" | xxd -ps -c 200 | tr -d '\n')
 

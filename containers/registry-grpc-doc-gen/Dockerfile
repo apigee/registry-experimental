@@ -12,10 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM pseudomuto/protoc-gen-doc:1.5 as protoc-gen-doc
+FROM golang:1.18 as protoc-gen-doc
+RUN go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest
 
 FROM ghcr.io/apigee/registry-tools:latest
-COPY --from=protoc-gen-doc /usr/bin/protoc* /bin/
+
+COPY --from=protoc-gen-doc /go/bin/protoc-gen-doc /bin/
+
+ARG PB_VERSION="21.8"
+RUN PB_REL="https://github.com/protocolbuffers/protobuf/releases" && \
+    curl -LO ${PB_REL}/download/v${PB_VERSION}/protoc-${PB_VERSION}-linux-x86_64.zip && \
+    mkdir /protoc && \
+    unzip protoc-${PB_VERSION}-linux-x86_64.zip -d /protoc && \
+    ln -s /protoc/bin/protoc /bin/protoc
+
 
 COPY ./doc-gen.sh /
 RUN chmod +x /doc-gen.sh

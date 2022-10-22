@@ -13,35 +13,38 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
 set -euox pipefail
 
 
 args=("$@")
-
-mkdir -p /workspace/args[0]/protos
-
-
+SPEC=${args[0]}
 TOKEN=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token | jq .access_token -r)
-SPEC_DETAILS=$(registry get args[0] --token=$TOKEN --registry.address=${REGISTRY_ADDRESS})
+SPEC_PATH="/tmp/workspace/$SPEC"
+
+rm -rf "$SPEC_PATH"
+
+mkdir -p "$SPEC_PATH/protos"
+
+SPEC_DETAILS=$(registry get  $SPEC --registry.token=$TOKEN --registry.address=${REGISTRY_ADDRESS})
 MIMETYPE=$( echo $SPEC_DETAILS | jq -r .mimeType)
 FILENAME=$( echo $SPEC_DETAILS | jq -r .filename)
 
-SPEC_PATH="/workspace/${args[0]}"
+registry get $SPEC  --contents --registry.token=$TOKEN --registry.address=${REGISTRY_ADDRESS} > "$SPEC_PATH/$FILENAME"
 
-registry get arg[0] --contents --token=$TOKEN --registry.address=${REGISTRY_ADDRESS} > $SPEC_PATH/$FILENAME
-
-if [$MIMETYPE eq "application/x.protobuf+gzip"]
-then
-  tar xvfz "$SPEC_PATH/$FILENAME" "$SPEC_PATH/protos"
+if [ $MIMETYPE == "application/x.protobuf+gzip" ]; then
+  tar -xf "$SPEC_PATH/$FILENAME" -C "$SPEC_PATH/protos"
 fi
 
-protoc "$SPEC_PATH/**/*.proto" --proto_path="/googleapis-common-protos" --doc_out="$SPEC_PATH" --doc_opt=html,index.html
+find "$SPEC_PATH/protos" -type f -name "*.proto"  > "$SPEC_PATH/proto-files.txt"
+
+protoc @"$SPEC_PATH/proto-files.txt" --proto_path="$SPEC_PATH/protos" --proto_path="/tmp/googleapis-common-protos" --doc_out="$SPEC_PATH" --doc_opt=html,index.html
+
+DOC_HEX_STRING=$(cat "$SPEC_PATH/index.html" | xxd -ps -c 200 | tr -d '\n')
 
 registry rpc create-artifact grpc-documentation \
-  --artifact.contents=$(cat "$SPEC_PATH/index.html" | od -A n -t x1 | sed 's/ *//g') \
-  --artifact.mime_type="text/html" \
-  --artifact_id=grpc-documentation \
-  --parent=args[0]
+  --artifact.mime_type "text/plain" \
+  --artifact_id grpc-documentation \
+  --parent $SPEC \
+  --artifact.contents "$DOC_HEX_STRING"
+
 

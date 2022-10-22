@@ -15,7 +15,7 @@ metadata:
   name: registry-grpc-doc-gen-controller-cronjob
   namespace: registry-custom
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "*/30 * * * *"
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 100
   suspend: false
@@ -37,6 +37,9 @@ spec:
           containers:
           - name: registry-grpc-doc-gen
             image: ghcr.io/giteshk-org/registry-grpc-doc-gen:main
+            env:
+            - name: REGISTRY_ADDRESS
+              value: "apigeeregistry.googleapis.com:443"
             args:
             - bin/sh
             - -c

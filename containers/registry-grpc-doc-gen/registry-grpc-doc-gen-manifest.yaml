@@ -17,5 +17,5 @@ generated_resources:
 - pattern: apis/-/versions/-/specs/-/artifacts/grpc-documentation
   dependencies:
   - pattern: $resource.spec
-    filter: "mime_type.contains('grpc')"
+    filter: "mime_type.contains('protobuf')"
   action: "/doc-gen.sh $resource.spec"

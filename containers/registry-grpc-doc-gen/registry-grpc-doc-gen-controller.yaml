@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: registry-custom
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: registry-admin-ksa
+  namespace: registry-custom
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: registry-grpc-doc-gen-controller-cronjob
+  namespace: registry-custom
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 100
+  suspend: false
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        app: registry-grpc-doc-gen-controller-cronjob
+    spec:
+      template:
+        metadata:
+          labels:
+            app: registry-grpc-doc-gen-controller-cronjob
+        spec:
+          serviceAccountName: registry-admin-ksa
+          nodeSelector:
+            iam.gke.io/gke-metadata-server-enabled: "true"
+          containers:
+          - name: registry-grpc-doc-gen
+            image: ghcr.io/giteshk-org/registry-grpc-doc-gen:main
+            args:
+            - bin/sh
+            - -c
+            - |
+              REGISTRY_PROJECT_NAME=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)
+              
+              TOKEN=$(curl -H "Metadata-Flavor: Google" http:///metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token | jq .access_token -r)
+
+              registry resolve projects/${REGISTRY_PROJECT_NAME}/locations/global/artifacts/registry-grpc-doc-gen \
+                --registry.token=$TOKEN --registry.address=${REGISTRY_ADDRESS}
+
+              rc=$(echo $?)
+              exit $rc
+          restartPolicy: Never
+      backoffLimit: 3

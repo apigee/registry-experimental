@@ -112,8 +112,8 @@ function renderTemplate(res, apiFormat, spec_name) {
         name: spec_name + '/artifacts/' + GRPC_DOC_ARTIFACT_NAME
       }, async (err, artifact_content) => {
         if (err) {
+          console.error("Error retrieving documentation for " + spec_name);
           res.sendStatus(500);
-          res.send("Error retrieving documentation for " + spec_name);
           res.end();
         } else {
           let artifact_url = artifact_content.data.toString().trim();

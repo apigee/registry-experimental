@@ -1,0 +1,17 @@
+type: google.api.Service
+config_version: 3
+name: bookstore
+title: Bookstore Example API
+
+apis:
+- name: examples.bookstore.v1.Bookstore
+
+documentation:
+  summary: A simple Google Example Library API.
+  overview: |-
+    # Introduction
+
+    This is a Google example service representing a simple digital library. It
+    manages a collection of shelf resources, and each shelf owns a collection of
+    book resources.
+

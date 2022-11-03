@@ -1,0 +1,90 @@
++ PROJECT=examples
++ echo Create a fresh project.
+Create a fresh project.
++ registry rpc admin delete-project --name projects/examples --force
++ registry rpc admin create-project --project_id examples --json
+{
+  "name": "projects/examples",
+  "createTime": "2022-11-03T17:39:44.264908Z",
+  "updateTime": "2022-11-03T17:39:44.264908Z"
+}
++ registry config set registry.project examples
+Updated property "registry.project".
++ echo Create an entry for the Petstore API.
+Create an entry for the Petstore API.
++ registry apply -f petstore.yaml
+[34m  INFO[0m[0000] Applying petstore.yaml    [34muid[0m=8aedccf8
++ echo Upload each revision of the Petstore API spec.
+Upload each revision of the Petstore API spec.
++ registry apply -f petstore-openapi-r1.yaml
+[34m  INFO[0m[0000] Applying petstore-openapi-r1.yaml [34muid[0m=db4fb09e
++ registry apply -f petstore-openapi-r2.yaml
+[34m  INFO[0m[0000] Applying petstore-openapi-r2.yaml [34muid[0m=35085d34
++ registry apply -f petstore-openapi-r3.yaml
+[34m  INFO[0m[0000] Applying petstore-openapi-r3.yaml [34muid[0m=30bad4d2
++ echo List all specs.
+List all specs.
++ registry list apis/-/versions/-/specs/
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml
++ echo List all spec revisions.
+List all spec revisions.
++ registry list apis/-/versions/-/specs/-@-
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@968e3185
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@19e1730d
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@11b91895
++ echo Compute complexity of the latest spec revisions.
+Compute complexity of the latest spec revisions.
++ registry compute complexity apis/-/versions/-/specs/-
+[37m DEBUG[0m[0000] Computing projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml/artifacts/complexity [37muid[0m=d31a1b29
++ registry list apis/-/versions/-/specs/-/artifacts
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@968e3185/artifacts/complexity
++ registry list apis/-/versions/-/specs/-@-/artifacts
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@968e3185/artifacts/complexity
++ echo Compute complexity of all spec revisions.
+Compute complexity of all spec revisions.
++ registry compute complexity apis/-/versions/-/specs/-@-
+[37m DEBUG[0m[0000] Computing projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@11b91895/artifacts/complexity [37muid[0m=a867bf7c
+[37m DEBUG[0m[0000] Computing projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@968e3185/artifacts/complexity [37muid[0m=a867bf7c
+[37m DEBUG[0m[0000] Computing projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@19e1730d/artifacts/complexity [37muid[0m=a867bf7c
++ registry list apis/-/versions/-/specs/-/artifacts
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@968e3185/artifacts/complexity
++ registry list apis/-/versions/-/specs/-@-/artifacts
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@11b91895/artifacts/complexity
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@19e1730d/artifacts/complexity
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@968e3185/artifacts/complexity
++ echo View the complexity of each revision.
+View the complexity of each revision.
+++ registry list apis/petstore/versions/v1/specs/-@-
++ for spec_revision in `registry list apis/petstore/versions/v1/specs/-@-`
++ echo projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@968e3185
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@968e3185
++ registry get projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@968e3185/artifacts/complexity --print
+{
+  "pathCount": 3,
+  "getCount": 3,
+  "postCount": 1,
+  "schemaCount": 11,
+  "schemaPropertyCount": 7
+}
++ for spec_revision in `registry list apis/petstore/versions/v1/specs/-@-`
++ echo projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@19e1730d
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@19e1730d
++ registry get projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@19e1730d/artifacts/complexity --print
+{
+  "pathCount": 2,
+  "getCount": 2,
+  "postCount": 1,
+  "schemaCount": 8,
+  "schemaPropertyCount": 5
+}
++ for spec_revision in `registry list apis/petstore/versions/v1/specs/-@-`
++ echo projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@11b91895
+projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@11b91895
++ registry get projects/examples/locations/global/apis/petstore/versions/v1/specs/openapi.yaml@11b91895/artifacts/complexity --print
+{
+  "pathCount": 1,
+  "getCount": 1,
+  "postCount": 1,
+  "schemaCount": 8,
+  "schemaPropertyCount": 5
+}

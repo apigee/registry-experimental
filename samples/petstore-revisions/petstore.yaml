@@ -1,0 +1,16 @@
+apiVersion: apigeeregistry/v1
+kind: API
+metadata:
+  name: petstore
+data:
+  displayName: Petstore API
+  description: A sample API
+  availability: Preview
+  recommendedVersion: v1
+  versions:
+    - metadata:
+        name: v1
+      data:
+        displayName: v1
+        description: v1
+        state: Design

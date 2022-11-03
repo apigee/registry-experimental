@@ -1,0 +1,10 @@
+apiVersion: apigeeregistry/v1
+kind: Spec
+metadata:
+  name: openapi.yaml
+  parent: apis/petstore/versions/v1
+data:
+  filename: openapi.yaml
+  description: OpenAPI description of the Petstore API
+  mimeType: application/x.openapi+gzip;version=3
+  sourceURI: file:///openapi-r2.yaml

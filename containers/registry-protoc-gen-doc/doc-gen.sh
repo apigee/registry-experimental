@@ -19,22 +19,24 @@ set -euo pipefail
 args=("$@")
 SPEC=${args[0]}
 BUCKET_NAME=${args[1]}
+PROTO_PATH=${args[2]}
+
+
 GRPC_GEN_DOC_FILE="index.html"
 
 echo "Started processing $SPEC"
 
-TOKEN=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token | jq .access_token -r)
 SPEC_PATH="/tmp/workspace/$SPEC"
 
 rm -rf "$SPEC_PATH"
 
 mkdir -p "$SPEC_PATH"
 
-SPEC_DETAILS=$(registry get  $SPEC --registry.token=$TOKEN --registry.address=${REGISTRY_ADDRESS})
+SPEC_DETAILS=$(registry get  $SPEC )
 MIMETYPE=$( echo $SPEC_DETAILS | jq -r .mimeType)
 FILENAME=$( echo $SPEC_DETAILS | jq -r .filename)
 
-registry get $SPEC  --contents --registry.token=$TOKEN --registry.address=${REGISTRY_ADDRESS} > "$SPEC_PATH/$FILENAME"
+registry get $SPEC  --contents > "$SPEC_PATH/$FILENAME"
 
 if [ $MIMETYPE == "application/x.protobuf+gzip" ]; then
   tar -xf "$SPEC_PATH/$FILENAME" -C "$SPEC_PATH"
@@ -50,7 +52,7 @@ echo "About to generate documentation for $SPEC"
 protoc @"$SPEC_PATH/proto-files.txt" \
   --proto_path="$SPEC_PATH" \
   --proto_path="/protoc/include" \
-  --proto_path="/googleapis-common-protos" \
+  --proto_path="$PROTO_PATH" \
   --doc_out="$SPEC_PATH" --doc_opt=html,$GRPC_GEN_DOC_FILE
 
 GCS_FILE_URL="https://storage.googleapis.com/$BUCKET_NAME/$SPEC/$GRPC_GEN_DOC_FILE"
@@ -70,8 +72,6 @@ registry rpc create-artifact \
   --parent="$SPEC" \
   --artifact_id="grpc-doc-url" \
   --artifact.mime_type="text/plain" \
-  --artifact.contents="$ARTIFACT_CONTENT" \
-  --registry.address="${REGISTRY_ADDRESS}" \
-  --registry.token="$TOKEN"
+  --artifact.contents="$ARTIFACT_CONTENT"
 
 echo "Finished processing $SPEC"

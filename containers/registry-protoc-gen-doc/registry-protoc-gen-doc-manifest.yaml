@@ -17,4 +17,4 @@ generated_resources:
   dependencies:
   - pattern: $resource.spec
     filter: "mime_type.contains('protobuf')"
-  action: "/doc-gen.sh $resource.spec grpc-docs"
+  action: "/doc-gen.sh $resource.spec grpc-docs /googleapis-common-protos"

@@ -5,7 +5,38 @@ We will be running the registry controller with a custom manifest which can :
 - store the generated markup to Google Storage bucket
 - store the reference to the GCS object, as an artifact `grpc-documentation`, on the spec object.
 
-## Steps to set up this solution
+## Run this solution on location machine
+1. Create a Google storage bucket to use for this setup.
+2. Install [protoc](https://grpc.io/docs/protoc-installation/)
+3. Install [protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc)
+4. Download Google APIs common protos using 
+   ```
+     git clone https://github.com/googleapis/api-common-protos
+   ```
+5. Updates the action field in the manifest file `registry-protoc-gen-doc-controller.yaml`
+   ```
+   /tmp/doc-gen.sh $resource.spec grpc-docs  /path/to/api-common-protos
+   ```
+   1. First parameter is the absolute path to doc-gen.sh file 
+   2. Second parameter to the doc-gen.sh file is the name of the GCS bucket
+   3. Third parameter is the spec reference 
+   4. Fourth parameter is the path to the protos from https://github.com/googleapis/api-common-protos
+      1. This could be referenced by any other common protos from your project
+6. Upload the manifest for this controller to the Registry project
+   ```shell
+   export TOKEN=$(gcloud auth print-access-token)
+   registry upload manifest ./registry-protoc-gen-doc-manifest.yaml
+   ```
+7. To generate the HTML markup and the artifacts on the spec run the following
+    ```shell
+    registry resolve artifacts/registry-protoc-gen-doc
+    ```
+8. List the artifacts using the below command
+    ```shell
+   registry list apis/-/versions/-/specs/-/artifacts/grpc-doc-url
+    ```
+
+## Run this solution on GKE
 1. Create a Google storage bucket to use for this setup.
 2. Update the manifest file `registry-protoc-gen-doc-controller.yaml` with the
    name of the bucket (replace grpc-docs).

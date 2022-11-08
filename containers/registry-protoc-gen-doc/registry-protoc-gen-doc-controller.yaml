@@ -58,12 +58,16 @@ spec:
             - bin/sh
             - -c
             - |
-              REGISTRY_PROJECT_NAME=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)
-              
-              TOKEN=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token | jq .access_token -r)
+              export REGISTRY_PROJECT_NAME=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)
+              export TOKEN=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token | jq .access_token -r)
 
-              registry resolve projects/${REGISTRY_PROJECT_NAME}/locations/global/artifacts/registry-protoc-gen-doc \
-                --registry.token=$TOKEN --registry.address=${REGISTRY_ADDRESS}
+              registry config set registry.address $REGISTRY_ADDRESS 
+              registry config set registry.insecure 0 
+              registry config set registry.project $REGISTRY_PROJECT_NAME 
+              registry config set registry.location global 
+              registry config set registry.token $TOKEN 
+
+              registry resolve artifacts/registry-protoc-gen-doc
 
               rc=$(echo $?)
               exit $rc

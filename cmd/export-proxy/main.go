@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/apex/log"
 	"github.com/apigee/registry/pkg/config"
@@ -58,9 +59,9 @@ type TargetEndpoint struct {
 
 func main() {
 	cmd := &cobra.Command{
-		Use:   "export-proxy",
+		Use:   "export-proxy DEPLOYMENT ORGANIZATION",
 		Short: "Exports Apigee resources to YAML files compatible with API Registry",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
 
@@ -79,6 +80,10 @@ func main() {
 			name, err := names.ParseDeployment(args[0])
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to parse deployment")
+			}
+
+			if !strings.HasPrefix(args[1], "organizations/") {
+				log.FromContext(ctx).Fatal("Invalid organization: must have format organizations/{org}")
 			}
 
 			deployment, err := client.GetApiDeployment(ctx, &rpc.GetApiDeploymentRequest{
@@ -116,7 +121,7 @@ func main() {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to create bundle")
 			}
 
-			if err := createProxy(ctx, root.Name, proxyZip.Bytes(), config.Registry.Token); err != nil {
+			if err := createProxy(ctx, args[1], root.Name, proxyZip.Bytes(), config.Registry.Token); err != nil {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to create proxy")
 			}
 		},
@@ -174,8 +179,8 @@ func write(zw *zip.Writer, name string, v any) error {
 	return nil
 }
 
-func createProxy(ctx context.Context, name string, bundle []byte, token string) error {
-	req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("https://apigee.googleapis.com/v1/organizations/egansean-integrations1/apis?action=import&name=%s", name), bytes.NewReader(bundle))
+func createProxy(ctx context.Context, org, name string, bundle []byte, token string) error {
+	req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("https://apigee.googleapis.com/v1/%s/apis?action=import&name=%s", org, name), bytes.NewReader(bundle))
 	if err != nil {
 		return err
 	}

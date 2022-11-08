@@ -12,6 +12,7 @@
     "@asyncapi/react-component": "^0.24.23",
     "@asyncapi/web-component": "^0.24.23",
     "@google-cloud/apigee-registry": "^0.2.1",
+    "@google-cloud/storage": "^6.5.4",
     "@graphql-tools/load": "^7.7.7",
     "@graphql-tools/mock": "^8.7.6",
     "@webcomponents/webcomponentsjs": "^2.6.0",

@@ -1,9 +1,11 @@
 # Generating Documentation from protos
 
-We will be creating a custom controller which can generate html documentation
-using [protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc) and store
-the generated markup to an artifact `grpc-documentation` on the spec object.
+We will be running the registry controller with a custom manifest which can :
+- generate html documentation using [protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc)
+- store the generated markup to Google Storage bucket
+- store the reference to the GCS object, as an artifact `grpc-documentation`, on the spec object.
 
+## Steps to set up this solution
 1. Create a Google storage bucket to use for this setup.
 2. Update the manifest file `registry-protoc-gen-doc-controller.yaml` with the
    name of the bucket (replace grpc-docs).
@@ -12,7 +14,7 @@ the generated markup to an artifact `grpc-documentation` on the spec object.
    PROJECT_ID=<GCP_PROJECT_NAME>
    registry upload manifest ./registry-protoc-gen-doc-manifest.yaml --project-id=${PROJECT_ID}
    ```
-4. Deploy to controller to GKE
+4. Deploy the controller to GKE
     1. Create a GKE cluster
        with [WorkLoad Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity)
        enabled.

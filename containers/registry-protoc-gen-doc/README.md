@@ -25,15 +25,17 @@ We will be running the registry controller with a custom manifest which can :
 6. Upload the manifest for this controller to the Registry project
    ```shell
    export TOKEN=$(gcloud auth print-access-token)
-   registry upload manifest ./registry-protoc-gen-doc-manifest.yaml
+   export REGISTRY_ADDRESS="apigeeregistry.googleapis.com:443"
+   export PROJECT_ID=<project_name>
+   registry upload manifest ./registry-protoc-gen-doc-manifest.yaml --project-id=$PROJECT_ID --registry.token=$TOKEN --registry.address=$REGISTRY_ADDRESS
    ```
 7. To generate the HTML markup and the artifacts on the spec run the following
     ```shell
-    registry resolve artifacts/registry-protoc-gen-doc
+    registry resolve projects/$PROJECT_ID/locations/global/artifacts/registry-protoc-gen-doc
     ```
 8. List the artifacts using the below command
     ```shell
-   registry list apis/-/versions/-/specs/-/artifacts/grpc-doc-url
+   registry list projects/$PROJECT_ID/locations/global/apis/-/versions/-/specs/-/artifacts/grpc-doc-url
     ```
 
 ## Run this solution on GKE
@@ -85,7 +87,7 @@ We will be running the registry controller with a custom manifest which can :
 
 ```shell
   #Delete grpc-doc-url artifact for all specs in registry 
-  registry delete apis/-/versions/-/specs/-/artifacts/grpc-doc-url
   #Delete the files from the GCS bucket
+  registry delete apis/-/versions/-/specs/-/artifacts/grpc-doc-url
   gsutil rm -rf gs://grpc-docs/*
 ```

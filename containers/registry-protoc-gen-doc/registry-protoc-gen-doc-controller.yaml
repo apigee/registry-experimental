@@ -51,6 +51,7 @@ spec:
           containers:
           - name: registry-protoc-gen-doc
             image: ghcr.io/apigee/registry-protoc-gen-doc:main
+            imagePullPolicy: Always
             env:
             - name: REGISTRY_ADDRESS
               value: "apigeeregistry.googleapis.com:443"
@@ -60,13 +61,15 @@ spec:
             - |
               export REGISTRY_PROJECT_NAME=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)
               export TOKEN=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token | jq .access_token -r)
+              echo $TOKEN > /tmp/registry-token
 
-              registry config set registry.address $REGISTRY_ADDRESS 
-              registry config set registry.insecure 0 
-              registry config set registry.project $REGISTRY_PROJECT_NAME 
-              registry config set registry.location global 
-              registry config set registry.token $TOKEN 
-
+              registry config configurations create default \
+                --registry.address=$REGISTRY_ADDRESS \
+                --registry.insecure=0 \
+                --registry.project=$REGISTRY_PROJECT_NAME \
+                --registry.location=global
+              registry config set token-source "cat /tmp/registry-token"
+              
               registry resolve artifacts/registry-protoc-gen-doc
 
               rc=$(echo $?)

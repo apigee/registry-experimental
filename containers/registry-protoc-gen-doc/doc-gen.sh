@@ -21,6 +21,9 @@ SPEC=${args[0]}
 BUCKET_NAME=${args[1]}
 PROTO_PATH=${args[2]}
 
+if [[ ${TOKEN:-"unset"} == "unset" ]]; then
+  TOKEN=$(cat /tmp/registry-token)
+fi
 
 GRPC_GEN_DOC_FILE="index.html"
 
@@ -32,13 +35,16 @@ rm -rf "$SPEC_PATH"
 
 mkdir -p "$SPEC_PATH"
 
-SPEC_DETAILS=$(registry get  $SPEC )
-MIMETYPE=$( echo $SPEC_DETAILS | jq -r .mimeType)
-FILENAME=$( echo $SPEC_DETAILS | jq -r .filename)
+SPEC_DETAILS=$(registry get  "$SPEC")
+MIMETYPE=$( echo "$SPEC_DETAILS" | jq -r .mimeType)
+FILENAME=$( echo "$SPEC_DETAILS" | jq -r .filename)
 
-registry get $SPEC  --contents > "$SPEC_PATH/$FILENAME"
+echo "About to get contents of $SPEC"
 
-if [ $MIMETYPE == "application/x.protobuf+gzip" ]; then
+registry get "$SPEC"  \
+    --contents > "$SPEC_PATH/$FILENAME"
+
+if [ "$MIMETYPE" == "application/x.protobuf+gzip" ]; then
   tar -xf "$SPEC_PATH/$FILENAME" -C "$SPEC_PATH"
   # Mac OS gziped files may contain archive files
   # https://en.wikipedia.org/wiki/AppleSingle_and_AppleDouble_formats
@@ -67,9 +73,10 @@ curl --upload-file "$SPEC_PATH/$GRPC_GEN_DOC_FILE" \
 ARTIFACT_CONTENT=$(echo "$GCS_FILE_URL" | xxd -p | tr -d '\n')
 
 echo "About to create grpc-doc-url artifact for $SPEC"
+SPEC_WITHOUT_REV=$(echo "$SPEC" | sed 's/\@.*//')
 
 registry rpc create-artifact \
-  --parent="$SPEC" \
+  --parent="$SPEC_WITHOUT_REV" \
   --artifact_id="grpc-doc-url" \
   --artifact.mime_type="text/plain" \
   --artifact.contents="$ARTIFACT_CONTENT"

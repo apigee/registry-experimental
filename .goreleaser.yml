@@ -25,7 +25,7 @@ builds:
   env:
   - CGO_ENABLED=0
   ldflags:
-  - -s -w -X "github.com/apigee/registry-experimental/cmd/apigee-export.Version={{.Env.RELEASE_VERSION}}"
+  - -s -w -X "main.Version={{.Env.RELEASE_VERSION}}"
 
 archives:
 - id: default

@@ -69,6 +69,8 @@ func exportDeployments(cmd *cobra.Command, args []string) {
 			},
 		}
 
+		annotateAPI(api)
+
 		hostnames, ok := env.Hostnames(dep.Environment)
 		if !ok {
 			log.Warnf(ctx, "Failed to find hostnames for environment %s", dep.Environment)
@@ -137,4 +139,32 @@ func deployments(ctx context.Context, org string) ([]*apigee.GoogleCloudApigeeV1
 	}
 
 	return resp.Deployments, nil
+}
+
+func annotateAPI(api *models.Api) {
+	api.Data.ApiVersions = []*models.ApiVersion{{
+		Header: models.Header{
+			ApiVersion: "apigeeregistry/v1",
+			Kind:       "Version",
+			Metadata: models.Metadata{
+				Name: "v1",
+				Annotations: map[string]string{
+					"apihub-end-of-life-type": "apihub-unknown",
+				},
+			},
+		},
+		Data: models.ApiVersionData{
+			DisplayName: "v1",
+			State:       "production",
+			ApiSpecs: []*models.ApiSpec{{
+				Header: models.Header{
+					ApiVersion: "apigeeregistry/v1",
+					Kind:       "Spec",
+					Metadata: models.Metadata{
+						Name: "unknown",
+					},
+				},
+			}},
+		},
+	}}
 }

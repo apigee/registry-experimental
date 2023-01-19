@@ -1,14 +1,28 @@
 # apigee-export
 
-`apigee-export` is a command-line tool for exporting information from Apigee
-into the API Registry. Apigee resources are exported as YAML files that can be
-imported into API Registry using the `registry` tool.
+`apigee-export` is a command-line tool for extracting proxy data from an
+Apigee X instance to be applied onto an API Registry.
 
+## Usage
+
+`apigee-export apis ORGANIZATION [DIRECTORY]`
+`apigee-export deployments ORGANIZATION [DIRECTORY]`
+
+Running this command exports Registry-compatible YAML files from an Apigee X
+instance into the specified DIRECTORY. (If no DIRECTORY is specified, it will
+only print to the console.)
+
+Once `apigee-export` has been successfully run, the entire exported directory or
+individual files can be imported into an API Registry instance by running:
+
+`registry apply -f DIRECTORY|FILE`
+
+See `registry apply --help` for more information.
 
 **MacOS note:** To run the `apigee-export` tool on MacOS, you may need to
 [unquarantine](https://discussions.apple.com/thread/3145071) it by running the
 following on the command line:
 
-```
+```sh
 xattr -d com.apple.quarantine apigee-export
 ```

@@ -49,7 +49,7 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := core.WorkerPool(ctx, 1)
+			taskQueue, wait := core.WorkerPoolWithWarnings(ctx, 1)
 			defer wait()
 
 			// Generate tasks.
@@ -100,28 +100,28 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	}
 	relation := task.newSpecID
 	var openapi string
-	if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
+	if core.IsOpenAPIv2(spec.GetMimeType()) || core.IsOpenAPIv3(spec.GetMimeType()) {
+		return nil
+	} else if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromZippedProtos(ctx, spec.Name, data)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Errorf("error processing protos: %s", spec.Name)
+			return fmt.Errorf("error processing protos %s: %s", spec.Name, err)
 		}
 	} else if core.IsDiscovery(spec.GetMimeType()) {
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromDiscovery(spec.Name, data)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).Errorf("error processing protos: %s", spec.Name)
+			return fmt.Errorf("error processing discovery %s: %s", spec.Name, err)
 		}
 	} else {
-		log.FromContext(ctx).Infof("we don't know how to generate OpenAPI for %s", spec.Name)
-		return nil
+		return fmt.Errorf("we don't know how to generate OpenAPI for %s", spec.Name)
 	}
 	specName, _ := names.ParseSpec(spec.GetName())
 	messageData := []byte(openapi)
 	messageData, err = core.GZippedBytes(messageData)
 	if err != nil {
-		log.FromContext(ctx).WithError(err).Errorf("Failed to compress generated OpenAPI")
-		return nil
+		return fmt.Errorf("failed to compress generated OpenAPI: %s", err)
 	}
 	newSpec := &rpc.ApiSpec{
 		Name:     specName.Version().Spec(relation).String(),
@@ -134,7 +134,7 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 		AllowMissing: true,
 	})
 	if err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to generate OpenAPI")
+		return fmt.Errorf("failed to generate OpenAPI: %s", err)
 	}
 	return nil
 }

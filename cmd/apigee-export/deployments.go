@@ -39,6 +39,9 @@ func exportDeployments(cmd *cobra.Command, args []string) {
 		ctx = cmd.Context()
 		org = args[0]
 	)
+	if len(args) < 2 {
+		verbose = true
+	}
 
 	env, err := newEnvMap(ctx, org)
 	if err != nil {

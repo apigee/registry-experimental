@@ -39,6 +39,9 @@ func exportApis(cmd *cobra.Command, args []string) {
 		ctx = cmd.Context()
 		org = args[0]
 	)
+	if len(args) < 2 {
+		verbose = true
+	}
 
 	apis, err := apis(ctx, org)
 	if err != nil {

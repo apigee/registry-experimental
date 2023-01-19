@@ -1,0 +1,2449 @@
+apiVersion: apigeeregistry/v1
+kind: StyleGuide
+metadata:
+  name: apihub-styleguide
+data:
+  displayName: ""
+  mimeTypes:
+    - application/x.protobuf+zip
+  guidelines:
+    - id: aip122
+      displayName: ""
+      description: ""
+      rules:
+        - id: camel-case-uris
+          displayName: ""
+          description: All resource names must use camel case in collection identifiers.
+          linter: api-linter
+          linterRulename: core::0122::camel-case-uris
+          severity: ERROR
+          docUri: linter.aip.dev/122/camel-case-uris
+        - id: name-suffix
+          displayName: ""
+          description: Fields should not use the suffix `_name`.
+          linter: api-linter
+          linterRulename: core::0122::name-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/122/name-suffix
+        - id: resource-collection-identifiers
+          displayName: ""
+          description: Resource patterns must use lowerCamelCase for collection identifiers.
+          linter: api-linter
+          linterRulename: core::0122::resource-collection-identifiers
+          severity: ERROR
+          docUri: linter.aip.dev/122/resource-collection-identifiers
+        - id: resource-reference-type
+          displayName: ""
+          description: All resource references must be strings.
+          linter: api-linter
+          linterRulename: core::0122::resource-reference-type
+          severity: ERROR
+          docUri: linter.aip.dev/122/resource-reference-type
+      state: ACTIVE
+    - id: aip123
+      displayName: ""
+      description: ""
+      rules:
+        - id: duplicate-resource
+          displayName: ""
+          description: Resource types should not be defined more than once.
+          linter: api-linter
+          linterRulename: core::0123::duplicate-resource
+          severity: ERROR
+          docUri: linter.aip.dev/123/duplicate-resource
+        - id: resource-annotation
+          displayName: ""
+          description: Resource messages should be annotated with `google.api.resource`.
+          linter: api-linter
+          linterRulename: core::0123::resource-annotation
+          severity: ERROR
+          docUri: linter.aip.dev/123/resource-annotation
+        - id: resource-definition-pattern
+          displayName: ""
+          description: Resource annotations should define a pattern.
+          linter: api-linter
+          linterRulename: core::0123::resource-definition-pattern
+          severity: ERROR
+          docUri: linter.aip.dev/123/resource-definition-pattern
+        - id: resource-definition-type-name
+          displayName: ""
+          description: Resource type names must be of the form {Service Name}/{Type}.
+          linter: api-linter
+          linterRulename: core::0123::resource-definition-type-name
+          severity: ERROR
+          docUri: linter.aip.dev/123/resource-definition-type-name
+        - id: resource-definition-variables
+          displayName: ""
+          description: Resource patterns should use consistent variable naming.
+          linter: api-linter
+          linterRulename: core::0123::resource-definition-variables
+          severity: ERROR
+          docUri: linter.aip.dev/123/resource-definition-variables
+        - id: resource-name-field
+          displayName: ""
+          description: Resource messages should have a `string name` field.
+          linter: api-linter
+          linterRulename: core::0123::resource-name-field
+          severity: ERROR
+          docUri: linter.aip.dev/123/resource-name-field
+        - id: resource-pattern
+          displayName: ""
+          description: Resource annotations should define a pattern.
+          linter: api-linter
+          linterRulename: core::0123::resource-pattern
+          severity: ERROR
+          docUri: linter.aip.dev/123/resource-pattern
+        - id: resource-reference-type
+          displayName: ""
+          description: Resource reference annotations should only apply to strings.
+          linter: api-linter
+          linterRulename: core::0123::resource-reference-type
+          severity: ERROR
+          docUri: linter.aip.dev/123/resource-reference-type
+        - id: resource-type-name
+          displayName: ""
+          description: Resource type names must be of the form {Service Name}/{Type}.
+          linter: api-linter
+          linterRulename: core::0123::resource-type-name
+          severity: ERROR
+          docUri: linter.aip.dev/123/resource-type-name
+        - id: resource-variables
+          displayName: ""
+          description: Resource patterns should use consistent variable naming.
+          linter: api-linter
+          linterRulename: core::0123::resource-variables
+          severity: ERROR
+          docUri: linter.aip.dev/123/resource-variables
+      state: ACTIVE
+    - id: aip124
+      displayName: ""
+      description: ""
+      rules:
+        - id: reference-same-package
+          displayName: ""
+          description: Resource references should refer to resources in the same package.
+          linter: api-linter
+          linterRulename: core::0124::reference-same-package
+          severity: ERROR
+          docUri: linter.aip.dev/124/reference-same-package
+      state: ACTIVE
+    - id: aip126
+      displayName: ""
+      description: ""
+      rules:
+        - id: unspecified
+          displayName: ""
+          description: All enums must have a default unspecified value.
+          linter: api-linter
+          linterRulename: core::0126::unspecified
+          severity: ERROR
+          docUri: linter.aip.dev/126/unspecified
+        - id: upper-snake-values
+          displayName: ""
+          description: All enum values must be in upper snake case.
+          linter: api-linter
+          linterRulename: core::0126::upper-snake-values
+          severity: ERROR
+          docUri: linter.aip.dev/126/upper-snake-values
+      state: ACTIVE
+    - id: aip127
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-annotation
+          displayName: ""
+          description: HTTP annotations must be present on non-streaming methods.
+          linter: api-linter
+          linterRulename: core::0127::http-annotation
+          severity: ERROR
+          docUri: linter.aip.dev/127/http-annotation
+        - id: resource-name-extraction
+          displayName: ""
+          description: HTTP annotations should extract full resource names into variables.
+          linter: api-linter
+          linterRulename: core::0127::resource-name-extraction
+          severity: ERROR
+          docUri: linter.aip.dev/127/resource-name-extraction
+        - id: uri-leading-slash
+          displayName: ""
+          description: URIs should always begin with a leading slash.
+          linter: api-linter
+          linterRulename: core::0127::uri-leading-slash
+          severity: ERROR
+          docUri: linter.aip.dev/127/uri-leading-slash
+      state: ACTIVE
+    - id: aip128
+      displayName: ""
+      description: ""
+      rules:
+        - id: resource-annotations-field
+          displayName: ""
+          description: Declarative-friendly resources must have an `annotations` field.
+          linter: api-linter
+          linterRulename: core::0128::resource-annotations-field
+          severity: ERROR
+          docUri: linter.aip.dev/128/resource-annotations-field
+        - id: resource-reconciling-behavior
+          displayName: ""
+          description: Declarative-friendly resources should annotate the `reconciling` field as `OUTPUT_ONLY`.
+          linter: api-linter
+          linterRulename: core::0128::resource-reconciling-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/128/resource-reconciling-behavior
+        - id: resource-reconciling-field
+          displayName: ""
+          description: Declarative-friendly resources must have a `reconciling` field.
+          linter: api-linter
+          linterRulename: core::0128::resource-reconciling-field
+          severity: ERROR
+          docUri: linter.aip.dev/128/resource-reconciling-field
+      state: ACTIVE
+    - id: aip131
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Get methods must not have an HTTP body.
+          linter: api-linter
+          linterRulename: core::0131::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/131/http-body
+        - id: http-method
+          displayName: ""
+          description: Get methods must use the GET HTTP verb.
+          linter: api-linter
+          linterRulename: core::0131::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/131/http-method
+        - id: http-uri-name
+          displayName: ""
+          description: Get methods must map the name field to the URI.
+          linter: api-linter
+          linterRulename: core::0131::http-uri-name
+          severity: ERROR
+          docUri: linter.aip.dev/131/http-uri-name
+        - id: method-signature
+          displayName: ""
+          description: Get RPCs should annotate a method signature of "name".
+          linter: api-linter
+          linterRulename: core::0131::method-signature
+          severity: ERROR
+          docUri: linter.aip.dev/131/method-signature
+        - id: request-message-name
+          displayName: ""
+          description: Get methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0131::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/131/request-message-name
+        - id: request-name-behavior
+          displayName: ""
+          description: Get RPCs should annotate the `name` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0131::request-name-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/131/request-name-behavior
+        - id: request-name-field
+          displayName: ""
+          description: Get RPCs must have a `string name` field in the request.
+          linter: api-linter
+          linterRulename: core::0131::request-name-field
+          severity: ERROR
+          docUri: linter.aip.dev/131/request-name-field
+        - id: request-name-reference-type
+          displayName: ""
+          description: The `google.api.resource_reference` on the `name` field of a Get RPC request message should use `type`, not `child_type`.
+          linter: api-linter
+          linterRulename: core::0131::request-name-reference-type
+          severity: ERROR
+          docUri: linter.aip.dev/131/request-name-reference-type
+        - id: request-name-reference
+          displayName: ""
+          description: Get RPCs should annotate the `name` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0131::request-name-reference
+          severity: ERROR
+          docUri: linter.aip.dev/131/request-name-reference
+        - id: request-name-required
+          displayName: ""
+          description: Get RPCs must have a `name` field in the request.
+          linter: api-linter
+          linterRulename: core::0131::request-name-required
+          severity: ERROR
+          docUri: linter.aip.dev/131/request-name-required
+        - id: request-unknown-fields
+          displayName: ""
+          description: Get RPCs should not have unexpected fields in the request.
+          linter: api-linter
+          linterRulename: core::0131::request-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/131/request-unknown-fields
+        - id: response-message-name
+          displayName: ""
+          description: Get methods must return the resource.
+          linter: api-linter
+          linterRulename: core::0131::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/131/response-message-name
+        - id: synonyms
+          displayName: ""
+          description: Get methods must be named starting with "Get".
+          linter: api-linter
+          linterRulename: core::0131::synonyms
+          severity: ERROR
+          docUri: linter.aip.dev/131/synonyms
+      state: ACTIVE
+    - id: aip132
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: List methods must not have an HTTP body.
+          linter: api-linter
+          linterRulename: core::0132::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/132/http-body
+        - id: http-method
+          displayName: ""
+          description: List methods must use the GET HTTP verb.
+          linter: api-linter
+          linterRulename: core::0132::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/132/http-method
+        - id: http-uri-parent
+          displayName: ""
+          description: List methods must map the parent field to the URI.
+          linter: api-linter
+          linterRulename: core::0132::http-uri-parent
+          severity: ERROR
+          docUri: linter.aip.dev/132/http-uri-parent
+        - id: method-signature
+          displayName: ""
+          description: List RPCs should annotate a method signature of "parent".
+          linter: api-linter
+          linterRulename: core::0132::method-signature
+          severity: ERROR
+          docUri: linter.aip.dev/132/method-signature
+        - id: request-field-types
+          displayName: ""
+          description: List RPCs should have fields with consistent types.
+          linter: api-linter
+          linterRulename: core::0132::request-field-types
+          severity: ERROR
+          docUri: linter.aip.dev/132/request-field-types
+        - id: request-message-name
+          displayName: ""
+          description: List methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0132::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/132/request-message-name
+        - id: request-parent-behavior
+          displayName: ""
+          description: List RPCs should annotate the `parent` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0132::request-parent-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/132/request-parent-behavior
+        - id: request-parent-field
+          displayName: ""
+          description: List RPCs must have a `parent` field in the request.
+          linter: api-linter
+          linterRulename: core::0132::request-parent-field
+          severity: ERROR
+          docUri: linter.aip.dev/132/request-parent-field
+        - id: request-parent-reference
+          displayName: ""
+          description: List RPCs should annotate the `parent` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0132::request-parent-reference
+          severity: ERROR
+          docUri: linter.aip.dev/132/request-parent-reference
+        - id: request-parent-required
+          displayName: ""
+          description: List RPCs must have a `parent` field in the request.
+          linter: api-linter
+          linterRulename: core::0132::request-parent-required
+          severity: ERROR
+          docUri: linter.aip.dev/132/request-parent-required
+        - id: request-parent-valid-reference
+          displayName: ""
+          description: List RPCs should reference the parent resource, not the listed resource.
+          linter: api-linter
+          linterRulename: core::0132::request-parent-valid-reference
+          severity: ERROR
+          docUri: linter.aip.dev/132/request-parent-valid-reference
+        - id: request-show-deleted-required
+          displayName: ""
+          description: List requests must have a `show-deleted` field for resources supporting soft delete.
+          linter: api-linter
+          linterRulename: core::0132::request-show-deleted-required
+          severity: ERROR
+          docUri: linter.aip.dev/132/request-show-deleted-required
+        - id: request-unknown-fields
+          displayName: ""
+          description: List RPCs should not have unexpected fields in the request.
+          linter: api-linter
+          linterRulename: core::0132::request-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/132/request-unknown-fields
+        - id: resource-reference-type
+          displayName: ""
+          description: List should use a `child_type` reference to the paginated resource.
+          linter: api-linter
+          linterRulename: core::0132::resource-reference-type
+          severity: ERROR
+          docUri: linter.aip.dev/132/resource-reference-type
+        - id: response-message-name
+          displayName: ""
+          description: List methods must have standardized response message names.
+          linter: api-linter
+          linterRulename: core::0132::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/132/response-message-name
+        - id: response-unknown-fields
+          displayName: ""
+          description: List RPCs should not have unexpected fields in the response.
+          linter: api-linter
+          linterRulename: core::0132::response-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/132/response-unknown-fields
+      state: ACTIVE
+    - id: aip133
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Create methods must have the HTTP body set to the resource.
+          linter: api-linter
+          linterRulename: core::0133::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/133/http-body
+        - id: http-method
+          displayName: ""
+          description: Create methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0133::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/133/http-method
+        - id: http-uri-parent
+          displayName: ""
+          description: Create methods must map the parent field to the URI.
+          linter: api-linter
+          linterRulename: core::0133::http-uri-parent
+          severity: ERROR
+          docUri: linter.aip.dev/133/http-uri-parent
+        - id: http-uri-resource
+          displayName: ""
+          description: The collection where the resource is added should map to the URI path.
+          linter: api-linter
+          linterRulename: core::0133::http-uri-resource
+          severity: ERROR
+          docUri: linter.aip.dev/133/http-uri-resource
+        - id: method-signature
+          displayName: ""
+          description: Create RPCs should annotate an appropriate method signature.
+          linter: api-linter
+          linterRulename: core::0133::method-signature
+          severity: ERROR
+          docUri: linter.aip.dev/133/method-signature
+        - id: request-id-field
+          displayName: ""
+          description: Declarative-friendly create methods should have a client-specified ID field.
+          linter: api-linter
+          linterRulename: core::0133::request-id-field
+          severity: ERROR
+          docUri: linter.aip.dev/133/request-id-field
+        - id: request-message-name
+          displayName: ""
+          description: Create methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0133::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/133/request-message-name
+        - id: request-parent-behavior
+          displayName: ""
+          description: Create RPCs should annotate the `parent` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0133::request-parent-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/133/request-parent-behavior
+        - id: request-parent-field
+          displayName: ""
+          description: Create RPCs must have a `parent` field in the request.
+          linter: api-linter
+          linterRulename: core::0133::request-parent-field
+          severity: ERROR
+          docUri: linter.aip.dev/133/request-parent-field
+        - id: request-parent-reference
+          displayName: ""
+          description: Create RPCs should annotate the `parent` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0133::request-parent-reference
+          severity: ERROR
+          docUri: linter.aip.dev/133/request-parent-reference
+        - id: request-parent-required
+          displayName: ""
+          description: Create RPCs must have a `parent` field in the request.
+          linter: api-linter
+          linterRulename: core::0133::request-parent-required
+          severity: ERROR
+          docUri: linter.aip.dev/133/request-parent-required
+        - id: request-resource-behavior
+          displayName: ""
+          description: Create RPCs should annotate the resource field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0133::request-resource-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/133/request-resource-behavior
+        - id: request-resource-field
+          displayName: ""
+          description: Create RPCs must have a field for the resource in the request.
+          linter: api-linter
+          linterRulename: core::0133::request-resource-field
+          severity: ERROR
+          docUri: linter.aip.dev/133/request-resource-field
+        - id: request-unknown-fields
+          displayName: ""
+          description: Create RPCs should not have unexpected fields in the request.
+          linter: api-linter
+          linterRulename: core::0133::request-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/133/request-unknown-fields
+        - id: resource-reference-type
+          displayName: ""
+          description: Create should use a `child_type` reference to the created resource.
+          linter: api-linter
+          linterRulename: core::0133::resource-reference-type
+          severity: ERROR
+          docUri: linter.aip.dev/133/resource-reference-type
+        - id: response-lro
+          displayName: ""
+          description: Declarative-friendly create methods should use long-running operations.
+          linter: api-linter
+          linterRulename: core::0133::response-lro
+          severity: ERROR
+          docUri: linter.aip.dev/133/response-lro
+        - id: response-message-name
+          displayName: ""
+          description: Create methods must return the resource.
+          linter: api-linter
+          linterRulename: core::0133::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/133/response-message-name
+        - id: synonyms
+          displayName: ""
+          description: Create methods must be named starting with "Create".
+          linter: api-linter
+          linterRulename: core::0133::synonyms
+          severity: ERROR
+          docUri: linter.aip.dev/133/synonyms
+      state: ACTIVE
+    - id: aip134
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Update methods must have the HTTP body set to the resource.
+          linter: api-linter
+          linterRulename: core::0134::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/134/http-body
+        - id: http-method
+          displayName: ""
+          description: Update methods must use the PATCH HTTP verb.
+          linter: api-linter
+          linterRulename: core::0134::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/134/http-method
+        - id: http-uri-name
+          displayName: ""
+          description: Update methods must map the resource's name field to the URI.
+          linter: api-linter
+          linterRulename: core::0134::http-uri-name
+          severity: ERROR
+          docUri: linter.aip.dev/134/http-uri-name
+        - id: method-signature
+          displayName: ""
+          description: Update RPCs should annotate an appropriate method signature.
+          linter: api-linter
+          linterRulename: core::0134::method-signature
+          severity: ERROR
+          docUri: linter.aip.dev/134/method-signature
+        - id: request-allow-missing-field
+          displayName: ""
+          description: Update RPCs on declarative-friendly resources should include allow_missing.
+          linter: api-linter
+          linterRulename: core::0134::request-allow-missing-field
+          severity: ERROR
+          docUri: linter.aip.dev/134/request-allow-missing-field
+        - id: request-mask-field
+          displayName: ""
+          description: Update RPCs must have a field mask in the request.
+          linter: api-linter
+          linterRulename: core::0134::request-mask-field
+          severity: ERROR
+          docUri: linter.aip.dev/134/request-mask-field
+        - id: request-mask-required
+          displayName: ""
+          description: Update RPCs must have a field mask in the request.
+          linter: api-linter
+          linterRulename: core::0134::request-mask-required
+          severity: ERROR
+          docUri: linter.aip.dev/134/request-mask-required
+        - id: request-message-name
+          displayName: ""
+          description: Update methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0134::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/134/request-message-name
+        - id: request-resource-field
+          displayName: ""
+          description: Update RPCs must have a field for the resource in the request.
+          linter: api-linter
+          linterRulename: core::0134::request-resource-field
+          severity: ERROR
+          docUri: linter.aip.dev/134/request-resource-field
+        - id: request-resource-required
+          displayName: ""
+          description: Update RPCs must have a field for the resource in the request.
+          linter: api-linter
+          linterRulename: core::0134::request-resource-required
+          severity: ERROR
+          docUri: linter.aip.dev/134/request-resource-required
+        - id: request-unknown-fields
+          displayName: ""
+          description: Update RPCs should not have unexpected fields in the request.
+          linter: api-linter
+          linterRulename: core::0134::request-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/134/request-unknown-fields
+        - id: response-lro
+          displayName: ""
+          description: Declarative-friendly Update methods should use long-running operations.
+          linter: api-linter
+          linterRulename: core::0134::response-lro
+          severity: ERROR
+          docUri: linter.aip.dev/134/response-lro
+        - id: response-message-name
+          displayName: ""
+          description: Update methods must return the resource.
+          linter: api-linter
+          linterRulename: core::0134::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/134/response-message-name
+        - id: synonyms
+          displayName: ""
+          description: Update methods must be named starting with "Update".
+          linter: api-linter
+          linterRulename: core::0134::synonyms
+          severity: ERROR
+          docUri: linter.aip.dev/134/synonyms
+      state: ACTIVE
+    - id: aip135
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Delete methods must not have an HTTP body.
+          linter: api-linter
+          linterRulename: core::0135::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/135/http-body
+        - id: http-method
+          displayName: ""
+          description: Delete methods must use the DELETE HTTP verb.
+          linter: api-linter
+          linterRulename: core::0135::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/135/http-method
+        - id: http-uri-name
+          displayName: ""
+          description: Delete methods must map the name field to the URI.
+          linter: api-linter
+          linterRulename: core::0135::http-uri-name
+          severity: ERROR
+          docUri: linter.aip.dev/135/http-uri-name
+        - id: method-signature
+          displayName: ""
+          description: Delete RPCs should annotate a method signature of "name".
+          linter: api-linter
+          linterRulename: core::0135::method-signature
+          severity: ERROR
+          docUri: linter.aip.dev/135/method-signature
+        - id: request-force-field
+          displayName: ""
+          description: Delete request `force` fields must have type `bool`.
+          linter: api-linter
+          linterRulename: core::0135::request-force-field
+          severity: ERROR
+          docUri: linter.aip.dev/135/request-force-field
+        - id: request-message-name
+          displayName: ""
+          description: Delete methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0135::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/135/request-message-name
+        - id: request-name-behavior
+          displayName: ""
+          description: Delete RPCs should annotate the `name` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0135::request-name-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/135/request-name-behavior
+        - id: request-name-field
+          displayName: ""
+          description: Delete RPCs must have a `name` field in the request.
+          linter: api-linter
+          linterRulename: core::0135::request-name-field
+          severity: ERROR
+          docUri: linter.aip.dev/135/request-name-field
+        - id: request-name-reference
+          displayName: ""
+          description: Delete RPCs should annotate the `name` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0135::request-name-reference
+          severity: ERROR
+          docUri: linter.aip.dev/135/request-name-reference
+        - id: request-name-required
+          displayName: ""
+          description: Delete RPCs must have a `name` field in the request.
+          linter: api-linter
+          linterRulename: core::0135::request-name-required
+          severity: ERROR
+          docUri: linter.aip.dev/135/request-name-required
+        - id: request-unknown-fields
+          displayName: ""
+          description: Delete RPCs should not have unexpected fields in the request.
+          linter: api-linter
+          linterRulename: core::0135::request-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/135/request-unknown-fields
+        - id: response-lro
+          displayName: ""
+          description: Declarative-friendly delete methods should use long-running operations.
+          linter: api-linter
+          linterRulename: core::0135::response-lro
+          severity: ERROR
+          docUri: linter.aip.dev/135/response-lro
+        - id: response-message-name
+          displayName: ""
+          description: Delete methods must return Empty or the resource.
+          linter: api-linter
+          linterRulename: core::0135::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/135/response-message-name
+      state: ACTIVE
+    - id: aip136
+      displayName: ""
+      description: ""
+      rules:
+        - id: standard-methods-only
+          displayName: ""
+          description: Declarative-friendly resources should eschew custom methods.
+          linter: api-linter
+          linterRulename: core::0136::standard-methods-only
+          severity: ERROR
+          docUri: linter.aip.dev/136/standard-methods-only
+        - id: http-body
+          displayName: ""
+          description: Custom methods must have the HTTP body set to `*`.
+          linter: api-linter
+          linterRulename: core::0136::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/136/http-body
+        - id: http-method
+          displayName: ""
+          description: Custom methods must use the POST or GET HTTP verb.
+          linter: api-linter
+          linterRulename: core::0136::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/136/http-method
+        - id: http-name-variable
+          displayName: ""
+          description: Custom methods should only use `name` if the RPC noun matches the resource.
+          linter: api-linter
+          linterRulename: core::0136::http-name-variable
+          severity: ERROR
+          docUri: linter.aip.dev/136/http-name-variable
+        - id: http-parent-variable
+          displayName: ""
+          description: Custom methods should only use `parent` if the RPC noun matches the resource.
+          linter: api-linter
+          linterRulename: core::0136::http-parent-variable
+          severity: ERROR
+          docUri: linter.aip.dev/136/http-parent-variable
+        - id: http-uri-suffix
+          displayName: ""
+          description: Custom methods should have a correct URI suffix.
+          linter: api-linter
+          linterRulename: core::0136::http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/136/http-uri-suffix
+        - id: prepositions
+          displayName: ""
+          description: Custom methods must not include prepositions in their names.
+          linter: api-linter
+          linterRulename: core::0136::prepositions
+          severity: ERROR
+          docUri: linter.aip.dev/136/prepositions
+        - id: verb-noun
+          displayName: ""
+          description: Custom methods should be named with the verb, then the noun.
+          linter: api-linter
+          linterRulename: core::0136::verb-noun
+          severity: ERROR
+          docUri: linter.aip.dev/136/verb-noun
+      state: ACTIVE
+    - id: aip140
+      displayName: ""
+      description: ""
+      rules:
+        - id: abbreviations
+          displayName: ""
+          description: Field names should use common abbreviations.
+          linter: api-linter
+          linterRulename: core::0140::abbreviations
+          severity: ERROR
+          docUri: linter.aip.dev/140/abbreviations
+        - id: base64
+          displayName: ""
+          description: Base64 fields should use the `bytes` type.
+          linter: api-linter
+          linterRulename: core::0140::base64
+          severity: ERROR
+          docUri: linter.aip.dev/140/base64
+        - id: lower-snake
+          displayName: ""
+          description: Field names should use `snake_case`.
+          linter: api-linter
+          linterRulename: core::0140::lower-snake
+          severity: ERROR
+          docUri: linter.aip.dev/140/lower-snake
+        - id: numbers
+          displayName: ""
+          description: Field names should not have words beginning with numbers.
+          linter: api-linter
+          linterRulename: core::0140::numbers
+          severity: ERROR
+          docUri: linter.aip.dev/140/numbers
+        - id: prepositions
+          displayName: ""
+          description: Fields must not include prepositions in their names.
+          linter: api-linter
+          linterRulename: core::0140::prepositions
+          severity: ERROR
+          docUri: linter.aip.dev/140/prepositions
+        - id: reserved-words
+          displayName: ""
+          description: Field names must not be reserved words.
+          linter: api-linter
+          linterRulename: core::0140::reserved-words
+          severity: ERROR
+          docUri: linter.aip.dev/140/reserved-words
+        - id: underscores
+          displayName: ""
+          description: Field names must not have goofy underscores.
+          linter: api-linter
+          linterRulename: core::0140::underscores
+          severity: ERROR
+          docUri: linter.aip.dev/140/underscores
+        - id: uri
+          displayName: ""
+          description: Field names should prefer `uri` to `url`.
+          linter: api-linter
+          linterRulename: core::0140::uri
+          severity: ERROR
+          docUri: linter.aip.dev/140/uri
+      state: ACTIVE
+    - id: aip141
+      displayName: ""
+      description: ""
+      rules:
+        - id: count-suffix
+          displayName: ""
+          description: Quantities should use a `_count` suffix.
+          linter: api-linter
+          linterRulename: core::0141::count-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/141/count-suffix
+        - id: forbidden-types
+          displayName: ""
+          description: Fields should avoid unsigned integer types.
+          linter: api-linter
+          linterRulename: core::0141::forbidden-types
+          severity: ERROR
+          docUri: linter.aip.dev/141/forbidden-types
+      state: ACTIVE
+    - id: aip142
+      displayName: ""
+      description: ""
+      rules:
+        - id: time-field-names
+          displayName: ""
+          description: Timestamps should use `google.protobuf.Timestamp`.
+          linter: api-linter
+          linterRulename: core::0142::time-field-names
+          severity: ERROR
+          docUri: linter.aip.dev/142/time-field-names
+        - id: time-field-type
+          displayName: ""
+          description: Timestamps should use `google.protobuf.Timestamp`.
+          linter: api-linter
+          linterRulename: core::0142::time-field-type
+          severity: ERROR
+          docUri: linter.aip.dev/142/time-field-type
+      state: ACTIVE
+    - id: aip143
+      displayName: ""
+      description: ""
+      rules:
+        - id: standardized-codes
+          displayName: ""
+          description: Fields representing concepts with standardized codes must use them.
+          linter: api-linter
+          linterRulename: core::0143::standard-codes
+          severity: ERROR
+          docUri: linter.aip.dev/143/standardized-codes
+        - id: string-type
+          displayName: ""
+          description: Fields representing standardized codes must be strings.
+          linter: api-linter
+          linterRulename: core::0143::string-type
+          severity: ERROR
+          docUri: linter.aip.dev/143/string-type
+      state: ACTIVE
+    - id: aip144
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Add/Remove methods should use `*` as the HTTP body.
+          linter: api-linter
+          linterRulename: core::0144::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/144/http-body
+        - id: http-method
+          displayName: ""
+          description: Add/Remove methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0144::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/144/http-method
+        - id: request-message-name
+          displayName: ""
+          description: Add/Remove methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0144::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/144/request-message-name
+      state: ACTIVE
+    - id: aip146
+      displayName: ""
+      description: ""
+      rules:
+        - id: standardized-codes
+          displayName: ""
+          description: Avoid `google.protobuf.Any` fields.
+          linter: api-linter
+          linterRulename: core::0146::any
+          severity: ERROR
+          docUri: linter.aip.dev/146/standardized-codes
+      state: ACTIVE
+    - id: aip148
+      displayName: ""
+      description: ""
+      rules:
+        - id: declarative-friendly-fields
+          displayName: ""
+          description: Declarative-friendly resources must include some standard fields.
+          linter: api-linter
+          linterRulename: core::0148::declarative-friendly-fields
+          severity: ERROR
+          docUri: linter.aip.dev/148/declarative-friendly-fields
+        - id: field-behavior
+          displayName: ""
+          description: Standard resource fields should have the correct field behavior.
+          linter: api-linter
+          linterRulename: core::0148::field-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/148/field-behavior
+        - id: human-names
+          displayName: ""
+          description: Avoid imprecise terms for human names.
+          linter: api-linter
+          linterRulename: core::0148::human-names
+          severity: ERROR
+          docUri: linter.aip.dev/148/human-names
+      state: ACTIVE
+    - id: aip151
+      displayName: ""
+      description: ""
+      rules:
+        - id: lro-metadata-reachable
+          displayName: ""
+          description: LRO metadata messages must be reachable.
+          linter: api-linter
+          linterRulename: core::0151::lro-metadata-reachable
+          severity: ERROR
+          docUri: linter.aip.dev/151/lro-metadata-reachable
+        - id: lro-metadata-type
+          displayName: ""
+          description: LRO methods must have a metadata type.
+          linter: api-linter
+          linterRulename: core::0151::lro-metadata-type
+          severity: ERROR
+          docUri: linter.aip.dev/151/lro-metadata-type
+        - id: lro-response-reachable
+          displayName: ""
+          description: LRO response messages must be reachable.
+          linter: api-linter
+          linterRulename: core::0151::lro-response-reachable
+          severity: ERROR
+          docUri: linter.aip.dev/151/lro-response-reachable
+        - id: lro-response-type
+          displayName: ""
+          description: LRO methods must have a response type.
+          linter: api-linter
+          linterRulename: core::0151::lro-response-type
+          severity: ERROR
+          docUri: linter.aip.dev/151/lro-response-type
+        - id: operation-info
+          displayName: ""
+          description: LRO methods must include an `operation_info` annotation.
+          linter: api-linter
+          linterRulename: core::0151::operation-info
+          severity: ERROR
+          docUri: linter.aip.dev/151/operation-info
+        - id: response-unary
+          displayName: ""
+          description: Long-running operations must not use streaming.
+          linter: api-linter
+          linterRulename: core::0151::response-unary
+          severity: ERROR
+          docUri: linter.aip.dev/151/response-unary
+      state: ACTIVE
+    - id: aip152
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Run methods should use `*` as the HTTP body.
+          linter: api-linter
+          linterRulename: core::0152::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/152/http-body
+        - id: http-method
+          displayName: ""
+          description: Run methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0152::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/152/http-method
+        - id: http-uri-suffix
+          displayName: ""
+          description: Run methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0152::http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/152/http-uri-suffix
+        - id: request-message-name
+          displayName: ""
+          description: Run methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0152::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/152/request-message-name
+        - id: request-name-behavior
+          displayName: ""
+          description: Run requests should annotate the `name` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0152::request-name-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/152/request-name-behavior
+        - id: request-name-field
+          displayName: ""
+          description: Run RPCs must have a `name` field in the request.
+          linter: api-linter
+          linterRulename: core::0152::request-name-field
+          severity: ERROR
+          docUri: linter.aip.dev/152/request-name-field
+        - id: request-name-reference
+          displayName: ""
+          description: Run requests should annotate the `name` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0152::request-name-reference
+          severity: ERROR
+          docUri: linter.aip.dev/152/request-name-reference
+        - id: request-resource-suffix
+          displayName: ""
+          description: Run requests should identify a resource type which ends in "Job".
+          linter: api-linter
+          linterRulename: core::0152::request-resource-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/152/request-resource-suffix
+        - id: response-message-name
+          displayName: ""
+          description: Run methods must return a long-running operation.
+          linter: api-linter
+          linterRulename: core::0152::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/152/response-message-name
+      state: ACTIVE
+    - id: aip154
+      displayName: ""
+      description: ""
+      rules:
+        - id: declarative-friendly-required
+          displayName: ""
+          description: Declarative-friendly resources must have an etag field.
+          linter: api-linter
+          linterRulename: core::0154::declarative-friendly-required
+          severity: ERROR
+          docUri: linter.aip.dev/154/declarative-friendly-required
+        - id: field-type
+          displayName: ""
+          description: Etag fields must be strings.
+          linter: api-linter
+          linterRulename: core::0154::field-type
+          severity: ERROR
+          docUri: linter.aip.dev/154/field-type
+        - id: no-duplicate-etag
+          displayName: ""
+          description: Etag fields should not be set on request messages that include the resource.
+          linter: api-linter
+          linterRulename: core::0154::no-duplicate-etag
+          severity: ERROR
+          docUri: linter.aip.dev/154/no-duplicate-etag
+      state: ACTIVE
+    - id: aip156
+      displayName: ""
+      description: ""
+      rules:
+        - id: forbidden-methods
+          displayName: ""
+          description: Singletons must not define List, Create, or Delete methods.
+          linter: api-linter
+          linterRulename: core::0156::forbidden-methods
+          severity: ERROR
+          docUri: linter.aip.dev/156/forbidden-methods
+      state: ACTIVE
+    - id: aip157
+      displayName: ""
+      description: ""
+      rules:
+        - id: request-read-mask-field
+          displayName: ""
+          description: Request read mask fields must have the correct type.
+          linter: api-linter
+          linterRulename: core::0157::request-read-mask-field
+          severity: ERROR
+          docUri: linter.aip.dev/157/request-read-mask-field
+      state: ACTIVE
+    - id: aip158
+      displayName: ""
+      description: ""
+      rules:
+        - id: request-page-size-field
+          displayName: ""
+          description: Paginated RPCs must have a `page_size` field in the request.
+          linter: api-linter
+          linterRulename: core::0158::request-page-size-field
+          severity: ERROR
+          docUri: linter.aip.dev/158/request-page-size-field
+        - id: request-page-token-field
+          displayName: ""
+          description: Paginated RPCs must have a `page_token` field in the request.
+          linter: api-linter
+          linterRulename: core::0158::request-page-token-field
+          severity: ERROR
+          docUri: linter.aip.dev/158/request-page-token-field
+        - id: request-skip-field
+          displayName: ""
+          description: Paginated RPC `skip` fields must have type `int32`.
+          linter: api-linter
+          linterRulename: core::0158::request-skip-field
+          severity: ERROR
+          docUri: linter.aip.dev/158/request-skip-field
+        - id: response-next-page-token-field
+          displayName: ""
+          description: Paginated RPCs must have a `next_page_token` field in the response.
+          linter: api-linter
+          linterRulename: core::0158::response-next-page-token-field
+          severity: ERROR
+          docUri: linter.aip.dev/158/response-next-page-token-field
+        - id: response-plural-first-field
+          displayName: ""
+          description: First field of Paginated RPCs' response should be plural.
+          linter: api-linter
+          linterRulename: core::0158::response-plural-first-field
+          severity: ERROR
+          docUri: linter.aip.dev/158/response-plural-first-field
+        - id: response-repeated-first-field
+          displayName: ""
+          description: First field (by both position and field number) of Paginated RPCs' response should be repeated.
+          linter: api-linter
+          linterRulename: core::0158::response-repeated-first-field
+          severity: ERROR
+          docUri: linter.aip.dev/158/response-repeated-first-field
+        - id: response-unary
+          displayName: ""
+          description: Paginated responses must not use streaming.
+          linter: api-linter
+          linterRulename: core::0158::response-unary
+          severity: ERROR
+          docUri: linter.aip.dev/158/response-unary
+      state: ACTIVE
+    - id: aip159
+      displayName: ""
+      description: ""
+      rules:
+        - id: hardcoded-hyphen
+          displayName: ""
+          description: Request URIs must not hard-code a `-` segment.
+          linter: api-linter
+          linterRulename: core::0159::hardcoded-hyphen
+          severity: ERROR
+          docUri: linter.aip.dev/159/hardcoded-hyphen
+      state: ACTIVE
+    - id: aip162
+      displayName: ""
+      description: ""
+      rules:
+        - id: commit-http-body
+          displayName: ""
+          description: Commit methods should use `*` as the HTTP body.
+          linter: api-linter
+          linterRulename: core::0162::commit-http-body
+          severity: ERROR
+          docUri: linter.aip.dev/162/commit-http-body
+        - id: commit-http-method
+          displayName: ""
+          description: Commit methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0162::commit-http-method
+          severity: ERROR
+          docUri: linter.aip.dev/162/commit-http-method
+        - id: commit-http-uri-suffix
+          displayName: ""
+          description: Commit methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0162::commit-http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/162/commit-http-uri-suffix
+        - id: commit-request-message-name
+          displayName: ""
+          description: Commit methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0162::commit-request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/162/commit-request-message-name
+        - id: commit-request-name-behavior
+          displayName: ""
+          description: Commit requests should annotate the `name` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0162::commit-request-name-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/162/commit-request-name-behavior
+        - id: commit-request-name-field
+          displayName: ""
+          description: Commit RPCs must have a `name` field in the request.
+          linter: api-linter
+          linterRulename: core::0162::commit-request-name-field
+          severity: ERROR
+          docUri: linter.aip.dev/162/commit-request-name-field
+        - id: commit-request-name-reference
+          displayName: ""
+          description: Commit requests should annotate the `name` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0162::commit-request-name-reference
+          severity: ERROR
+          docUri: linter.aip.dev/162/commit-request-name-reference
+        - id: commit-response-message-name
+          displayName: ""
+          description: Commit methods must have standardized response message names.
+          linter: api-linter
+          linterRulename: core::0162::commit-response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/162/commit-response-message-name
+        - id: delete-revision-http-body
+          displayName: ""
+          description: Delete Revision methods should not have an HTTP body.
+          linter: api-linter
+          linterRulename: core::0162::delete-revision-http-body
+          severity: ERROR
+          docUri: linter.aip.dev/162/delete-revision-http-body
+        - id: delete-revision-http-method
+          displayName: ""
+          description: Delete Revision methods must use the DELETE HTTP verb.
+          linter: api-linter
+          linterRulename: core::0162::delete-revision-http-method
+          severity: ERROR
+          docUri: linter.aip.dev/162/delete-revision-http-method
+        - id: delete-revision-http-uri-suffix
+          displayName: ""
+          description: Delete Revision methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0162::delete-revision-http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/162/delete-revision-http-uri-suffix
+        - id: delete-revision-request-message-name
+          displayName: ""
+          description: Delete Revision methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0162::delete-revision-request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/162/delete-revision-request-message-name
+        - id: delete-revision-request-name-behavior
+          displayName: ""
+          description: Delete Revision requests should annotate the `name` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0162::delete-revision-request-name-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/162/delete-revision-request-name-behavior
+        - id: delete-revision-request-name-field
+          displayName: ""
+          description: Delete Revision RPCs must have a `name` field in the request.
+          linter: api-linter
+          linterRulename: core::0162::delete-revision-request-name-field
+          severity: ERROR
+          docUri: linter.aip.dev/162/delete-revision-request-name-field
+        - id: delete-revision-request-name-reference
+          displayName: ""
+          description: Delete Revision requests should annotate the `name` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0162::delete-revision-request-name-reference
+          severity: ERROR
+          docUri: linter.aip.dev/162/delete-revision-request-name-reference
+        - id: delete-revision-response-message-name
+          displayName: ""
+          description: Delete Revision methods must return the resource.
+          linter: api-linter
+          linterRulename: core::0162::delete-revision-response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/162/delete-revision-response-message-name
+        - id: list-revisions-http-body
+          displayName: ""
+          description: List Revisions methods must not have an HTTP body.
+          linter: api-linter
+          linterRulename: core::0162::list-revisions-http-body
+          severity: ERROR
+          docUri: linter.aip.dev/162/list-revisions-http-body
+        - id: list-revisions-http-method
+          displayName: ""
+          description: List Revisions methods must use the GET HTTP verb.
+          linter: api-linter
+          linterRulename: core::0162::list-revisions-http-method
+          severity: ERROR
+          docUri: linter.aip.dev/162/list-revisions-http-method
+        - id: list-revisions-http-uri-suffix
+          displayName: ""
+          description: List Revisions methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0162::list-revisions-http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/162/list-revisions-http-uri-suffix
+        - id: list-revisions-request-message-name
+          displayName: ""
+          description: List Revisions methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0162::list-revisions-request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/162/list-revisions-request-message-name
+        - id: list-revisions-request-name-behavior
+          displayName: ""
+          description: List Revisions requests should annotate the `name` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0162::list-revisions-request-name-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/162/list-revisions-request-name-behavior
+        - id: list-revisions-request-name-field
+          displayName: ""
+          description: List Revisions RPCs must have a `name` field in the request.
+          linter: api-linter
+          linterRulename: core::0162::list-revisions-request-name-field
+          severity: ERROR
+          docUri: linter.aip.dev/162/list-revisions-request-name-field
+        - id: list-revisions-request-name-reference
+          displayName: ""
+          description: List Revisions requests should annotate the `name` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0162::list-revisions-request-name-reference
+          severity: ERROR
+          docUri: linter.aip.dev/162/list-revisions-request-name-reference
+        - id: list-revisions-request-no-order-by-field
+          displayName: ""
+          description: List Revisions requests should not have an `order_by` field.
+          linter: api-linter
+          linterRulename: core::0162::list-revisions-request-no-order-by-field
+          severity: ERROR
+          docUri: linter.aip.dev/162/list-revisions-request-no-order-by-field
+        - id: list-revisions-response-message-name
+          displayName: ""
+          description: List Revisions methods must have standardized response message names.
+          linter: api-linter
+          linterRulename: core::0162::list-revisions-response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/162/list-revisions-response-message-name
+        - id: rollback-http-body
+          displayName: ""
+          description: Rollback methods should use `*` as the HTTP body.
+          linter: api-linter
+          linterRulename: core::0162::rollback-http-body
+          severity: ERROR
+          docUri: linter.aip.dev/162/rollback-http-body
+        - id: rollback-http-method
+          displayName: ""
+          description: Rollback methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0162::rollback-http-method
+          severity: ERROR
+          docUri: linter.aip.dev/162/rollback-http-method
+        - id: rollback-http-uri-suffix
+          displayName: ""
+          description: Rollback methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0162::rollback-http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/162/rollback-http-uri-suffix
+        - id: rollback-request-message-name
+          displayName: ""
+          description: Rollback methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0162::rollback-request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/162/rollback-request-message-name
+        - id: rollback-request-name-behavior
+          displayName: ""
+          description: Rollback requests should annotate the `name` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0162::rollback-request-name-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/162/rollback-request-name-behavior
+        - id: rollback-request-name-field
+          displayName: ""
+          description: Rollback RPCs must have a `name` field in the request.
+          linter: api-linter
+          linterRulename: core::0162::rollback-request-name-field
+          severity: ERROR
+          docUri: linter.aip.dev/162/rollback-request-name-field
+        - id: rollback-request-name-reference
+          displayName: ""
+          description: Rollback requests should annotate the `name` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0162::rollback-request-name-reference
+          severity: ERROR
+          docUri: linter.aip.dev/162/rollback-request-name-reference
+        - id: rollback-request-revision-id-behavior
+          displayName: ""
+          description: Rollback requests should annotate the `revision_id` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0162::rollback-request-revision-id-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/162/rollback-request-revision-id-behavior
+        - id: rollback-request-revision-id-field
+          displayName: ""
+          description: Rollback RPCs must have a `revision_id` field in the request.
+          linter: api-linter
+          linterRulename: core::0162::rollback-request-revision-id-field
+          severity: ERROR
+          docUri: linter.aip.dev/162/rollback-request-revision-id-field
+        - id: rollback-response-message-name
+          displayName: ""
+          description: Rollback methods must have standardized response message names.
+          linter: api-linter
+          linterRulename: core::0162::rollback-response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/162/rollback-response-message-name
+        - id: tag-revision-http-body
+          displayName: ""
+          description: Tag Revision methods should use `*` as the HTTP body.
+          linter: api-linter
+          linterRulename: core::0162::tag-revision-http-body
+          severity: ERROR
+          docUri: linter.aip.dev/162/tag-revision-http-body
+        - id: tag-revision-http-method
+          displayName: ""
+          description: Tag Revision methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0162::tag-revision-http-method
+          severity: ERROR
+          docUri: linter.aip.dev/162/tag-revision-http-method
+        - id: tag-revision-http-uri-suffix
+          displayName: ""
+          description: Tag Revision methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0162::tag-revision-http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/162/tag-revision-http-uri-suffix
+        - id: tag-revision-request-message-name
+          displayName: ""
+          description: Tag Revision methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0162::tag-revision-request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/162/tag-revision-request-message-name
+        - id: tag-revision-request-name-behavior
+          displayName: ""
+          description: Tag Revision requests should annotate the `name` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0162::tag-revision-request-name-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/162/tag-revision-request-name-behavior
+        - id: tag-revision-request-name-field
+          displayName: ""
+          description: Tag Revision RPCs must have a `name` field in the request.
+          linter: api-linter
+          linterRulename: core::0162::tag-revision-request-name-field
+          severity: ERROR
+          docUri: linter.aip.dev/162/tag-revision-request-name-field
+        - id: tag-revision-request-name-reference
+          displayName: ""
+          description: Tag Revision requests should annotate the `name` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0162::tag-revision-request-name-reference
+          severity: ERROR
+          docUri: linter.aip.dev/162/tag-revision-request-name-reference
+        - id: tag-revision-request-tag-behavior
+          displayName: ""
+          description: Tag Revision requests should annotate the `tag` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0162::tag-revision-request-tag-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/162/tag-revision-request-tag-behavior
+        - id: tag-revision-request-tag-field
+          displayName: ""
+          description: Tag Revision RPCs must have a `tag` field in the request.
+          linter: api-linter
+          linterRulename: core::0162::tag-revision-request-tag-field
+          severity: ERROR
+          docUri: linter.aip.dev/162/tag-revision-request-tag-field
+        - id: tag-revision-response-message-name
+          displayName: ""
+          description: Tag Revision methods must have standardized response message names.
+          linter: api-linter
+          linterRulename: core::0162::tag-revision-response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/162/tag-revision-response-message-name
+      state: ACTIVE
+    - id: aip163
+      displayName: ""
+      description: ""
+      rules:
+        - id: declarative-friendly-required
+          displayName: ""
+          description: Declarative-friendly mutations should have a validate_only field.
+          linter: api-linter
+          linterRulename: core::0163::declarative-friendly-required
+          severity: ERROR
+          docUri: linter.aip.dev/163/declarative-friendly-required
+        - id: synonyms
+          displayName: ""
+          description: Change validation fields should be named `validate_only`.
+          linter: api-linter
+          linterRulename: core::0163::synonyms
+          severity: ERROR
+          docUri: linter.aip.dev/163/synonyms
+      state: ACTIVE
+    - id: aip164
+      displayName: ""
+      description: ""
+      rules:
+        - id: declarative-friendly-required
+          displayName: ""
+          description: Declarative-friendly resources should have an Undelete method.
+          linter: api-linter
+          linterRulename: core::0164::declarative-friendly-required
+          severity: ERROR
+          docUri: linter.aip.dev/164/declarative-friendly-required
+        - id: http-body
+          displayName: ""
+          description: Undelete methods should use `*` as the HTTP body.
+          linter: api-linter
+          linterRulename: core::0164::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/164/http-body
+        - id: http-method
+          displayName: ""
+          description: Undelete methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0164::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/164/http-method
+        - id: http-uri-suffix
+          displayName: ""
+          description: Undelete methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0164::http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/164/http-uri-suffix
+        - id: request-message-name
+          displayName: ""
+          description: Undelete methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0164::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/164/request-message-name
+        - id: request-name-behavior
+          displayName: ""
+          description: Undelete RPCs should annotate the `name` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0164::request-name-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/164/request-name-behavior
+        - id: request-name-field
+          displayName: ""
+          description: Undelete RPCs must have a `name` field in the request.
+          linter: api-linter
+          linterRulename: core::0164::request-name-field
+          severity: ERROR
+          docUri: linter.aip.dev/164/request-name-field
+        - id: request-name-reference
+          displayName: ""
+          description: Undelete RPCs should annotate the `name` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0164::request-name-reference
+          severity: ERROR
+          docUri: linter.aip.dev/164/request-name-reference
+        - id: request-unknown-fields
+          displayName: ""
+          description: Undelete RPCs should not have unexpected fields in the request.
+          linter: api-linter
+          linterRulename: core::0164::request-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/164/request-unknown-fields
+        - id: resource-expire-time-field
+          displayName: ""
+          description: Resources supporting soft delete must have an `expire_time` field.
+          linter: api-linter
+          linterRulename: core::0164::resource-expire-time-field
+          severity: ERROR
+          docUri: linter.aip.dev/164/resource-expire-time-field
+        - id: response-lro
+          displayName: ""
+          description: Declarative-friendly undelete methods should use long-running operations.
+          linter: api-linter
+          linterRulename: core::0164::response-lro
+          severity: ERROR
+          docUri: linter.aip.dev/164/response-lro
+        - id: response-message-name
+          displayName: ""
+          description: Undelete methods must return the resource.
+          linter: api-linter
+          linterRulename: core::0164::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/164/response-message-name
+      state: ACTIVE
+    - id: aip165
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Purge methods should use `*` as the HTTP body.
+          linter: api-linter
+          linterRulename: core::0165::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/165/http-body
+        - id: http-method
+          displayName: ""
+          description: Purge methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0165::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/165/http-method
+        - id: http-parent-variable
+          displayName: ""
+          description: Purge methods must map the parent field to the URI.
+          linter: api-linter
+          linterRulename: core::0165::http-parent-variable
+          severity: ERROR
+          docUri: linter.aip.dev/165/http-parent-variable
+        - id: http-uri-suffix
+          displayName: ""
+          description: Purge methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0165::http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/165/http-uri-suffix
+        - id: request-filter-behavior
+          displayName: ""
+          description: Purge requests should annotate the `filter` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0165::request-filter-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/165/request-filter-behavior
+        - id: request-filter-field
+          displayName: ""
+          description: Purge RPCs must have a `filter` field in the request.
+          linter: api-linter
+          linterRulename: core::0165::request-filter-field
+          severity: ERROR
+          docUri: linter.aip.dev/165/request-filter-field
+        - id: request-force-field
+          displayName: ""
+          description: Purge RPCs must have a `force` field in the request.
+          linter: api-linter
+          linterRulename: core::0165::request-force-field
+          severity: ERROR
+          docUri: linter.aip.dev/165/request-force-field
+        - id: request-message-name
+          displayName: ""
+          description: Purge methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0165::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/165/request-message-name
+        - id: request-parent-behavior
+          displayName: ""
+          description: Purge requests should annotate the `parent` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0165::request-parent-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/165/request-parent-behavior
+        - id: request-parent-field
+          displayName: ""
+          description: Purge RPCs must have a `parent` field in the request.
+          linter: api-linter
+          linterRulename: core::0165::request-parent-field
+          severity: ERROR
+          docUri: linter.aip.dev/165/request-parent-field
+        - id: request-parent-reference
+          displayName: ""
+          description: Purge requests should annotate the `parent` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0165::request-parent-reference
+          severity: ERROR
+          docUri: linter.aip.dev/165/request-parent-reference
+        - id: response-message-name
+          displayName: ""
+          description: Purge methods must return a long-running operation.
+          linter: api-linter
+          linterRulename: core::0165::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/165/response-message-name
+        - id: response-purge-count-field
+          displayName: ""
+          description: Purge RPCs must have a `purge_count` field in the response.
+          linter: api-linter
+          linterRulename: core::0165::response-purge-count-field
+          severity: ERROR
+          docUri: linter.aip.dev/165/response-purge-count-field
+        - id: response-purge-sample-field
+          displayName: ""
+          description: Purge RPCs must have a `purge_sample` field in the response.
+          linter: api-linter
+          linterRulename: core::0165::response-purge-sample-field
+          severity: ERROR
+          docUri: linter.aip.dev/165/response-purge-sample-field
+        - id: response-purge-sample-reference
+          displayName: ""
+          description: Purge responses should annotate the `purge_sample` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0165::response-purge-sample-reference
+          severity: ERROR
+          docUri: linter.aip.dev/165/response-purge-sample-reference
+      state: ACTIVE
+    - id: aip191
+      displayName: ""
+      description: ""
+      rules:
+        - id: csharp-namespace
+          displayName: ""
+          description: The `option csharp_namespace` annotation should be idiomatic if set.
+          linter: api-linter
+          linterRulename: core::0191::csharp-namespace
+          severity: ERROR
+          docUri: linter.aip.dev/191/csharp-namespace
+        - id: file-layout
+          displayName: ""
+          description: Proto files should follow a consistent layout.
+          linter: api-linter
+          linterRulename: core::0191::file-layout
+          severity: ERROR
+          docUri: linter.aip.dev/191/file-layout
+        - id: file-option-consistency
+          displayName: ""
+          description: All proto files must set file packaging options consistently.
+          linter: api-linter
+          linterRulename: core::0191::file-option-consistency
+          severity: ERROR
+          docUri: linter.aip.dev/191/file-option-consistency
+        - id: filenames
+          displayName: ""
+          description: Proto files must use reasonable filenames.
+          linter: api-linter
+          linterRulename: core::0191::filenames
+          severity: ERROR
+          docUri: linter.aip.dev/191/filenames
+        - id: java-multiple-files
+          displayName: ""
+          description: All proto files must set `option java_multiple_files = true`.
+          linter: api-linter
+          linterRulename: core::0191::java-multiple-files
+          severity: ERROR
+          docUri: linter.aip.dev/191/java-multiple-files
+        - id: java-outer-classname
+          displayName: ""
+          description: All proto files must set `option java_outer_classname`.
+          linter: api-linter
+          linterRulename: core::0191::java-outer-classname
+          severity: ERROR
+          docUri: linter.aip.dev/191/java-outer-classname
+        - id: java-package
+          displayName: ""
+          description: All proto files must set `option java_package`.
+          linter: api-linter
+          linterRulename: core::0191::java-package
+          severity: ERROR
+          docUri: linter.aip.dev/191/java-package
+        - id: php-namespace
+          displayName: ""
+          description: The `option php_namespace` annotation should be idiomatic if set.
+          linter: api-linter
+          linterRulename: core::0191::php-namespace
+          severity: ERROR
+          docUri: linter.aip.dev/191/php-namespace
+        - id: proto-package
+          displayName: ""
+          description: Proto package must match the directory structure.
+          linter: api-linter
+          linterRulename: core::0191::proto-package
+          severity: ERROR
+          docUri: linter.aip.dev/191/proto-package
+        - id: proto-version
+          displayName: ""
+          description: All proto files must use proto3.
+          linter: api-linter
+          linterRulename: core::0191::proto-version
+          severity: ERROR
+          docUri: linter.aip.dev/191/proto-version
+        - id: ruby-package
+          displayName: ""
+          description: The `option ruby_package` annotation should be idiomatic if set.
+          linter: api-linter
+          linterRulename: core::0191::ruby-package
+          severity: ERROR
+          docUri: linter.aip.dev/191/ruby-package
+      state: ACTIVE
+    - id: aip192
+      displayName: ""
+      description: ""
+      rules:
+        - id: absolute-links
+          displayName: ""
+          description: Comments must use absolute links
+          linter: api-linter
+          linterRulename: core::0192::absolute-links
+          severity: ERROR
+          docUri: linter.aip.dev/192/absolute-links
+        - id: deprecated-comment
+          displayName: ""
+          description: Deprecated methods must have a corresponding comment.
+          linter: api-linter
+          linterRulename: core::0192::deprecated-comment
+          severity: ERROR
+          docUri: linter.aip.dev/192/deprecated-comment
+        - id: has-comments
+          displayName: ""
+          description: Everything in a proto file must be commented.
+          linter: api-linter
+          linterRulename: core::0192::has-comments
+          severity: ERROR
+          docUri: linter.aip.dev/192/has-comments
+        - id: no-html
+          displayName: ""
+          description: Comments must not use raw HTML
+          linter: api-linter
+          linterRulename: core::0192::no-html
+          severity: ERROR
+          docUri: linter.aip.dev/192/no-html
+        - id: no-markdown-headings
+          displayName: ""
+          description: Public comments should not include Markdown headings.
+          linter: api-linter
+          linterRulename: core::0192::no-markdown-headings
+          severity: ERROR
+          docUri: linter.aip.dev/192/no-markdown-headings
+        - id: no-markdown-tables
+          displayName: ""
+          description: Public comments should not include Markdown tables.
+          linter: api-linter
+          linterRulename: core::0192::no-markdown-tables
+          severity: ERROR
+          docUri: linter.aip.dev/192/no-markdown-tables
+        - id: only-leading-comments
+          displayName: ""
+          description: All public comments should be leading comments.
+          linter: api-linter
+          linterRulename: core::0192::only-leading-comments
+          severity: ERROR
+          docUri: linter.aip.dev/192/only-leading-comments
+        - id: trademarked-names
+          displayName: ""
+          description: Trademarked names should be used correctly.
+          linter: api-linter
+          linterRulename: core::0192::trademarked-names
+          severity: ERROR
+          docUri: linter.aip.dev/192/trademarked-names
+      state: ACTIVE
+    - id: aip203
+      displayName: ""
+      description: ""
+      rules:
+        - id: immutable
+          displayName: ""
+          description: Immutable fields should be annotated.
+          linter: api-linter
+          linterRulename: core::0203::immutable
+          severity: ERROR
+          docUri: linter.aip.dev/203/immutable
+        - id: input-only
+          displayName: ""
+          description: Input only fields should be annotated.
+          linter: api-linter
+          linterRulename: core::0203::input-only
+          severity: ERROR
+          docUri: linter.aip.dev/203/input-only
+        - id: optional-conflict
+          displayName: ""
+          description: Optional fields must not have any other field behavior.
+          linter: api-linter
+          linterRulename: core::0203::optional-conflict
+          severity: ERROR
+          docUri: linter.aip.dev/203/optional-conflict
+        - id: optional-consistency
+          displayName: ""
+          description: Optional fields should either be always or never annotated.
+          linter: api-linter
+          linterRulename: core::0203::optional-consistency
+          severity: ERROR
+          docUri: linter.aip.dev/203/optional-consistency
+        - id: optional
+          displayName: ""
+          description: Optional fields may be annotated.
+          linter: api-linter
+          linterRulename: core::0203::optional
+          severity: ERROR
+          docUri: linter.aip.dev/203/optional
+        - id: output-only
+          displayName: ""
+          description: Output only fields should be annotated.
+          linter: api-linter
+          linterRulename: core::0203::output-only
+          severity: ERROR
+          docUri: linter.aip.dev/203/output-only
+        - id: required-and-optional
+          displayName: ""
+          description: Required fields must not use the optional keyword.
+          linter: api-linter
+          linterRulename: core::0203::required-and-optional
+          severity: ERROR
+          docUri: linter.aip.dev/203/required-and-optional
+        - id: required
+          displayName: ""
+          description: Required fields should be annotated.
+          linter: api-linter
+          linterRulename: core::0203::required
+          severity: ERROR
+          docUri: linter.aip.dev/203/required
+        - id: unordered-list-repeated
+          displayName: ""
+          description: Only repeated fields may be annotated with `UNORDERED_LIST`.
+          linter: api-linter
+          linterRulename: core::0203::unordered-list-repeated
+          severity: ERROR
+          docUri: linter.aip.dev/203/unordered-list-repeated
+      state: ACTIVE
+    - id: aip214
+      displayName: ""
+      description: ""
+      rules:
+        - id: resource-expiry
+          displayName: ""
+          description: Resources with user-set expiry times should offer a ttl field.
+          linter: api-linter
+          linterRulename: core::0214::resource-expiry
+          severity: ERROR
+          docUri: linter.aip.dev/214/resource-expiry
+        - id: ttl-type
+          displayName: ""
+          description: The `ttl` field should be a `google.protobuf.Duration`.
+          linter: api-linter
+          linterRulename: core::0214::ttl-type
+          severity: ERROR
+          docUri: linter.aip.dev/214/ttl-type
+      state: ACTIVE
+    - id: aip215
+      displayName: ""
+      description: ""
+      rules:
+        - id: versioned-packages
+          displayName: ""
+          description: API-specific protos should be in versioned packages.
+          linter: api-linter
+          linterRulename: core::0215::versioned-packages
+          severity: ERROR
+          docUri: linter.aip.dev/215/versioned-packages
+      state: ACTIVE
+    - id: aip216
+      displayName: ""
+      description: ""
+      rules:
+        - id: nesting
+          displayName: ""
+          description: Lifecycle state enums should be nested within the resource.
+          linter: api-linter
+          linterRulename: core::0216::nesting
+          severity: ERROR
+          docUri: linter.aip.dev/216/nesting
+        - id: synonyms
+          displayName: ""
+          description: Lifecycle state enums should be called "State", not "Status".
+          linter: api-linter
+          linterRulename: core::0216::synonyms
+          severity: ERROR
+          docUri: linter.aip.dev/216/synonyms
+        - id: value-synonyms
+          displayName: ""
+          description: Enforce common state values.
+          linter: api-linter
+          linterRulename: core::0216::value-synonyms
+          severity: ERROR
+          docUri: linter.aip.dev/216/value-synonyms
+      state: ACTIVE
+    - id: aip217
+      displayName: ""
+      description: ""
+      rules:
+        - id: synonyms
+          displayName: ""
+          description: The field for unreachable resources should be named `unreachable`.
+          linter: api-linter
+          linterRulename: core::0217::synonyms
+          severity: ERROR
+          docUri: linter.aip.dev/217/synonyms
+        - id: unreachable-field-type
+          displayName: ""
+          description: The unreachable field should be a repeated string.
+          linter: api-linter
+          linterRulename: core::0217::unreachable-field-type
+          severity: ERROR
+          docUri: linter.aip.dev/217/unreachable-field-type
+      state: ACTIVE
+    - id: aip231
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Batch Get methods must not have an HTTP body.
+          linter: api-linter
+          linterRulename: core::0231::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/231/http-body
+        - id: http-method
+          displayName: ""
+          description: Batch Get methods must use the GET HTTP verb.
+          linter: api-linter
+          linterRulename: core::0231::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/231/http-method
+        - id: http-uri-suffix
+          displayName: ""
+          description: Batch Get methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0231::http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/231/http-uri-suffix
+        - id: plural-method-name
+          displayName: ""
+          description: Batch Get methods must have plural names.
+          linter: api-linter
+          linterRulename: core::0231::plural-method-name
+          severity: ERROR
+          docUri: linter.aip.dev/231/plural-method-name
+        - id: request-message-name
+          displayName: ""
+          description: Batch Get methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0231::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/231/request-message-name
+        - id: request-names-behavior
+          displayName: ""
+          description: Batch Get requests should annotate the `names` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0231::request-names-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/231/request-names-behavior
+        - id: request-names-field
+          displayName: ""
+          description: Batch Get RPCs should have a `names` field in the request.
+          linter: api-linter
+          linterRulename: core::0231::request-names-field
+          severity: ERROR
+          docUri: linter.aip.dev/231/request-names-field
+        - id: request-names-reference
+          displayName: ""
+          description: Batch Get requests should annotate the `names` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0231::request-names-reference
+          severity: ERROR
+          docUri: linter.aip.dev/231/request-names-reference
+        - id: request-parent-field
+          displayName: ""
+          description: Batch Get RPCs must have a `parent` field in the request.
+          linter: api-linter
+          linterRulename: core::0231::request-parent-field
+          severity: ERROR
+          docUri: linter.aip.dev/231/request-parent-field
+        - id: request-parent-reference
+          displayName: ""
+          description: Batch Get requests should annotate the `parent` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0231::request-parent-reference
+          severity: ERROR
+          docUri: linter.aip.dev/231/request-parent-reference
+        - id: request-unknown-fields
+          displayName: ""
+          description: Batch Get RPCs should not have unexpected fields in the request.
+          linter: api-linter
+          linterRulename: core::0231::request-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/231/request-unknown-fields
+        - id: response-message-name
+          displayName: ""
+          description: Batch Get methods must have standardized response message names.
+          linter: api-linter
+          linterRulename: core::0231::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/231/response-message-name
+        - id: response-resource-field
+          displayName: ""
+          description: Batch Get RPCs must have a repeated field for the resource in the response.
+          linter: api-linter
+          linterRulename: core::0231::response-resource-field
+          severity: ERROR
+          docUri: linter.aip.dev/231/response-resource-field
+      state: ACTIVE
+    - id: aip233
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Batch Create methods should use `*` as the HTTP body.
+          linter: api-linter
+          linterRulename: core::0233::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/233/http-body
+        - id: http-method
+          displayName: ""
+          description: Batch Create methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0233::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/233/http-method
+        - id: http-uri-suffix
+          displayName: ""
+          description: Batch Create methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0233::http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/233/http-uri-suffix
+        - id: plural-method-name
+          displayName: ""
+          description: Batch Create methods must have plural names.
+          linter: api-linter
+          linterRulename: core::0233::plural-method-name
+          severity: ERROR
+          docUri: linter.aip.dev/233/plural-method-name
+        - id: request-message-name
+          displayName: ""
+          description: Batch Create methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0233::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/233/request-message-name
+        - id: request-parent-field
+          displayName: ""
+          description: Batch Create RPCs must have a `parent` field in the request.
+          linter: api-linter
+          linterRulename: core::0233::request-parent-field
+          severity: ERROR
+          docUri: linter.aip.dev/233/request-parent-field
+        - id: request-parent-reference
+          displayName: ""
+          description: Batch Create requests should annotate the `parent` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0233::request-parent-reference
+          severity: ERROR
+          docUri: linter.aip.dev/233/request-parent-reference
+        - id: request-requests-behavior
+          displayName: ""
+          description: Batch Create requests should annotate the `requests` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0233::request-requests-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/233/request-requests-behavior
+        - id: request-requests-field
+          displayName: ""
+          description: Batch Create RPCs should have a `requests` field in the request.
+          linter: api-linter
+          linterRulename: core::0233::request-requests-field
+          severity: ERROR
+          docUri: linter.aip.dev/233/request-requests-field
+        - id: request-unknown-fields
+          displayName: ""
+          description: Batch Create RPCs should not have unexpected fields in the request.
+          linter: api-linter
+          linterRulename: core::0233::request-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/233/request-unknown-fields
+        - id: resource-reference-type
+          displayName: ""
+          description: BatchCreate should use a `child_type` reference to the created resource.
+          linter: api-linter
+          linterRulename: core::0233::resource-reference-type
+          severity: ERROR
+          docUri: linter.aip.dev/233/resource-reference-type
+        - id: response-message-name
+          displayName: ""
+          description: Batch Create methods must have standardized response message names.
+          linter: api-linter
+          linterRulename: core::0233::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/233/response-message-name
+        - id: response-resource-field
+          displayName: ""
+          description: Batch Create RPCs must have a repeated field for the resource in the response.
+          linter: api-linter
+          linterRulename: core::0233::response-resource-field
+          severity: ERROR
+          docUri: linter.aip.dev/233/response-resource-field
+      state: ACTIVE
+    - id: aip234
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Batch Update methods should use `*` as the HTTP body.
+          linter: api-linter
+          linterRulename: core::0234::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/234/http-body
+        - id: http-method
+          displayName: ""
+          description: Batch Update methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0234::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/234/http-method
+        - id: http-uri-suffix
+          displayName: ""
+          description: Batch Update methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0234::http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/234/http-uri-suffix
+        - id: plural-method-name
+          displayName: ""
+          description: Batch Update methods must have plural names.
+          linter: api-linter
+          linterRulename: core::0234::plural-method-name
+          severity: ERROR
+          docUri: linter.aip.dev/234/plural-method-name
+        - id: request-message-name
+          displayName: ""
+          description: Batch Update methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0234::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/234/request-message-name
+        - id: request-parent-field
+          displayName: ""
+          description: Batch Update RPCs must have a `parent` field in the request.
+          linter: api-linter
+          linterRulename: core::0234::request-parent-field
+          severity: ERROR
+          docUri: linter.aip.dev/234/request-parent-field
+        - id: request-parent-reference
+          displayName: ""
+          description: Batch Update requests should annotate the `parent` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0234::request-parent-reference
+          severity: ERROR
+          docUri: linter.aip.dev/234/request-parent-reference
+        - id: request-requests-behavior
+          displayName: ""
+          description: Batch Update requests should annotate the `requests` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0234::request-requests-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/234/request-requests-behavior
+        - id: request-requests-field
+          displayName: ""
+          description: Batch Update RPCs should have a `requests` field in the request.
+          linter: api-linter
+          linterRulename: core::0234::request-requests-field
+          severity: ERROR
+          docUri: linter.aip.dev/234/request-requests-field
+        - id: request-unknown-fields
+          displayName: ""
+          description: Batch Update RPCs should not have unexpected fields in the request.
+          linter: api-linter
+          linterRulename: core::0234::request-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/234/request-unknown-fields
+        - id: response-message-name
+          displayName: ""
+          description: Batch Update methods must have standardized response message names.
+          linter: api-linter
+          linterRulename: core::0234::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/234/response-message-name
+        - id: response-resource-field
+          displayName: ""
+          description: Batch Update RPCs must have a repeated field for the resource in the response.
+          linter: api-linter
+          linterRulename: core::0234::response-resource-field
+          severity: ERROR
+          docUri: linter.aip.dev/234/response-resource-field
+      state: ACTIVE
+    - id: aip235
+      displayName: ""
+      description: ""
+      rules:
+        - id: http-body
+          displayName: ""
+          description: Batch Delete methods should use `*` as the HTTP body.
+          linter: api-linter
+          linterRulename: core::0235::http-body
+          severity: ERROR
+          docUri: linter.aip.dev/235/http-body
+        - id: http-method
+          displayName: ""
+          description: Batch Delete methods must use the POST HTTP verb.
+          linter: api-linter
+          linterRulename: core::0235::http-method
+          severity: ERROR
+          docUri: linter.aip.dev/235/http-method
+        - id: http-uri-suffix
+          displayName: ""
+          description: Batch Delete methods must have the correct URI suffix
+          linter: api-linter
+          linterRulename: core::0235::http-uri-suffix
+          severity: ERROR
+          docUri: linter.aip.dev/235/http-uri-suffix
+        - id: plural-method-name
+          displayName: ""
+          description: Batch Delete methods must have plural names.
+          linter: api-linter
+          linterRulename: core::0235::plural-method-name
+          severity: ERROR
+          docUri: linter.aip.dev/235/plural-method-name
+        - id: request-message-name
+          displayName: ""
+          description: Batch Delete methods must have standardized request message names.
+          linter: api-linter
+          linterRulename: core::0235::request-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/235/request-message-name
+        - id: request-names-behavior
+          displayName: ""
+          description: Batch Delete requests should annotate the `names` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0235::request-names-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/235/request-names-behavior
+        - id: request-names-field
+          displayName: ""
+          description: Batch Delete RPCs should have a `names` field in the request.
+          linter: api-linter
+          linterRulename: core::0235::request-names-field
+          severity: ERROR
+          docUri: linter.aip.dev/235/request-names-field
+        - id: request-names-reference
+          displayName: ""
+          description: Batch Delete requests should annotate the `names` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0235::request-names-reference
+          severity: ERROR
+          docUri: linter.aip.dev/235/request-names-reference
+        - id: request-parent-field
+          displayName: ""
+          description: Batch Delete RPCs must have a `parent` field in the request.
+          linter: api-linter
+          linterRulename: core::0235::request-parent-field
+          severity: ERROR
+          docUri: linter.aip.dev/235/request-parent-field
+        - id: request-parent-reference
+          displayName: ""
+          description: Batch Delete requests should annotate the `parent` field with `google.api.resource_reference`.
+          linter: api-linter
+          linterRulename: core::0235::request-parent-reference
+          severity: ERROR
+          docUri: linter.aip.dev/235/request-parent-reference
+        - id: request-requests-behavior
+          displayName: ""
+          description: Batch Delete requests should annotate the `requests` field with `google.api.field_behavior`.
+          linter: api-linter
+          linterRulename: core::0235::request-requests-behavior
+          severity: ERROR
+          docUri: linter.aip.dev/235/request-requests-behavior
+        - id: request-unknown-fields
+          displayName: ""
+          description: Batch Delete RPCs should not have unexpected fields in the request.
+          linter: api-linter
+          linterRulename: core::0235::request-unknown-fields
+          severity: ERROR
+          docUri: linter.aip.dev/235/request-unknown-fields
+        - id: response-message-name
+          displayName: ""
+          description: Batch Delete methods must have standardized response message names.
+          linter: api-linter
+          linterRulename: core::0235::response-message-name
+          severity: ERROR
+          docUri: linter.aip.dev/235/response-message-name
+        - id: response-resource-field
+          displayName: ""
+          description: Batch Delete RPCs must have a repeated field for the resource in the response.
+          linter: api-linter
+          linterRulename: core::0235::response-resource-field
+          severity: ERROR
+          docUri: linter.aip.dev/235/response-resource-field
+      state: ACTIVE
+    - id: aip4232
+      displayName: ""
+      description: ""
+      rules:
+        - id: repeated-fields
+          displayName: ""
+          description: Method Signatures can only have repeated fields in the last element.
+          linter: api-linter
+          linterRulename: client-libraries::4232::repeated-fields
+          severity: ERROR
+          docUri: linter.aip.dev/4232/repeated-fields
+        - id: required-fields
+          displayName: ""
+          description: Method Signatures must contain all fields annotated as required.
+          linter: api-linter
+          linterRulename: client-libraries::4232::required-fields
+          severity: ERROR
+          docUri: linter.aip.dev/4232/required-fields
+      state: ACTIVE
+  linters:
+    - name: api-linter
+      uri: https://github.com/googleapis/api-linter
+

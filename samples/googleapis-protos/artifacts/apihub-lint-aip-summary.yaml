@@ -1,0 +1,53 @@
+apiVersion: apigeeregistry/v1
+kind: ScoreCardDefinition
+metadata:
+  name: apihub-lint-aip-summary
+data:
+  displayName: Lint Summary
+  description: Summary of aip lint scores
+  targetResource:
+    pattern: apis/-/versions/-/specs/-
+    filter: ""
+  scorePatterns:
+    - $resource.spec/artifacts/score-apihub-lint-122
+    - $resource.spec/artifacts/score-apihub-lint-123
+    - $resource.spec/artifacts/score-apihub-lint-124
+    - $resource.spec/artifacts/score-apihub-lint-126
+    - $resource.spec/artifacts/score-apihub-lint-127
+    - $resource.spec/artifacts/score-apihub-lint-128
+    - $resource.spec/artifacts/score-apihub-lint-131
+    - $resource.spec/artifacts/score-apihub-lint-132
+    - $resource.spec/artifacts/score-apihub-lint-133
+    - $resource.spec/artifacts/score-apihub-lint-134
+    - $resource.spec/artifacts/score-apihub-lint-135
+    - $resource.spec/artifacts/score-apihub-lint-136
+    - $resource.spec/artifacts/score-apihub-lint-140
+    - $resource.spec/artifacts/score-apihub-lint-141
+    - $resource.spec/artifacts/score-apihub-lint-142
+    - $resource.spec/artifacts/score-apihub-lint-143
+    - $resource.spec/artifacts/score-apihub-lint-144
+    - $resource.spec/artifacts/score-apihub-lint-146
+    - $resource.spec/artifacts/score-apihub-lint-148
+    - $resource.spec/artifacts/score-apihub-lint-151
+    - $resource.spec/artifacts/score-apihub-lint-152
+    - $resource.spec/artifacts/score-apihub-lint-154
+    - $resource.spec/artifacts/score-apihub-lint-156
+    - $resource.spec/artifacts/score-apihub-lint-157
+    - $resource.spec/artifacts/score-apihub-lint-158
+    - $resource.spec/artifacts/score-apihub-lint-159
+    - $resource.spec/artifacts/score-apihub-lint-162
+    - $resource.spec/artifacts/score-apihub-lint-163
+    - $resource.spec/artifacts/score-apihub-lint-164
+    - $resource.spec/artifacts/score-apihub-lint-165
+    - $resource.spec/artifacts/score-apihub-lint-191
+    - $resource.spec/artifacts/score-apihub-lint-192
+    - $resource.spec/artifacts/score-apihub-lint-203
+    - $resource.spec/artifacts/score-apihub-lint-214
+    - $resource.spec/artifacts/score-apihub-lint-215
+    - $resource.spec/artifacts/score-apihub-lint-216
+    - $resource.spec/artifacts/score-apihub-lint-217
+    - $resource.spec/artifacts/score-apihub-lint-231
+    - $resource.spec/artifacts/score-apihub-lint-233
+    - $resource.spec/artifacts/score-apihub-lint-234
+    - $resource.spec/artifacts/score-apihub-lint-235
+    - $resource.spec/artifacts/score-apihub-lint-4232

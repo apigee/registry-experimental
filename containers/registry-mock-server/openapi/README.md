@@ -7,6 +7,9 @@ For a registry spec 'projects/openapi/locations/global/apis/benchtest-1/versions
 The mock service will be available at
 http://localhost:3000/projects/openapi/locations/global/apis/benchtest-1/versions/v1/specs/spec-1
 
+### Running this service on Cloud Run
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?dir=containers/registry-mock-server/openapi)
+
 ### To run this service on a GCE instance run the following command:
 ```
 export REGISTRY_PROJECT_IDENTIFIER=$(gcloud config list --format 'value(core.project)')
@@ -25,10 +28,10 @@ gcloud compute firewall-rules create registry-mock-service-fw \
     --rules tcp:80
 
 
-gcloud compute instances create-with-container registry-mock-server-instance \
+gcloud compute instances create-with-container registry-prism-mock-server-instance \
 	--machine-type=e2-micro  --tags=registry-mock-service,http-server \
 	--scopes=https://www.googleapis.com/auth/cloud-platform \
 	--restart-on-failure --service-account=registry-viewer@$REGISTRY_PROJECT_IDENTIFIER.iam.gserviceaccount.com\
 	--zone=us-central1-a \
-    --container-image ghcr.io/giteshk-org/registry-prism-mock-server:main
+    --container-image ghcr.io/apigee/registry-prism-mock-server:main
 ```

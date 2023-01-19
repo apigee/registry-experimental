@@ -1,0 +1,23 @@
+apiVersion: apigeeregistry/v1
+kind: ScoreDefinition
+metadata:
+  name: apihub-lint-errors-exist
+data:
+  display_name: "Lint Errors Exist"
+  description: "Keeps track if there are lint errors present or not"
+  uri: "https://meta.stoplight.io/docs/spectral/4dec24461f3af-open-api-rules"
+  uri_display_name: "Spectral rules"
+  target_resource:
+    pattern: "apis/-/versions/-/specs/-"
+  score_formula:
+    artifact:
+      pattern: "$resource.spec/artifacts/conformance-apihub-styleguide"
+    score_expression: "has(guidelineReportGroups[2].guidelineReports) ? sum(guidelineReportGroups[2].guidelineReports.map(r, has(r.ruleReportGroups[1].ruleReports) ? size(r.ruleReportGroups[1].ruleReports) : 0)) > 0 : false"
+  boolean:
+    display_true: "Yes"
+    display_false: "No"
+    thresholds:
+      - severity: WARNING
+        value: true
+      - severity: OK
+        value: false

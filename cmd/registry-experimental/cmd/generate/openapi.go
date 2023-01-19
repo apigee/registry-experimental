@@ -70,7 +70,7 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().StringVar(&specID, "spec-id", "generated.yaml", "ID to use for generated spec")
+	cmd.Flags().StringVar(&specID, "spec-id", "generated", "ID to use for generated spec")
 	return cmd
 }
 
@@ -127,6 +127,7 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 		Name:     specName.Version().Spec(relation).String(),
 		MimeType: "application/x.openapi+gzip;version=3",
 		Contents: messageData,
+		Filename: "openapi.yaml",
 	}
 	_, err = task.client.UpdateApiSpec(ctx, &rpc.UpdateApiSpecRequest{
 		ApiSpec:      newSpec,

@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/compute"
+	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/count"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/export"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/search"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/wipeout"
@@ -42,6 +43,7 @@ func Command(ctx context.Context) *cobra.Command {
 	})
 
 	cmd.AddCommand(compute.Command(ctx))
+	cmd.AddCommand(count.Command())
 	cmd.AddCommand(export.Command())
 	cmd.AddCommand(search.Command(ctx))
 	cmd.AddCommand(wipeout.Command(ctx))

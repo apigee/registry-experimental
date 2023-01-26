@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/apigee/registry/cmd/registry/core"
+	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/rpc"
@@ -58,7 +59,7 @@ func descriptorCommand(ctx context.Context) *cobra.Command {
 			// Generate tasks.
 			name := args[0]
 			if spec, err := names.ParseSpec(name); err == nil {
-				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) error {
+				err = core.ListSpecs(ctx, client, spec, filter, false, func(spec *rpc.ApiSpec) error {
 					taskQueue <- &computeDescriptorTask{
 						client:   client,
 						specName: spec.Name,
@@ -100,25 +101,25 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	subject := spec.GetName()
 	var typeURL string
 	var document proto.Message
-	if core.IsOpenAPIv2(spec.GetMimeType()) {
+	if types.IsOpenAPIv2(spec.GetMimeType()) {
 		typeURL = "gnostic.openapiv2.Document"
 		document, err = oas2.ParseDocument(data)
 		if err != nil {
 			return err
 		}
-	} else if core.IsOpenAPIv3(spec.GetMimeType()) {
+	} else if types.IsOpenAPIv3(spec.GetMimeType()) {
 		typeURL = "gnostic.openapiv3.Document"
 		document, err = oas3.ParseDocument(data)
 		if err != nil {
 			return err
 		}
-	} else if core.IsDiscovery(spec.GetMimeType()) {
+	} else if types.IsDiscovery(spec.GetMimeType()) {
 		typeURL = "gnostic.discoveryv1.Document"
 		document, err = discovery.ParseDocument(data)
 		if err != nil {
 			return err
 		}
-	} else if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
+	} else if types.IsProto(spec.GetMimeType()) && types.IsZipArchive(spec.GetMimeType()) {
 		typeURL = "google.protobuf.FileDescriptorSet"
 		document, err = descriptorFromZippedProtos(ctx, spec.Name, data)
 		if err != nil {
@@ -135,7 +136,7 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	// this will probably require some representation of compression type in the typeURL
 	artifact := &rpc.Artifact{
 		Name:     subject + "/artifacts/" + relation,
-		MimeType: core.MimeTypeForMessageType(typeURL),
+		MimeType: types.MimeTypeForMessageType(typeURL),
 		Contents: messageData,
 	}
 	return core.SetArtifact(ctx, task.client, artifact)

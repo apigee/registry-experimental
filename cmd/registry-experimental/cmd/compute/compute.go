@@ -27,7 +27,6 @@ func Command(ctx context.Context) *cobra.Command {
 	}
 
 	cmd.AddCommand(descriptorCommand(ctx))
-	cmd.AddCommand(indexCommand(ctx))
 	cmd.AddCommand(searchIndexCommand(ctx))
 
 	cmd.PersistentFlags().String("filter", "", "Filter selected resources")

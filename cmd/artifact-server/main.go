@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/apigee/registry/cmd/registry/core"
+	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/rpc"
 	"golang.org/x/exp/slices"
@@ -37,28 +37,26 @@ import (
 )
 
 var messageTypes map[string]proto.Message = map[string]proto.Message{
-	"gnostic.metrics.Complexity":                                   &metrics.Complexity{},
-	"gnostic.metrics.VersionHistory":                               &metrics.VersionHistory{},
-	"gnostic.metrics.Vocabulary":                                   &metrics.Vocabulary{},
-	"gnostic.openapiv2.Document":                                   &oas2.Document{},
-	"gnostic.openapiv3.Document":                                   &oas3.Document{},
-	"google.cloud.apigeeregistry.applications.v1alpha1.Index":      &rpc.Index{},
-	"google.cloud.apigeeregistry.applications.v1alpha1.Lint":       &rpc.Lint{},
-	"google.cloud.apigeeregistry.applications.v1alpha1.LintStats":  &rpc.LintStats{},
-	"google.cloud.apigeeregistry.applications.v1alpha1.References": &rpc.References{},
-	"google.cloud.apigeeregistry.v1.apihub.DisplaySettings":        &rpc.DisplaySettings{},
-	"google.cloud.apigeeregistry.v1.apihub.Lifecycle":              &rpc.Lifecycle{},
-	"google.cloud.apigeeregistry.v1.apihub.ReferenceList":          &rpc.ReferenceList{},
-	"google.cloud.apigeeregistry.v1.apihub.TaxonomyList":           &rpc.TaxonomyList{},
-	"google.cloud.apigeeregistry.v1.controller.Manifest":           &rpc.Manifest{},
-	"google.cloud.apigeeregistry.v1.controller.Receipt":            &rpc.Receipt{},
-	"google.cloud.apigeeregistry.v1.scoring.Score":                 &rpc.Score{},
-	"google.cloud.apigeeregistry.v1.scoring.ScoreCard":             &rpc.ScoreCard{},
-	"google.cloud.apigeeregistry.v1.scoring.ScoreCardDefinition":   &rpc.ScoreCardDefinition{},
-	"google.cloud.apigeeregistry.v1.scoring.ScoreDefinition":       &rpc.ScoreDefinition{},
-	"google.cloud.apigeeregistry.v1.style.ConformanceReport":       &rpc.ConformanceReport{},
-	"google.cloud.apigeeregistry.v1.style.StyleGuide":              &rpc.StyleGuide{},
-	"google.protobuf.FileDescriptorSet":                            &descriptorpb.FileDescriptorSet{},
+	"gnostic.metrics.Complexity":                                 &metrics.Complexity{},
+	"gnostic.metrics.VersionHistory":                             &metrics.VersionHistory{},
+	"gnostic.metrics.Vocabulary":                                 &metrics.Vocabulary{},
+	"gnostic.openapiv2.Document":                                 &oas2.Document{},
+	"gnostic.openapiv3.Document":                                 &oas3.Document{},
+	"google.cloud.apigeeregistry.v1.style.Lint":                  &rpc.Lint{},
+	"google.cloud.apigeeregistry.v1.style.LintStats":             &rpc.LintStats{},
+	"google.cloud.apigeeregistry.v1.apihub.DisplaySettings":      &rpc.DisplaySettings{},
+	"google.cloud.apigeeregistry.v1.apihub.Lifecycle":            &rpc.Lifecycle{},
+	"google.cloud.apigeeregistry.v1.apihub.ReferenceList":        &rpc.ReferenceList{},
+	"google.cloud.apigeeregistry.v1.apihub.TaxonomyList":         &rpc.TaxonomyList{},
+	"google.cloud.apigeeregistry.v1.controller.Manifest":         &rpc.Manifest{},
+	"google.cloud.apigeeregistry.v1.controller.Receipt":          &rpc.Receipt{},
+	"google.cloud.apigeeregistry.v1.scoring.Score":               &rpc.Score{},
+	"google.cloud.apigeeregistry.v1.scoring.ScoreCard":           &rpc.ScoreCard{},
+	"google.cloud.apigeeregistry.v1.scoring.ScoreCardDefinition": &rpc.ScoreCardDefinition{},
+	"google.cloud.apigeeregistry.v1.scoring.ScoreDefinition":     &rpc.ScoreDefinition{},
+	"google.cloud.apigeeregistry.v1.style.ConformanceReport":     &rpc.ConformanceReport{},
+	"google.cloud.apigeeregistry.v1.style.StyleGuide":            &rpc.StyleGuide{},
+	"google.protobuf.FileDescriptorSet":                          &descriptorpb.FileDescriptorSet{},
 }
 
 func handleRequest(w http.ResponseWriter, req *http.Request) {
@@ -78,7 +76,7 @@ func handleRequest(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "%s\n", contents.GetData())
 		return
 	}
-	messageType, err := core.MessageTypeForMimeType(contents.GetContentType())
+	messageType, err := types.MessageTypeForMimeType(contents.GetContentType())
 	if err != nil {
 		writeError(w, err, http.StatusInternalServerError)
 		return

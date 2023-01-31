@@ -21,6 +21,7 @@ import (
 	"github.com/apigee/registry/cmd/registry/core"
 	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/apigee/registry/server/registry/names"
 	"github.com/spf13/cobra"
@@ -60,7 +61,7 @@ func versionsCommand() *cobra.Command {
 			}
 
 			// Iterate through a collection of APIs and count the number of versions of each.
-			err = core.ListAPIs(ctx, client, api, filter, func(api *rpc.Api) error {
+			err = visitor.ListAPIs(ctx, client, api, filter, func(api *rpc.Api) error {
 				taskQueue <- &countApiVersionsTask{
 					client: client,
 					api:    api,

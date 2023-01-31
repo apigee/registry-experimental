@@ -21,6 +21,7 @@ import (
 	"github.com/apigee/registry/cmd/registry/core"
 	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/apigee/registry/server/registry/names"
 	"github.com/spf13/cobra"
@@ -55,7 +56,7 @@ func revisionsCommand() *cobra.Command {
 			defer wait()
 			// Generate tasks.
 			if spec, err := names.ParseSpec(args[0]); err == nil {
-				err = core.ListSpecs(ctx, client, spec, filter, false, func(spec *rpc.ApiSpec) error {
+				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(spec *rpc.ApiSpec) error {
 					taskQueue <- &countSpecRevisionsTask{
 						client:     client,
 						specName:   spec.Name,
@@ -67,7 +68,7 @@ func revisionsCommand() *cobra.Command {
 					log.FromContext(ctx).WithError(err).Fatal("Failed to list API specs")
 				}
 			} else if deployment, err := names.ParseDeployment(args[0]); err == nil {
-				err = core.ListDeployments(ctx, client, deployment, filter, func(deployment *rpc.ApiDeployment) error {
+				err = visitor.ListDeployments(ctx, client, deployment, filter, func(deployment *rpc.ApiDeployment) error {
 					taskQueue <- &countDeploymentRevisionsTask{
 						client:           client,
 						deploymentName:   deployment.Name,
@@ -103,7 +104,7 @@ func (task *countSpecRevisionsTask) Run(ctx context.Context) error {
 		return err
 	}
 	count := 0
-	err = core.ListSpecRevisions(ctx, task.client, name, "", false, func(*rpc.ApiSpec) error {
+	err = visitor.ListSpecRevisions(ctx, task.client, name, "", false, func(*rpc.ApiSpec) error {
 		count++
 		return nil
 	})

@@ -39,6 +39,16 @@ func main() {
 		Use:     "apigee-export",
 		Version: Version,
 		Short:   "Exports Apigee resources to YAML files compatible with API Registry",
+		Long: `This command exports API Registry-compatible YAML files from an Apigee X
+instance into the specified DIRECTORY. (If no DIRECTORY is specified, it will
+only print to the console.)
+		
+Once this command has been successfully run, the entire exported DIRECTORY or
+individual files can be imported into an API Registry instance by running:
+		
+  registry apply -f DIRECTORY|FILE
+		
+See "registry apply --help" for more information.`,
 	}
 
 	cmd.AddCommand(exportApisCommand)

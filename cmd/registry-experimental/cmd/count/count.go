@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package compute
+package count
 
 import (
-	"context"
-
 	"github.com/spf13/cobra"
 )
 
-func Command(ctx context.Context) *cobra.Command {
+func Command() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "compute",
-		Short: "Compute properties of resources in the API Registry",
+		Use:   "count",
+		Short: "Count quantities in the API Registry",
 	}
 
-	cmd.AddCommand(descriptorCommand(ctx))
-	cmd.AddCommand(searchIndexCommand(ctx))
+	cmd.AddCommand(revisionsCommand())
+	cmd.AddCommand(versionsCommand())
 
-	cmd.PersistentFlags().String("filter", "", "Filter selected resources")
+	cmd.PersistentFlags().Int("jobs", 10, "Number of actions to perform concurrently")
 	return cmd
 }

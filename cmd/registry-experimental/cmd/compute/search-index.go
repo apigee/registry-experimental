@@ -20,10 +20,12 @@ import (
 	"sync"
 
 	"github.com/apigee/registry/cmd/registry/core"
+	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/names"
+	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
-	"github.com/apigee/registry/server/registry/names"
 	"github.com/blevesearch/bleve"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/proto"
@@ -56,7 +58,7 @@ func searchIndexCommand(ctx context.Context) *cobra.Command {
 			// Generate tasks.
 			name := args[0]
 			if spec, err := names.ParseSpec(name); err == nil {
-				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) error {
+				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(spec *rpc.ApiSpec) error {
 					taskQueue <- &indexSpecTask{
 						client:   client,
 						specName: spec.Name,
@@ -96,7 +98,7 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 		return nil
 	}
 	var message proto.Message
-	if core.IsOpenAPIv2(spec.GetMimeType()) {
+	if types.IsOpenAPIv2(spec.GetMimeType()) {
 		document, err := oas2.ParseDocument(data)
 		if err != nil {
 			return fmt.Errorf("errors parsing %s", name)
@@ -109,7 +111,7 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 		document.Security = nil
 		document.SecurityDefinitions = nil
 		message = document
-	} else if core.IsOpenAPIv3(spec.GetMimeType()) {
+	} else if types.IsOpenAPIv3(spec.GetMimeType()) {
 		document, err := oas3.ParseDocument(data)
 		if err != nil {
 			return fmt.Errorf("errors parsing %s", name)

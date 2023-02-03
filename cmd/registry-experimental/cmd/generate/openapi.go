@@ -24,10 +24,12 @@ import (
 	"strings"
 
 	"github.com/apigee/registry/cmd/registry/core"
+	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/names"
+	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
-	"github.com/apigee/registry/server/registry/names"
 	"github.com/spf13/cobra"
 )
 
@@ -56,7 +58,7 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 			name := args[0]
 			if spec, err := names.ParseSpec(name); err == nil {
 				// Iterate through a collection of specs and evaluate each.
-				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) error {
+				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(spec *rpc.ApiSpec) error {
 					taskQueue <- &generateOpenAPITask{
 						client:    client,
 						specName:  spec.Name,
@@ -100,15 +102,15 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	}
 	relation := task.newSpecID
 	var openapi string
-	if core.IsOpenAPIv2(spec.GetMimeType()) || core.IsOpenAPIv3(spec.GetMimeType()) {
+	if types.IsOpenAPIv2(spec.GetMimeType()) || types.IsOpenAPIv3(spec.GetMimeType()) {
 		return nil
-	} else if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
+	} else if types.IsProto(spec.GetMimeType()) && types.IsZipArchive(spec.GetMimeType()) {
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromZippedProtos(ctx, spec.Name, data)
 		if err != nil {
 			return fmt.Errorf("error processing protos %s: %s", spec.Name, err)
 		}
-	} else if core.IsDiscovery(spec.GetMimeType()) {
+	} else if types.IsDiscovery(spec.GetMimeType()) {
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromDiscovery(spec.Name, data)
 		if err != nil {

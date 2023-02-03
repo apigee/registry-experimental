@@ -17,6 +17,7 @@ package compute
 import (
 	"context"
 
+	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/compute/summary"
 	"github.com/spf13/cobra"
 )
 
@@ -28,6 +29,7 @@ func Command(ctx context.Context) *cobra.Command {
 
 	cmd.AddCommand(descriptorCommand(ctx))
 	cmd.AddCommand(searchIndexCommand(ctx))
+	cmd.AddCommand(summary.Command())
 
 	cmd.PersistentFlags().String("filter", "", "Filter selected resources")
 	return cmd

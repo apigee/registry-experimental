@@ -19,8 +19,8 @@ import (
 	"strings"
 
 	"github.com/apigee/registry-experimental/server/search/internal/storage/models"
+	"github.com/apigee/registry/pkg/names"
 	registry_rpc "github.com/apigee/registry/rpc"
-	"github.com/apigee/registry/server/registry/names"
 	openapi_v2 "github.com/google/gnostic/openapiv2"
 	openapi_v3 "github.com/google/gnostic/openapiv3"
 )

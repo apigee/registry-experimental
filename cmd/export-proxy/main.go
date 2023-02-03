@@ -27,8 +27,8 @@ import (
 	"github.com/apex/log"
 	"github.com/apigee/registry/pkg/config"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/rpc"
-	"github.com/apigee/registry/server/registry/names"
 	"github.com/spf13/cobra"
 )
 

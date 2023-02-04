@@ -17,7 +17,8 @@ package extract
 import (
 	"context"
 	"fmt"
-	"log"
+	"strconv"
+	"strings"
 
 	"github.com/apigee/registry/cmd/registry/core"
 	"github.com/apigee/registry/cmd/registry/types"
@@ -72,7 +73,7 @@ type extractVisitor struct {
 
 func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 	return func(spec *rpc.ApiSpec) error {
-		log.Printf("%s %s", spec.Name, spec.MimeType)
+		fmt.Printf("%s %s\n", spec.Name, spec.MimeType)
 		err := visitor.FetchSpecContents(v.ctx, v.registryClient, spec)
 		if err != nil {
 			return err
@@ -87,8 +88,74 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 		if types.IsOpenAPIv2(spec.MimeType) || types.IsOpenAPIv3(spec.MimeType) {
 			var node yaml.Node
 			yaml.Unmarshal(bytes, &node)
-			fmt.Printf("%+v\n", node)
+
+			openapi := yqQueryString(&node, "openapi")
+			if openapi != nil {
+				fmt.Printf("openapi %s\n", *openapi)
+			}
+
+			swagger := yqQueryString(&node, "swagger")
+			if swagger != nil {
+				fmt.Printf("swagger %s\n", *swagger)
+			}
+
+			title := yqQueryString(&node, "info.title")
+			if title != nil {
+				fmt.Printf("title %s\n", *title)
+			}
+
+			provider := yqQueryString(&node, "info.x-providerName")
+			if provider != nil {
+				fmt.Printf("provider %s\n", *provider)
+			}
 		}
 		return nil
 	}
+}
+
+func yqQueryString(node *yaml.Node, path string) *string {
+	if n := query(node, strings.Split(path, ".")); n == nil {
+		return nil
+	} else {
+		if n.Kind == yaml.ScalarNode {
+			return &n.Value
+		} else {
+			bytes, _ := yaml.Marshal(n)
+			s := string(bytes)
+			return &s
+		}
+	}
+}
+
+func query(node *yaml.Node, path []string) *yaml.Node {
+	if len(path) == 0 {
+		return node
+	}
+	switch node.Kind {
+	case yaml.DocumentNode:
+		for _, c := range node.Content {
+			if n := query(c, path); n != nil {
+				return n
+			}
+		}
+	case yaml.SequenceNode:
+		index, err := strconv.Atoi(path[0])
+		if err != nil {
+			return nil
+		}
+		return query(node.Content[index], path[1:])
+	case yaml.MappingNode:
+		for i := 0; i < len(node.Content); i += 2 {
+			if node.Content[i].Value == path[0] {
+				return query(node.Content[i+1], path[1:])
+			}
+		}
+	case yaml.ScalarNode:
+		return node
+	case yaml.AliasNode:
+		return nil
+	default:
+		return nil
+	}
+	return nil
 }

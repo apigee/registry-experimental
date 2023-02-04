@@ -23,6 +23,7 @@ import (
 	"github.com/apigee/registry/cmd/registry/core"
 	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
@@ -71,6 +72,8 @@ type extractVisitor struct {
 	registryClient connection.RegistryClient
 }
 
+var empty = ""
+
 func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 	return func(spec *rpc.ApiSpec) error {
 		fmt.Printf("%s %s\n", spec.Name, spec.MimeType)
@@ -99,14 +102,69 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 				fmt.Printf("swagger %s\n", *swagger)
 			}
 
+			description := yqQueryString(&node, "info.description")
+			if description != nil {
+				fmt.Printf("description %s\n", *description)
+			}
+			if description == nil {
+				description = &empty
+			}
+
 			title := yqQueryString(&node, "info.title")
 			if title != nil {
 				fmt.Printf("title %s\n", *title)
+			}
+			if title == nil {
+				title = &empty
 			}
 
 			provider := yqQueryString(&node, "info.x-providerName")
 			if provider != nil {
 				fmt.Printf("provider %s\n", *provider)
+			}
+
+			// Set API (displayName, description) from (title, description).
+			if *title != "" || *description != "" {
+				specName, _ := names.ParseSpec(spec.Name)
+				apiName := specName.Api()
+				_, err := v.registryClient.UpdateApi(v.ctx,
+					&rpc.UpdateApiRequest{
+						Api: &rpc.Api{
+							Name:        apiName.String(),
+							DisplayName: *title,
+							Description: *description,
+						},
+					},
+				)
+				if err != nil {
+					return err
+				}
+			}
+
+			// Set the spec mimetype (this should not bump the revision!).
+			if openapi != nil || swagger != nil {
+				var compression string
+				if types.IsGZipCompressed(spec.MimeType) {
+					compression = "+gzip"
+				}
+				var mimeType string
+				if openapi != nil {
+					mimeType = types.OpenAPIMimeType(compression, *openapi)
+				} else if swagger != nil {
+					mimeType = types.OpenAPIMimeType(compression, *swagger)
+				}
+				specName, _ := names.ParseSpec(spec.Name)
+				_, err := v.registryClient.UpdateApiSpec(v.ctx,
+					&rpc.UpdateApiSpecRequest{
+						ApiSpec: &rpc.ApiSpec{
+							Name:     specName.String(),
+							MimeType: mimeType,
+						},
+					},
+				)
+				if err != nil {
+					return err
+				}
 			}
 		}
 		return nil

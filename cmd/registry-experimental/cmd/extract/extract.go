@@ -17,6 +17,9 @@ package extract
 import (
 	"context"
 	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -123,22 +126,44 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 				fmt.Printf("provider %s\n", *provider)
 			}
 
+			categories := yqQueryNode(&node, "info.x-apisguru-categories")
+			if categories != nil {
+				fmt.Printf("categories:\n%s\n", yqDescribe(categories))
+			}
+
 			// Set API (displayName, description) from (title, description).
-			if *title != "" || *description != "" {
-				specName, _ := names.ParseSpec(spec.Name)
-				apiName := specName.Api()
-				_, err := v.registryClient.UpdateApi(v.ctx,
-					&rpc.UpdateApiRequest{
-						Api: &rpc.Api{
-							Name:        apiName.String(),
-							DisplayName: *title,
-							Description: *description,
-						},
+			specName, _ := names.ParseSpec(spec.Name)
+			apiName := specName.Api()
+			api, err := v.registryClient.GetApi(v.ctx,
+				&rpc.GetApiRequest{
+					Name: apiName.String(),
+				},
+			)
+			if err != nil {
+				return err
+			}
+			labels := api.Labels
+			if labels == nil {
+				labels = make(map[string]string)
+			}
+			labels["openapi"] = "true"
+			delete(labels, "style-openapi")
+			labels["categories"] = strings.Join(yqQueryStringArray(categories), ",")
+			if provider != nil {
+				labels["provider"] = *provider
+			}
+			_, err = v.registryClient.UpdateApi(v.ctx,
+				&rpc.UpdateApiRequest{
+					Api: &rpc.Api{
+						Name:        apiName.String(),
+						DisplayName: *title,
+						Description: *description,
+						Labels:      labels,
 					},
-				)
-				if err != nil {
-					return err
-				}
+				},
+			)
+			if err != nil {
+				return err
 			}
 
 			// Set the spec mimetype (this should not bump the revision!).
@@ -167,8 +192,175 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 				}
 			}
 		}
+		if types.IsDiscovery(spec.MimeType) {
+			var node yaml.Node
+			yaml.Unmarshal(bytes, &node)
+			styleForYAML(&node)
+			//fmt.Printf("discovery:\n%s\n", yqDescribe(&node))
+
+			description := yqQueryString(&node, "description")
+			if description != nil {
+				fmt.Printf("description %s\n", *description)
+			}
+			if description == nil {
+				description = &empty
+			}
+
+			title := yqQueryString(&node, "canonicalName")
+			if title != nil {
+				fmt.Printf("title %s\n", *title)
+			}
+			if title == nil {
+				title = &empty
+			}
+
+			provider := yqQueryString(&node, "ownerDomain")
+			if provider != nil {
+				fmt.Printf("provider %s\n", *provider)
+			}
+
+			// Set API (displayName, description) from (title, description).
+			specName, _ := names.ParseSpec(spec.Name)
+			apiName := specName.Api()
+			api, err := v.registryClient.GetApi(v.ctx,
+				&rpc.GetApiRequest{
+					Name: apiName.String(),
+				},
+			)
+			if err != nil {
+				return err
+			}
+			labels := api.Labels
+			if labels == nil {
+				labels = make(map[string]string)
+			}
+			labels["discovery"] = "true"
+			delete(labels, "style-discovery")
+			if provider != nil {
+				labels["provider"] = *provider
+			}
+			_, err = v.registryClient.UpdateApi(v.ctx,
+				&rpc.UpdateApiRequest{
+					Api: &rpc.Api{
+						Name:        apiName.String(),
+						DisplayName: *title,
+						Description: *description,
+						Labels:      labels,
+					},
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+		}
+		if types.IsProto(spec.MimeType) {
+			// create a tmp directory
+			root, err := os.MkdirTemp("", "extract-protos-")
+			if err != nil {
+				return err
+			}
+			// whenever we finish, delete the tmp directory
+			defer os.RemoveAll(root)
+			// unzip the protos to the temp directory
+			_, err = core.UnzipArchiveToPath(spec.Contents, root)
+			if err != nil {
+				return err
+			}
+
+			var displayName string
+			var description string
+
+			if err = filepath.Walk(root, func(filepath string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+
+				// Skip everything that's not a YAML file.
+				if info.IsDir() || !strings.HasSuffix(filepath, ".yaml") {
+					return nil
+				}
+
+				bytes, err := os.ReadFile(filepath)
+				if err != nil {
+					return err
+				}
+
+				sc := &ServiceConfig{}
+				if err := yaml.Unmarshal(bytes, sc); err != nil {
+					return err
+				}
+
+				// Skip invalid API service configurations.
+				if sc.Type != "google.api.Service" || sc.Title == "" || sc.Name == "" {
+					return nil
+				}
+
+				displayName = sc.Title
+				description = strings.ReplaceAll(sc.Documentation.Summary, "\n", " ")
+
+				// Skip the directory after we find an API service configuration.
+				return fs.SkipDir
+			}); err != nil {
+				return err
+			}
+
+			specName, _ := names.ParseSpec(spec.Name)
+			apiName := specName.Api()
+			api, err := v.registryClient.GetApi(v.ctx,
+				&rpc.GetApiRequest{
+					Name: apiName.String(),
+				},
+			)
+			if err != nil {
+				return err
+			}
+			labels := api.Labels
+			if labels == nil {
+				labels = make(map[string]string)
+			}
+			labels["grpc"] = "true"
+			delete(labels, "style-grpc")
+			labels["provider"] = "google.com"
+			_, err = v.registryClient.UpdateApi(v.ctx,
+				&rpc.UpdateApiRequest{
+					Api: &rpc.Api{
+						Name:        apiName.String(),
+						DisplayName: displayName,
+						Description: description,
+						Labels:      labels,
+					},
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+		}
 		return nil
 	}
+}
+
+// The API Service Configuration contains important API properties.
+type ServiceConfig struct {
+	Type          string `yaml:"type"`
+	Name          string `yaml:"name"`
+	Title         string `yaml:"title"`
+	Documentation struct {
+		Summary string `yaml:"summary"`
+	} `yaml:"documentation"`
+}
+
+// styleForYAML sets the style field on a tree of yaml.Nodes for YAML export.
+func styleForYAML(node *yaml.Node) {
+	node.Style = 0
+	for _, n := range node.Content {
+		styleForYAML(n)
+	}
+}
+
+func yqQueryNode(node *yaml.Node, path string) *yaml.Node {
+	return query(node, strings.Split(path, "."))
 }
 
 func yqQueryString(node *yaml.Node, path string) *string {
@@ -183,6 +375,17 @@ func yqQueryString(node *yaml.Node, path string) *string {
 			return &s
 		}
 	}
+}
+
+func yqQueryStringArray(node *yaml.Node) []string {
+	if node == nil || node.Kind != yaml.SequenceNode {
+		return nil
+	}
+	results := []string{}
+	for _, n := range node.Content {
+		results = append(results, n.Value)
+	}
+	return results
 }
 
 func query(node *yaml.Node, path []string) *yaml.Node {
@@ -216,4 +419,12 @@ func query(node *yaml.Node, path []string) *yaml.Node {
 		return nil
 	}
 	return nil
+}
+
+func yqDescribe(node *yaml.Node) string {
+	bytes, err := yaml.Marshal(node)
+	if err != nil {
+		return err.Error()
+	}
+	return string(bytes)
 }

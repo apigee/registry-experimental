@@ -24,7 +24,6 @@ func Command() *cobra.Command {
 		Short: "Count quantities in the API Registry",
 	}
 
-	cmd.AddCommand(deploymentsCommand())
 	cmd.AddCommand(revisionsCommand())
 	cmd.AddCommand(versionsCommand())
 

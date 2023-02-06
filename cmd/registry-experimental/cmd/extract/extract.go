@@ -93,7 +93,9 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 		}
 		if types.IsOpenAPIv2(spec.MimeType) || types.IsOpenAPIv3(spec.MimeType) {
 			var node yaml.Node
-			yaml.Unmarshal(bytes, &node)
+			if err := yaml.Unmarshal(bytes, &node); err != nil {
+				return err
+			}
 
 			openapi := yqQueryString(&node, "openapi")
 			if openapi != nil {
@@ -194,7 +196,9 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 		}
 		if types.IsDiscovery(spec.MimeType) {
 			var node yaml.Node
-			yaml.Unmarshal(bytes, &node)
+			if err := yaml.Unmarshal(bytes, &node); err != nil {
+				return err
+			}
 			styleForYAML(&node)
 			//fmt.Printf("discovery:\n%s\n", yqDescribe(&node))
 

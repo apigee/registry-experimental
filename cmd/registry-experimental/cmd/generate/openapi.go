@@ -37,8 +37,8 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 	var specID string
 	cmd := &cobra.Command{
 		Use:   "openapi",
-		Short: "Generate an OpenAPI spec from another specificaton format",
-		Args:  cobra.MinimumNArgs(1),
+		Short: "Generate an OpenAPI spec from another specification format",
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 
 			filter, err := cmd.Flags().GetString("filter")
@@ -144,7 +144,8 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 // openAPIFromZippedProtos runs the OpenAPI generator and returns the results.
 // This uses protoc and https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
 // which can be installed using
-//   go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
+//
+//	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 func openAPIFromZippedProtos(ctx context.Context, name string, b []byte) (string, error) {
 	// create a tmp directory
 	root, err := ioutil.TempDir("", "registry-protos-")
@@ -202,7 +203,8 @@ func generateOpenAPIForDirectory(ctx context.Context, name string, root string) 
 // openAPIFromDiscovery runs the OpenAPI generator and returns the results.
 // This uses https://github.com/LucyBot-Inc/api-spec-converter
 // which can be installed using
-//   npm install -g api-spec-converter
+//
+//	npm install -g api-spec-converter
 func openAPIFromDiscovery(name string, b []byte) (string, error) {
 	// create a tmp directory
 	root, err := ioutil.TempDir("", "registry-disco-")

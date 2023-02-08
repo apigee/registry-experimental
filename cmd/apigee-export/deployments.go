@@ -67,7 +67,7 @@ func exportDeployments(cmd *cobra.Command, args []string) {
 				},
 			},
 			Data: models.ApiData{
-				DisplayName:    dep.ApiProxy,
+				DisplayName:    "proxy: " + dep.ApiProxy,
 				ApiDeployments: make([]*models.ApiDeployment, 0, len(deps)),
 			},
 		}
@@ -142,4 +142,52 @@ func deployments(ctx context.Context, org string) ([]*apigee.GoogleCloudApigeeV1
 	}
 
 	return resp.Deployments, nil
+}
+
+func annotateAPI(api *models.Api) {
+
+	if api.Header.Metadata.Labels == nil {
+		api.Header.Metadata.Labels = make(map[string]string)
+	}
+	api.Header.Metadata.Labels["apihub-lifecycle"] = "design"
+	api.Header.Metadata.Labels["apihub-style"] = "apihub-openapi"
+	api.Header.Metadata.Labels["apihub-target-users"] = "team_internal_partner_public"
+	api.Header.Metadata.Labels["apihub-team"] = "demo-customer"
+	api.Data.ApiVersions = []*models.ApiVersion{{
+		Header: models.Header{
+			ApiVersion: "apigeeregistry/v1",
+			Kind:       "Version",
+			Metadata: models.Metadata{
+				Name: "v1",
+				Annotations: map[string]string{
+					"apihub-end-of-life-type": "apihub-unknown",
+				},
+			},
+		},
+		Data: models.ApiVersionData{
+			DisplayName: "v1",
+			State:       "production",
+			ApiSpecs: []*models.ApiSpec{{
+				Header: models.Header{
+					ApiVersion: "apigeeregistry/v1",
+					Kind:       "Spec",
+					Metadata: models.Metadata{
+						Name: "unknown",
+					},
+				},
+			}},
+		},
+	}}
+
+	for _, d := range api.Data.ApiDeployments {
+		d.Metadata.Annotations["apihub-external-channel-name"] = "Apigee X Console (authorized users only)"
+
+		if d.Metadata.Labels == nil {
+			d.Metadata.Labels = make(map[string]string)
+		}
+		d.Metadata.Labels["apihub-gateway"] = "apihub-google-cloud-apigee"
+
+		d.Data.ApiSpecRevision = "v1/specs/unknown"
+		d.Data.ExternalChannelURI = fmt.Sprintf("https://apigee.google.com/%s/proxies-v2/%s/overview", api.Metadata.Annotations["apigee-organization"], api.Metadata.Name)
+	}
 }

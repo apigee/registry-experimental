@@ -51,8 +51,9 @@ individual files can be imported into an API Registry instance by running:
 See "registry apply --help" for more information.`,
 	}
 
-	cmd.AddCommand(exportApisCommand)
+	cmd.AddCommand(exportProxiesCommand)
 	cmd.AddCommand(exportDeploymentsCommand)
+	cmd.AddCommand(exportProductsCommand)
 
 	ctx := context.Background()
 	if err := cmd.ExecuteContext(ctx); err != nil {

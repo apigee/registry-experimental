@@ -23,10 +23,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/apigee/registry/cmd/registry/core"
+	"github.com/apigee/registry/cmd/registry/compress"
+	"github.com/apigee/registry/cmd/registry/tasks"
 	"github.com/apigee/registry/cmd/registry/types"
-	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
@@ -55,12 +56,12 @@ func descriptorCommand(ctx context.Context) *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := core.WorkerPool(ctx, 1)
+			taskQueue, wait := tasks.WorkerPool(ctx, 1)
 			defer wait()
 			// Generate tasks.
 			name := args[0]
 			if spec, err := names.ParseSpec(name); err == nil {
-				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(spec *rpc.ApiSpec) error {
+				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
 					taskQueue <- &computeDescriptorTask{
 						client:   client,
 						specName: spec.Name,
@@ -95,7 +96,7 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	name := spec.GetName()
 	relation := "descriptor"
 	log.Infof(ctx, "Computing %s/artifacts/%s", name, relation)
-	data, err := core.GetBytesForSpec(ctx, task.client, spec)
+	data, err := visitor.GetBytesForSpec(ctx, task.client, spec)
 	if err != nil {
 		return nil
 	}
@@ -140,7 +141,7 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 		MimeType: types.MimeTypeForMessageType(typeURL),
 		Contents: messageData,
 	}
-	return core.SetArtifact(ctx, task.client, artifact)
+	return visitor.SetArtifact(ctx, task.client, artifact)
 }
 
 // descriptorFromZippedProtos runs protoc on a collection of protos and returns a file descriptor set.
@@ -150,7 +151,7 @@ func descriptorFromZippedProtos(ctx context.Context, name string, b []byte) (*de
 		return nil, err
 	}
 	defer os.RemoveAll(root)
-	_, err = core.UnzipArchiveToPath(b, root+"/protos")
+	_, err = compress.UnzipArchiveToPath(b, root+"/protos")
 	if err != nil {
 		return nil, err
 	}

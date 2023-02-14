@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/apigee/registry/cmd/registry/core"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
@@ -84,7 +83,7 @@ type Summary struct {
 }
 
 func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
-	return func(message *rpc.Project) error {
+	return func(ctx context.Context, message *rpc.Project) error {
 		fmt.Printf("%s\n", message.Name)
 		projectName, err := names.ParseProject(message.Name)
 		if err != nil {
@@ -93,7 +92,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 		apiCount := 0
 		if err := visitor.ListAPIs(v.ctx, v.registryClient,
 			projectName.Api("-"), "",
-			func(api *rpc.Api) error {
+			func(ctx context.Context, api *rpc.Api) error {
 				apiCount++
 				return nil
 			}); err != nil {
@@ -102,7 +101,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 		versionCount := 0
 		if err := visitor.ListVersions(v.ctx, v.registryClient,
 			projectName.Api("-").Version("-"), "",
-			func(message *rpc.ApiVersion) error {
+			func(ctx context.Context, message *rpc.ApiVersion) error {
 				versionCount++
 				return nil
 			}); err != nil {
@@ -111,7 +110,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 		specCount := 0
 		if err := visitor.ListSpecs(v.ctx, v.registryClient,
 			projectName.Api("-").Version("-").Spec("-"), "", false,
-			func(message *rpc.ApiSpec) error {
+			func(ctx context.Context, message *rpc.ApiSpec) error {
 				specCount++
 				return nil
 			}); err != nil {
@@ -120,7 +119,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 		deploymentCount := 0
 		if err := visitor.ListDeployments(v.ctx, v.registryClient,
 			projectName.Api("-").Deployment("-"), "",
-			func(message *rpc.ApiDeployment) error {
+			func(ctx context.Context, message *rpc.ApiDeployment) error {
 				deploymentCount++
 				return nil
 			}); err != nil {
@@ -141,6 +140,6 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 			MimeType: "application/yaml;type=Summary",
 			Contents: bytes,
 		}
-		return core.SetArtifact(v.ctx, v.registryClient, artifact)
+		return visitor.SetArtifact(v.ctx, v.registryClient, artifact)
 	}
 }

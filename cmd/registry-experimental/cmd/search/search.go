@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/apigee/registry/log"
+	"github.com/apigee/registry/pkg/log"
 	"github.com/blevesearch/bleve"
 	_ "github.com/blevesearch/bleve/search/highlight/highlighter/ansi"
 	"github.com/spf13/cobra"

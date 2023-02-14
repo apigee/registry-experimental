@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/apigee/registry/cmd/registry/core"
+	"github.com/apigee/registry/cmd/registry/compress"
 	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/names"
@@ -78,7 +78,7 @@ type extractVisitor struct {
 var empty = ""
 
 func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
-	return func(spec *rpc.ApiSpec) error {
+	return func(ctx context.Context, spec *rpc.ApiSpec) error {
 		fmt.Printf("%s %s\n", spec.Name, spec.MimeType)
 		err := visitor.FetchSpecContents(v.ctx, v.registryClient, spec)
 		if err != nil {
@@ -86,7 +86,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 		}
 		bytes := spec.Contents
 		if types.IsGZipCompressed(spec.MimeType) {
-			bytes, err = core.GUnzippedBytes(bytes)
+			bytes, err = compress.GUnzippedBytes(bytes)
 			if err != nil {
 				return err
 			}
@@ -267,7 +267,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			// whenever we finish, delete the tmp directory
 			defer os.RemoveAll(root)
 			// unzip the protos to the temp directory
-			_, err = core.UnzipArchiveToPath(spec.Contents, root)
+			_, err = compress.UnzipArchiveToPath(spec.Contents, root)
 			if err != nil {
 				return err
 			}

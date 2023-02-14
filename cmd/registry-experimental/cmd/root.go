@@ -25,7 +25,7 @@ import (
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/extract"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/search"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/wipeout"
-	"github.com/apigee/registry/log"
+	"github.com/apigee/registry/pkg/log"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )

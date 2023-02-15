@@ -40,16 +40,16 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 		Use:   "openapi",
 		Short: "Generate an OpenAPI spec from another specification format",
 		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 
 			filter, err := cmd.Flags().GetString("filter")
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")
+				return fmt.Errorf("failed to get filter from flags: %s", err)
 			}
 
 			client, err := connection.NewRegistryClient(ctx)
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
+				return fmt.Errorf("failed to get client: %s", err)
 			}
 			// Initialize task queue.
 			taskQueue, wait := tasks.WorkerPoolWithWarnings(ctx, 1)
@@ -57,20 +57,24 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 
 			// Generate tasks.
 			name := args[0]
-			if spec, err := names.ParseSpec(name); err == nil {
-				// Iterate through a collection of specs and evaluate each.
-				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
-					taskQueue <- &generateOpenAPITask{
-						client:    client,
-						specName:  spec.Name,
-						newSpecID: specID,
-					}
-					return nil
-				})
-				if err != nil {
-					log.FromContext(ctx).WithError(err).Fatal("Failed to list specs")
-				}
+			spec, err := names.ParseSpec(name)
+			if err != nil {
+				return fmt.Errorf("%q is not a valid spec name: %s", name, err)
 			}
+
+			// Iterate through a collection of specs and evaluate each.
+			err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
+				taskQueue <- &generateOpenAPITask{
+					client:    client,
+					specName:  spec.Name,
+					newSpecID: specID,
+				}
+				return nil
+			})
+			if err != nil {
+				return fmt.Errorf("failed to list specs: %s", err)
+			}
+			return nil
 		},
 	}
 	cmd.Flags().StringVar(&specID, "spec-id", "generated", "ID to use for generated spec")

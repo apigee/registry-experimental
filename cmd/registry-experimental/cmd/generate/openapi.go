@@ -118,7 +118,7 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 		}
 	case types.IsDiscovery(spec.GetMimeType()):
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
-		openapi, err = openAPIFromDiscovery(spec.Name, data)
+		openapi, err = openAPIFromDiscovery(ctx, spec.Name, data)
 		if err != nil {
 			return fmt.Errorf("error processing discovery %s: %s", spec.Name, err)
 		}
@@ -195,7 +195,9 @@ func generateOpenAPIForDirectory(ctx context.Context, name string, root string) 
 	log.FromContext(ctx).Debugf("Running %+v\n", cmd)
 	data, err := cmd.CombinedOutput()
 	if err != nil {
-		log.FromContext(ctx).Errorf("error %+v\n", err)
+		log.FromContext(ctx).WithError(err).Errorf(
+			"See %q for installation instructions",
+			"https://github.com/google/gnostic/tree/main/cmd/protoc-gen-openapi")
 		return "", err
 	}
 	log.FromContext(ctx).Debugf("protoc output: %s\n", string(data))
@@ -212,7 +214,7 @@ func generateOpenAPIForDirectory(ctx context.Context, name string, root string) 
 // which can be installed using
 //
 //	npm install -g api-spec-converter
-func openAPIFromDiscovery(name string, b []byte) (string, error) {
+func openAPIFromDiscovery(ctx context.Context, name string, b []byte) (string, error) {
 	// create a tmp directory
 	root, err := ioutil.TempDir("", "registry-disco-")
 	if err != nil {
@@ -230,7 +232,9 @@ func openAPIFromDiscovery(name string, b []byte) (string, error) {
 	cmd.Dir = root
 	data, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Printf("error %+v\n", err)
+		log.FromContext(ctx).WithError(err).Errorf(
+			"See %q for installation instructions",
+			"https://www.npmjs.com/package/api-spec-converter")
 		return "", err
 	}
 	return string(data), err

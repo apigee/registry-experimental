@@ -15,11 +15,12 @@
 package export
 
 import (
+	"context"
 	"encoding/csv"
 	"fmt"
 
-	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
@@ -67,7 +68,7 @@ func csvCommand() *cobra.Command {
 					return
 				}
 
-				err = visitor.ListSpecs(ctx, client, version.Spec(""), filter, false, func(spec *rpc.ApiSpec) error {
+				err = visitor.ListSpecs(ctx, client, version.Spec(""), filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
 					name, err := names.ParseSpec(spec.GetName())
 					if err != nil {
 						log.Debugf(ctx, "Failed to parse spec name %q: skipping spec row", spec.GetName())

@@ -19,10 +19,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/apigee/registry/cmd/registry/core"
+	"github.com/apigee/registry/cmd/registry/tasks"
 	"github.com/apigee/registry/cmd/registry/types"
-	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
@@ -53,12 +53,12 @@ func searchIndexCommand(ctx context.Context) *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := core.WorkerPool(ctx, 64)
+			taskQueue, wait := tasks.WorkerPool(ctx, 64)
 			defer wait()
 			// Generate tasks.
 			name := args[0]
 			if spec, err := names.ParseSpec(name); err == nil {
-				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(spec *rpc.ApiSpec) error {
+				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
 					taskQueue <- &indexSpecTask{
 						client:   client,
 						specName: spec.Name,
@@ -93,7 +93,7 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 		return err
 	}
 	name := spec.GetName()
-	data, err := core.GetBytesForSpec(ctx, task.client, spec)
+	data, err := visitor.GetBytesForSpec(ctx, task.client, spec)
 	if err != nil {
 		return nil
 	}

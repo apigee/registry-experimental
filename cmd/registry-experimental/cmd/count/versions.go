@@ -18,9 +18,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/apigee/registry/cmd/registry/core"
-	"github.com/apigee/registry/log"
+	"github.com/apigee/registry/cmd/registry/tasks"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
@@ -52,7 +52,7 @@ func versionsCommand() *cobra.Command {
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get jobs from flags")
 			}
-			taskQueue, wait := core.WorkerPool(ctx, jobs)
+			taskQueue, wait := tasks.WorkerPool(ctx, jobs)
 			defer wait()
 
 			api, err := names.ParseApi(args[0])
@@ -61,7 +61,7 @@ func versionsCommand() *cobra.Command {
 			}
 
 			// Iterate through a collection of APIs and count the number of versions of each.
-			err = visitor.ListAPIs(ctx, client, api, filter, func(api *rpc.Api) error {
+			err = visitor.ListAPIs(ctx, client, api, filter, func(ctx context.Context, api *rpc.Api) error {
 				taskQueue <- &countApiVersionsTask{
 					client: client,
 					api:    api,

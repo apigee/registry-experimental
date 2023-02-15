@@ -20,7 +20,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/apigee/registry/log"
+	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/models"
 	"github.com/spf13/cobra"
 	"google.golang.org/api/apigee/v1"

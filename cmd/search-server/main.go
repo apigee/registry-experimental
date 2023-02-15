@@ -24,8 +24,8 @@ import (
 
 	experimental_rpc "github.com/apigee/registry-experimental/rpc"
 	"github.com/apigee/registry-experimental/server/search"
-	"github.com/apigee/registry/log"
-	"github.com/apigee/registry/log/interceptor"
+	"github.com/apigee/registry/pkg/log"
+	"github.com/apigee/registry/pkg/log/interceptor"
 	registry_rpc "github.com/apigee/registry/rpc"
 	"github.com/apigee/registry/server/registry"
 	"github.com/spf13/pflag"

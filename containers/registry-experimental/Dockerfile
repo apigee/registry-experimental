@@ -36,9 +36,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -v -o registry-experimental ./cmd/registry
 # Get registry code.
 RUN git clone https://github.com/apigee/registry
 
-# Build registry tool and apg.
+# Build registry tool.
 RUN cd registry; CGO_ENABLED=0 GOOS=linux go build -v -o registry ./cmd/registry
-RUN cd registry; CGO_ENABLED=0 GOOS=linux go build -v -o apg ./cmd/apg
 
 # Install protoc-gen-openapi plugin
 RUN go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
@@ -56,9 +55,8 @@ RUN apk add --no-cache ca-certificates
 # Copy the registry-experimental binary from the builder stage.
 COPY --from=builder /app/registry-experimental /usr/local/bin/registry-experimental
 
-# Copy the registry and apg binaries from the builder stage.
+# Copy the registry binary from the builder stage.
 COPY --from=builder /app/registry/registry /usr/local/bin/registry
-COPY --from=builder /app/registry/apg /usr/local/bin/apg
 
 # Install node-based tools
 RUN apk add --no-cache nodejs npm
@@ -67,8 +65,9 @@ RUN npm install -g api-spec-converter
 
 # Install protoc
 RUN apk add curl gcompat
-COPY --from=builder /app/registry/tools/FETCH-PROTOC.sh ./FETCH-PROTOC.sh
-RUN ./FETCH-PROTOC.sh
+COPY --from=builder /app/registry/tools/PROTOC-VERSION.sh ./tools/PROTOC-VERSION.sh
+COPY --from=builder /app/registry/tools/FETCH-PROTOC.sh ./tools/FETCH-PROTOC.sh
+RUN ./tools/FETCH-PROTOC.sh
 
 # Copy protoc-gen-openapi from the builder stage.
 COPY --from=builder /go/bin/protoc-gen-openapi /usr/local/bin/protoc-gen-openapi

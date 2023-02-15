@@ -107,23 +107,25 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	}
 	relation := task.newSpecID
 	var openapi string
-	if types.IsOpenAPIv2(spec.GetMimeType()) || types.IsOpenAPIv3(spec.GetMimeType()) {
+	switch {
+	case types.IsOpenAPIv2(spec.GetMimeType()) || types.IsOpenAPIv3(spec.GetMimeType()):
 		return nil
-	} else if types.IsProto(spec.GetMimeType()) && types.IsZipArchive(spec.GetMimeType()) {
+	case types.IsProto(spec.GetMimeType()) && types.IsZipArchive(spec.GetMimeType()):
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromZippedProtos(ctx, spec.Name, data)
 		if err != nil {
 			return fmt.Errorf("error processing protos %s: %s", spec.Name, err)
 		}
-	} else if types.IsDiscovery(spec.GetMimeType()) {
+	case types.IsDiscovery(spec.GetMimeType()):
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromDiscovery(spec.Name, data)
 		if err != nil {
 			return fmt.Errorf("error processing discovery %s: %s", spec.Name, err)
 		}
-	} else {
+	default:
 		return fmt.Errorf("we don't know how to generate OpenAPI for %s", spec.Name)
 	}
+
 	specName, _ := names.ParseSpec(spec.GetName())
 	messageData := []byte(openapi)
 	messageData, err = compress.GZippedBytes(messageData)

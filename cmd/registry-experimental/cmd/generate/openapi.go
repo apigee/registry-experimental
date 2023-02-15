@@ -23,10 +23,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/apigee/registry/cmd/registry/core"
+	"github.com/apigee/registry/cmd/registry/compress"
+	"github.com/apigee/registry/cmd/registry/tasks"
 	"github.com/apigee/registry/cmd/registry/types"
-	"github.com/apigee/registry/log"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
@@ -51,14 +52,14 @@ func openapiCommand(ctx context.Context) *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := core.WorkerPoolWithWarnings(ctx, 1)
+			taskQueue, wait := tasks.WorkerPoolWithWarnings(ctx, 1)
 			defer wait()
 
 			// Generate tasks.
 			name := args[0]
 			if spec, err := names.ParseSpec(name); err == nil {
 				// Iterate through a collection of specs and evaluate each.
-				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(spec *rpc.ApiSpec) error {
+				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
 					taskQueue <- &generateOpenAPITask{
 						client:    client,
 						specName:  spec.Name,
@@ -96,7 +97,7 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	data, err := core.GetBytesForSpec(ctx, task.client, spec)
+	data, err := visitor.GetBytesForSpec(ctx, task.client, spec)
 	if err != nil {
 		return err
 	}
@@ -121,7 +122,7 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	}
 	specName, _ := names.ParseSpec(spec.GetName())
 	messageData := []byte(openapi)
-	messageData, err = core.GZippedBytes(messageData)
+	messageData, err = compress.GZippedBytes(messageData)
 	if err != nil {
 		return fmt.Errorf("failed to compress generated OpenAPI: %s", err)
 	}
@@ -155,7 +156,7 @@ func openAPIFromZippedProtos(ctx context.Context, name string, b []byte) (string
 	// whenever we finish, delete the tmp directory
 	defer os.RemoveAll(root)
 	// unzip the protos to the temp directory
-	_, err = core.UnzipArchiveToPath(b, root+"/protos")
+	_, err = compress.UnzipArchiveToPath(b, root+"/protos")
 	if err != nil {
 		return "", err
 	}

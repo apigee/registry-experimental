@@ -21,7 +21,6 @@ import (
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/export"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/extract"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/generate"
-	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/wipeout"
 	pkgconf "github.com/apigee/registry/pkg/config"
 	"github.com/spf13/cobra"
 )
@@ -44,6 +43,5 @@ func Command() *cobra.Command {
 	cmd.AddCommand(export.Command())
 	cmd.AddCommand(extract.Command())
 	cmd.AddCommand(generate.Command())
-	cmd.AddCommand(wipeout.Command())
 	return cmd
 }

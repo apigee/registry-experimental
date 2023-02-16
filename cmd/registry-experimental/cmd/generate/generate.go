@@ -15,18 +15,16 @@
 package generate
 
 import (
-	"context"
-
 	"github.com/spf13/cobra"
 )
 
-func Command(ctx context.Context) *cobra.Command {
+func Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "generate",
 		Short: "Generate resources from the API Registry",
 	}
 
-	cmd.AddCommand(openapiCommand(ctx))
+	cmd.AddCommand(openapiCommand())
 
 	cmd.PersistentFlags().String("filter", "", "Filter selected resources")
 	return cmd

@@ -15,7 +15,6 @@
 package search
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/apigee/registry/pkg/log"
@@ -24,12 +23,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Command(ctx context.Context) *cobra.Command {
+func Command() *cobra.Command {
 	return &cobra.Command{
 		Use:   "search",
 		Short: "Search a local index of specs in the API Registry (experimental)",
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
 			// open an existing index
 			index, err := bleve.Open("registry.bleve")
 			if err != nil {

@@ -36,18 +36,18 @@ import (
 
 var bleveMutex sync.Mutex
 
-func searchIndexCommand(ctx context.Context) *cobra.Command {
+func searchIndexCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "search-index",
 		Short: "Compute a local search index of specs (experimental)",
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
 			filter, err := cmd.Flags().GetString("filter")
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")
 			}
 
-			ctx := context.Background()
 			client, err := connection.NewRegistryClient(ctx)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")

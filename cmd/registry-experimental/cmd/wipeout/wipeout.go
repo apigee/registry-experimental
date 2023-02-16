@@ -24,13 +24,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Command(ctx context.Context) *cobra.Command {
+func Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "wipeout PROJECT-ID",
 		Short: "Delete everything in a project",
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			ctx := context.Background()
+			ctx := cmd.Context()
 			registryClient, err := connection.NewRegistryClient(ctx)
 			if err != nil {
 				log.Fatalf(ctx, "Failed to create client: %+v", err)

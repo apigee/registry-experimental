@@ -40,12 +40,14 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-func descriptorCommand(ctx context.Context) *cobra.Command {
+func descriptorCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "descriptor",
 		Short: "Compute descriptors of API specs",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
+
 			filter, err := cmd.Flags().GetString("filter")
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")

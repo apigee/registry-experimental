@@ -34,13 +34,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func openapiCommand(ctx context.Context) *cobra.Command {
+func openapiCommand() *cobra.Command {
 	var specID string
 	cmd := &cobra.Command{
 		Use:   "openapi",
 		Short: "Generate an OpenAPI spec from another specification format",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
 
 			filter, err := cmd.Flags().GetString("filter")
 			if err != nil {

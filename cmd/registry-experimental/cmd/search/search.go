@@ -47,7 +47,7 @@ func Command() *cobra.Command {
 				log.FromContext(ctx).WithError(err).Debug("Failed to search index")
 				return
 			}
-			log.FromContext(ctx).Debug(fmt.Sprint(searchResults))
+			fmt.Fprintf(cmd.OutOrStdout(), "%+v", searchResults)
 		},
 	}
 }

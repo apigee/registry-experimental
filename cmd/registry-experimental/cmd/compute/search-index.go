@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/apigee/registry/cmd/registry/compress"
 	"github.com/apigee/registry/cmd/registry/tasks"
 	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/pkg/connection"
@@ -28,10 +29,6 @@ import (
 	"github.com/apigee/registry/rpc"
 	"github.com/blevesearch/bleve"
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/proto"
-
-	oas2 "github.com/google/gnostic/openapiv2"
-	oas3 "github.com/google/gnostic/openapiv3"
 )
 
 var bleveMutex sync.Mutex
@@ -53,7 +50,7 @@ func searchIndexCommand() *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPool(ctx, 64)
+			taskQueue, wait := tasks.WorkerPoolWithWarnings(ctx, 64)
 			defer wait()
 			// Generate tasks.
 			name := args[0]
@@ -92,36 +89,29 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	name := spec.GetName()
 	data, err := visitor.GetBytesForSpec(ctx, task.client, spec)
 	if err != nil {
 		return nil
 	}
-	var message proto.Message
-	if types.IsOpenAPIv2(spec.GetMimeType()) {
-		document, err := oas2.ParseDocument(data)
+	var message interface{}
+	switch {
+	case spec.GetMimeType() == "text/plain" ||
+		types.IsOpenAPIv2(spec.GetMimeType()) ||
+		types.IsOpenAPIv3(spec.GetMimeType()) ||
+		types.IsDiscovery(spec.GetMimeType()):
+		message = map[string]string{spec.GetFilename(): string(data)}
+	case types.IsProto(spec.GetMimeType()):
+		m, err := compress.UnzipArchiveToMap(data)
 		if err != nil {
-			return fmt.Errorf("errors parsing %s", name)
+			return err
 		}
-		// remove some fields to simplify the search index
-		document.Paths = nil
-		document.Definitions = nil
-		document.Responses = nil
-		document.Parameters = nil
-		document.Security = nil
-		document.SecurityDefinitions = nil
-		message = document
-	} else if types.IsOpenAPIv3(spec.GetMimeType()) {
-		document, err := oas3.ParseDocument(data)
-		if err != nil {
-			return fmt.Errorf("errors parsing %s", name)
+		// for bleve, the map content must be strings
+		m2 := make(map[string]string)
+		for k, v := range m {
+			m2[k] = string(v)
 		}
-		// remove some fields to simplify the search index
-		document.Paths = nil
-		document.Components = nil
-		document.Security = nil
-		message = document
-	} else {
+		message = m2
+	default:
 		return fmt.Errorf("unable to generate descriptor for style %s", spec.GetMimeType())
 	}
 

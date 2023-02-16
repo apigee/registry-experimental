@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package compute
+package bleve
 
 import (
 	"context"
@@ -33,11 +33,11 @@ import (
 
 var bleveMutex sync.Mutex
 
-func searchIndexCommand() *cobra.Command {
-	return &cobra.Command{
-		Use:   "search-index",
-		Short: "Compute a local search index of specs (experimental)",
-		Args:  cobra.MinimumNArgs(1),
+func indexCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "index PATTERN",
+		Short: "Add documents to a local search index",
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
 			filter, err := cmd.Flags().GetString("filter")
@@ -70,6 +70,8 @@ func searchIndexCommand() *cobra.Command {
 			}
 		},
 	}
+	cmd.Flags().String("filter", "", "Filter selected resources")
+	return cmd
 }
 
 type indexSpecTask struct {

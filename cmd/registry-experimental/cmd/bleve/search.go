@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package search
+package bleve
 
 import (
 	"fmt"
@@ -23,10 +23,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Command() *cobra.Command {
+func searchCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "search",
-		Short: "Search a local index of specs in the API Registry (experimental)",
+		Short: "Search a local search index",
 		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
@@ -37,7 +37,6 @@ func Command() *cobra.Command {
 				return
 			}
 
-			log.Debugf(ctx, "Searching for %s", args[0])
 			// search for some text
 			query := bleve.NewQueryStringQuery(args[0])
 			search := bleve.NewSearchRequest(query)

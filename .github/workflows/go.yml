@@ -40,15 +40,11 @@ jobs:
         version: v1.45
         args: --timeout 5m0s
 
-    - name: Install
-      run: go install ./...
+    - name: Install the registry tool
+      run: go install github.com/apigee/registry/cmd/registry@latest  
 
-    - name: Install registry-server
-      run: go install github.com/apigee/registry/cmd/registry-server@latest  
+    - name: Create default registry configuration
+      run: registry config configurations create localhost --registry.address='localhost:8080'
 
     - name: Test everything with SQLite
-      run: registry-server & make test
-      env:
-        APG_REGISTRY_ADDRESS: localhost:8080 
-        APG_REGISTRY_AUDIENCES: http://localhost:8080
-        APG_REGISTRY_INSECURE: 1
+      run: make test

@@ -17,7 +17,6 @@ package bleve
 import (
 	"fmt"
 
-	"github.com/apigee/registry/pkg/log"
 	"github.com/blevesearch/bleve"
 	_ "github.com/blevesearch/bleve/search/highlight/highlighter/ansi"
 	"github.com/spf13/cobra"
@@ -27,15 +26,14 @@ func searchCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "search",
 		Short: "Search a local search index",
-		Args:  cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			ctx := cmd.Context()
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// open an existing index
 			index, err := bleve.Open(bleveDir)
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Debug("Failed to open bleve")
-				return
+				return fmt.Errorf("failed to open search index: %s", err)
 			}
+			defer index.Close()
 
 			// search for some text
 			query := bleve.NewQueryStringQuery(args[0])
@@ -43,10 +41,10 @@ func searchCommand() *cobra.Command {
 			search.Highlight = bleve.NewHighlightWithStyle("ansi")
 			searchResults, err := index.Search(search)
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Debug("Failed to search index")
-				return
+				return fmt.Errorf("failed to search index: %s", err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "%+v", searchResults)
+			return nil
 		},
 	}
 }

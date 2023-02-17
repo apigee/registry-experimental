@@ -41,12 +41,11 @@ func indexCommand() *cobra.Command {
 		Use:   "index PATTERN",
 		Short: "Add documents to a local search index",
 		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-
 			client, err := connection.NewRegistryClient(ctx)
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
+				return fmt.Errorf("failed to get client: %s", err)
 			}
 			// Initialize task queue.
 			taskQueue, wait := tasks.WorkerPoolWithWarnings(ctx, jobs)
@@ -62,16 +61,16 @@ func indexCommand() *cobra.Command {
 					return nil
 				})
 				if err != nil {
-					log.FromContext(ctx).WithError(err).Fatal("Failed to list specs")
+					return fmt.Errorf("failed to list specs: %s", err)
 				}
 			} else {
-				log.FromContext(ctx).Fatalf("We don't know how to index %s", name)
+				return fmt.Errorf("unsupported pattern: %s", name)
 			}
+			return nil
 		},
 	}
 	cmd.Flags().StringVar(&filter, "filter", "", "filter selected resources")
 	cmd.Flags().IntVarP(&jobs, "jobs", "j", 10, "number of actions to perform concurrently")
-
 	return cmd
 }
 

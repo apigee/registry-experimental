@@ -48,8 +48,12 @@ func searchCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to serialize search results: %s", err)
 			}
-			cmd.OutOrStdout().Write(bytes)
-			cmd.OutOrStdout().Write([]byte("\n"))
+			if _, err = cmd.OutOrStdout().Write(bytes); err != nil {
+				return err
+			}
+			if _, err = cmd.OutOrStdout().Write([]byte("\n")); err != nil {
+				return err
+			}
 			return nil
 		},
 	}

@@ -95,7 +95,7 @@ func TestSearch(t *testing.T) {
 		cmd := Command()
 		buf := &bytes.Buffer{}
 		cmd.SetOut(buf)
-		cmd.SetArgs([]string{"search", "books", "--bleve", blevePath})
+		cmd.SetArgs([]string{"search", "books", "--bleve", blevePath, "--output", "json"})
 		if err := cmd.Execute(); err != nil {
 			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 		}
@@ -113,7 +113,7 @@ func TestSearch(t *testing.T) {
 		cmd := Command()
 		buf := &bytes.Buffer{}
 		cmd.SetOut(buf)
-		cmd.SetArgs([]string{"search", "discovery", "--bleve", blevePath})
+		cmd.SetArgs([]string{"search", "discovery", "--bleve", blevePath, "--output", "json"})
 		if err := cmd.Execute(); err != nil {
 			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 		}
@@ -131,7 +131,7 @@ func TestSearch(t *testing.T) {
 		cmd := Command()
 		buf := &bytes.Buffer{}
 		cmd.SetOut(buf)
-		cmd.SetArgs([]string{"search", "pets", "--bleve", blevePath})
+		cmd.SetArgs([]string{"search", "pets", "--bleve", blevePath, "--output", "json"})
 		if err := cmd.Execute(); err != nil {
 			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 		}
@@ -149,7 +149,7 @@ func TestSearch(t *testing.T) {
 		cmd := Command()
 		buf := &bytes.Buffer{}
 		cmd.SetOut(buf)
-		cmd.SetArgs([]string{"search", "http", "--bleve", blevePath})
+		cmd.SetArgs([]string{"search", "http", "--bleve", blevePath, "--output", "json"})
 		if err := cmd.Execute(); err != nil {
 			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 		}
@@ -167,7 +167,7 @@ func TestSearch(t *testing.T) {
 		cmd := Command()
 		buf := &bytes.Buffer{}
 		cmd.SetOut(buf)
-		cmd.SetArgs([]string{"search", "nohits", "--bleve", blevePath})
+		cmd.SetArgs([]string{"search", "nohits", "--bleve", blevePath, "--output", "json"})
 		if err := cmd.Execute(); err != nil {
 			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 		}

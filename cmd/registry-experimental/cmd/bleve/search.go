@@ -15,6 +15,7 @@
 package bleve
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/blevesearch/bleve"
@@ -43,7 +44,12 @@ func searchCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to search index: %s", err)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "%+v", searchResults)
+			bytes, err := json.MarshalIndent(searchResults, "", "  ")
+			if err != nil {
+				return fmt.Errorf("failed to serialize search results: %s", err)
+			}
+			cmd.OutOrStdout().Write(bytes)
+			cmd.OutOrStdout().Write([]byte("\n"))
 			return nil
 		},
 	}

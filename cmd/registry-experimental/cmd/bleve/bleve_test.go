@@ -15,7 +15,9 @@
 package bleve
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -85,27 +87,82 @@ func TestSearch(t *testing.T) {
 		t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 	}
 
-	cmd = Command()
-	cmd.SetArgs([]string{"search", "books", "--bleve", blevePath})
-	if err := cmd.Execute(); err != nil {
-		t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
+	type searchResult struct {
+		TotalHits int `json:"total_hits"`
 	}
 
-	cmd = Command()
-	cmd.SetArgs([]string{"search", "discovery", "--bleve", blevePath})
-	if err := cmd.Execute(); err != nil {
-		t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
-	}
+	t.Run("search-books", func(t *testing.T) {
+		cmd := Command()
+		buf := &bytes.Buffer{}
+		cmd.SetOut(buf)
+		cmd.SetArgs([]string{"search", "books", "--bleve", blevePath})
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
+		}
+		var result searchResult
+		json.Unmarshal(buf.Bytes(), &result)
+		if result.TotalHits != 1 {
+			t.Errorf("Expected 1 hit, got %d", result.TotalHits)
+		}
+	})
 
-	cmd = Command()
-	cmd.SetArgs([]string{"search", "pets", "--bleve", blevePath})
-	if err := cmd.Execute(); err != nil {
-		t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
-	}
+	t.Run("search-discovery", func(t *testing.T) {
+		cmd := Command()
+		buf := &bytes.Buffer{}
+		cmd.SetOut(buf)
+		cmd.SetArgs([]string{"search", "discovery", "--bleve", blevePath})
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
+		}
+		var result searchResult
+		json.Unmarshal(buf.Bytes(), &result)
+		if result.TotalHits != 1 {
+			t.Errorf("Expected 1 hit, got %d", result.TotalHits)
+		}
+	})
 
-	cmd = Command()
-	cmd.SetArgs([]string{"search", "http", "--bleve", blevePath})
-	if err := cmd.Execute(); err != nil {
-		t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
-	}
+	t.Run("search-pets", func(t *testing.T) {
+		cmd := Command()
+		buf := &bytes.Buffer{}
+		cmd.SetOut(buf)
+		cmd.SetArgs([]string{"search", "pets", "--bleve", blevePath})
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
+		}
+		var result searchResult
+		json.Unmarshal(buf.Bytes(), &result)
+		if result.TotalHits != 1 {
+			t.Errorf("Expected 1 hit, got %d", result.TotalHits)
+		}
+	})
+
+	t.Run("search-http", func(t *testing.T) {
+		cmd := Command()
+		buf := &bytes.Buffer{}
+		cmd.SetOut(buf)
+		cmd.SetArgs([]string{"search", "http", "--bleve", blevePath})
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
+		}
+		var result searchResult
+		json.Unmarshal(buf.Bytes(), &result)
+		if result.TotalHits != 4 {
+			t.Errorf("Expected 4 hits, got %d", result.TotalHits)
+		}
+	})
+
+	t.Run("search-nohits", func(t *testing.T) {
+		cmd := Command()
+		buf := &bytes.Buffer{}
+		cmd.SetOut(buf)
+		cmd.SetArgs([]string{"search", "nohits", "--bleve", blevePath})
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
+		}
+		var result searchResult
+		json.Unmarshal(buf.Bytes(), &result)
+		if result.TotalHits != 0 {
+			t.Errorf("Expected 0 hits, got %d", result.TotalHits)
+		}
+	})
 }

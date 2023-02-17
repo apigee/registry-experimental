@@ -31,7 +31,7 @@ func searchCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
 			// open an existing index
-			index, err := bleve.Open("registry.bleve")
+			index, err := bleve.Open(bleveDir)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Debug("Failed to open bleve")
 				return

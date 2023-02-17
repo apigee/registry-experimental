@@ -33,6 +33,9 @@ import (
 
 var bleveMutex sync.Mutex
 
+var filter string
+var jobs int
+
 func indexCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "index PATTERN",
@@ -40,17 +43,13 @@ func indexCommand() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := cmd.Context()
-			filter, err := cmd.Flags().GetString("filter")
-			if err != nil {
-				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")
-			}
 
 			client, err := connection.NewRegistryClient(ctx)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPoolWithWarnings(ctx, 64)
+			taskQueue, wait := tasks.WorkerPoolWithWarnings(ctx, jobs)
 			defer wait()
 			// Generate tasks.
 			name := args[0]
@@ -70,7 +69,9 @@ func indexCommand() *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().String("filter", "", "Filter selected resources")
+	cmd.Flags().StringVar(&filter, "filter", "", "filter selected resources")
+	cmd.Flags().IntVarP(&jobs, "jobs", "j", 10, "number of actions to perform concurrently")
+
 	return cmd
 }
 
@@ -121,7 +122,6 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	bleveMutex.Lock()
 	defer bleveMutex.Unlock()
 	// Open the index, creating a new one if necessary.
-	const bleveDir = "registry.bleve"
 	index, err := bleve.Open(bleveDir)
 	if err != nil {
 		mapping := bleve.NewIndexMapping()

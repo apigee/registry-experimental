@@ -18,13 +18,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var bleveDir string
+
 func Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bleve",
 		Short: "Experimental search features built using blevesearch.com",
 	}
-
 	cmd.AddCommand(indexCommand())
 	cmd.AddCommand(searchCommand())
+	cmd.PersistentFlags().StringVar(&bleveDir, "bleve", "registry.bleve", "path to local bleve search index")
 	return cmd
 }

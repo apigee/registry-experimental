@@ -40,6 +40,7 @@ require (
 	cloud.google.com/go/iam v0.5.0 // indirect
 	github.com/RoaringBitmap/roaring v0.4.23 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
+	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/mmap-go v1.0.2 // indirect
 	github.com/blevesearch/segment v0.9.0 // indirect

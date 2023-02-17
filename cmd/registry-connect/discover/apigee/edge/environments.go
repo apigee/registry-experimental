@@ -35,9 +35,9 @@ type Environment struct {
 
 type VirtualHost struct {
 	Name        string   `json:"name,omitempty"`
-	Port        string   `json:"port,omitEmpty"`
-	BaseUrl     string   `json:"baseUrl,omitEmpty"`
-	HostAliases []string `json:"hostAliases,omitEmpty"`
+	Port        string   `json:"port,omitempty"`
+	BaseUrl     string   `json:"baseUrl,omitempty"`
+	HostAliases []string `json:"hostAliases,omitempty"`
 }
 
 // List retrieves the list of environment names for the organization referred by the ApigeeClient.

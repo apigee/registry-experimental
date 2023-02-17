@@ -33,6 +33,9 @@ func (c *EdgeClient) Org() string {
 
 func (c *EdgeClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProxy, error) {
 	client, err := edge.ConfiguredClient(c.org)
+	if err != nil {
+		return nil, err
+	}
 
 	names, _, err := client.Proxies.ListNames()
 	if err != nil {
@@ -49,6 +52,9 @@ func (c *EdgeClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1
 
 func (c *EdgeClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error) {
 	client, err := edge.ConfiguredClient(c.org)
+	if err != nil {
+		return nil, err
+	}
 
 	proxyNames, _, err := client.Proxies.ListNames()
 	if err != nil {
@@ -81,6 +87,9 @@ func (c *EdgeClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApig
 
 func (c *EdgeClient) EnvMap(ctx context.Context) (*EnvMap, error) {
 	client, err := edge.ConfiguredClient(c.org)
+	if err != nil {
+		return nil, err
+	}
 
 	envNames, _, err := client.Environments.ListNames()
 	if err != nil {

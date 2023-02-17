@@ -100,7 +100,10 @@ func TestSearch(t *testing.T) {
 			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 		}
 		var result searchResult
-		json.Unmarshal(buf.Bytes(), &result)
+		err = json.Unmarshal(buf.Bytes(), &result)
+		if err != nil {
+			t.Fatalf("Failed to unmarshal search results: %s", err)
+		}
 		if result.TotalHits != 1 {
 			t.Errorf("Expected 1 hit, got %d", result.TotalHits)
 		}
@@ -115,7 +118,10 @@ func TestSearch(t *testing.T) {
 			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 		}
 		var result searchResult
-		json.Unmarshal(buf.Bytes(), &result)
+		err = json.Unmarshal(buf.Bytes(), &result)
+		if err != nil {
+			t.Fatalf("Failed to unmarshal search results: %s", err)
+		}
 		if result.TotalHits != 1 {
 			t.Errorf("Expected 1 hit, got %d", result.TotalHits)
 		}
@@ -130,7 +136,10 @@ func TestSearch(t *testing.T) {
 			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 		}
 		var result searchResult
-		json.Unmarshal(buf.Bytes(), &result)
+		err = json.Unmarshal(buf.Bytes(), &result)
+		if err != nil {
+			t.Fatalf("Failed to unmarshal search results: %s", err)
+		}
 		if result.TotalHits != 1 {
 			t.Errorf("Expected 1 hit, got %d", result.TotalHits)
 		}
@@ -145,7 +154,10 @@ func TestSearch(t *testing.T) {
 			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 		}
 		var result searchResult
-		json.Unmarshal(buf.Bytes(), &result)
+		err = json.Unmarshal(buf.Bytes(), &result)
+		if err != nil {
+			t.Fatalf("Failed to unmarshal search results: %s", err)
+		}
 		if result.TotalHits != 4 {
 			t.Errorf("Expected 4 hits, got %d", result.TotalHits)
 		}
@@ -160,7 +172,10 @@ func TestSearch(t *testing.T) {
 			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
 		}
 		var result searchResult
-		json.Unmarshal(buf.Bytes(), &result)
+		err = json.Unmarshal(buf.Bytes(), &result)
+		if err != nil {
+			t.Fatalf("Failed to unmarshal search results: %s", err)
+		}
 		if result.TotalHits != 0 {
 			t.Errorf("Expected 0 hits, got %d", result.TotalHits)
 		}

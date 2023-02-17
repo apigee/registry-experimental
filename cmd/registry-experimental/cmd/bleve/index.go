@@ -47,12 +47,16 @@ func indexCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to get client: %s", err)
 			}
+			c, err := connection.ActiveConfig()
+			if err != nil {
+				return err
+			}
+			pattern := c.FQName(args[0])
 			// Initialize task queue.
 			taskQueue, wait := tasks.WorkerPoolWithWarnings(ctx, jobs)
 			defer wait()
 			// Generate tasks.
-			name := args[0]
-			if spec, err := names.ParseSpec(name); err == nil {
+			if spec, err := names.ParseSpec(pattern); err == nil {
 				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
 					taskQueue <- &indexSpecTask{
 						client:   client,
@@ -64,7 +68,7 @@ func indexCommand() *cobra.Command {
 					return fmt.Errorf("failed to list specs: %s", err)
 				}
 			} else {
-				return fmt.Errorf("unsupported pattern: %s", name)
+				return fmt.Errorf("unsupported pattern: %s", pattern)
 			}
 			return nil
 		},

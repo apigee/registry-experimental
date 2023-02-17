@@ -21,7 +21,7 @@ import (
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/common"
 	"github.com/apigee/registry/cmd/registry/patch"
-	"github.com/apigee/registry/log"
+	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/models"
 	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"

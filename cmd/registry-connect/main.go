@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover"
-	"github.com/apigee/registry/log"
+	"github.com/apigee/registry/pkg/log"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )

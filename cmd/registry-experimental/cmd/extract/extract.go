@@ -18,8 +18,10 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -114,6 +116,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			if description == nil {
 				description = &empty
 			}
+			*description = markdownify(*description)
 
 			title := yqQueryString(&node, "info.title")
 			if title != nil {
@@ -431,4 +434,22 @@ func yqDescribe(node *yaml.Node) string {
 		return err.Error()
 	}
 	return string(bytes)
+}
+
+func markdownify(text string) string {
+	log.Printf("checking %s", text)
+	re := regexp.MustCompile(`<a href="([^"]*)">([^<]*)</a>`)
+	for {
+		m := re.FindStringSubmatch(text)
+		if m == nil {
+			break
+		}
+		log.Printf("%+v", m)
+		markdownLink := "[" + m[2] + "](" + m[1] + ")"
+		log.Printf("replacing %s", m[0])
+		log.Printf("with %s", markdownLink)
+		text = strings.Replace(text, m[0], markdownLink, 1)
+	}
+	log.Printf("returning %s", text)
+	return text
 }

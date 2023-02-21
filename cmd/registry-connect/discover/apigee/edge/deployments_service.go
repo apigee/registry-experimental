@@ -18,9 +18,42 @@ const deploymentsPath = "deployments"
 
 // https://apidocs.apigee.com/docs/deployments/1/routes/organizations/%7Borg_name%7D/deployments/get
 type OrganizationDeployments struct {
-	Environments []Environment `json:"environment"`
-	Name         string        `json:"name"`
-	State        string        `json:"state"`
+	Environments []DeploymentEnvironment `json:"environment"`
+	Name         string                  `json:"name"`
+}
+
+type DeploymentEnvironment struct {
+	Name       string            `json:"name,omitempty"`
+	APIProxies []DeploymentProxy `json:"aPIProxy,omitempty"`
+}
+
+type DeploymentProxy struct {
+	Name      string               `json:"name,omitempty"`
+	Revisions []DeploymentRevision `json:"revision,omitempty"`
+}
+
+type DeploymentRevision struct {
+	Configuration interface{}        `json:"configuration,omitempty"`
+	Name          string             `json:"name,omitempty"`
+	Servers       []DeploymentServer `json:"server,omitempty"`
+	State         string             `json:"state,omitempty"`
+}
+
+type DeploymentConfiguration struct {
+	BasePath string      `json:"basePath,omitempty"`
+	Steps    interface{} `json:"steps,omitempty"`
+}
+
+type DeploymentServer struct {
+	Pod    Pod      `json:"pod,omitempty"`
+	Status string   `json:"status,omitempty"`
+	Types  []string `json:"type,omitempty"`
+	UUID   string   `json:"uUID,omitempty"`
+}
+
+type Pod struct {
+	Name   string `json:"name,omitempty"`
+	Region string `json:"region,omitempty"`
 }
 
 // DeploymentsService is an interface for interfacing with the Apigee Edge Admin API
@@ -42,8 +75,7 @@ func (s *DeploymentsServiceOp) OrganizationDeployments() (*OrganizationDeploymen
 	if e != nil {
 		return nil, nil, e
 	}
-	var names []string
-	resp, e := s.client.Do(req, &names)
+	resp, e := s.client.Do(req, &deployments)
 	if e != nil {
 		return nil, resp, e
 	}

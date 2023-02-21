@@ -29,7 +29,8 @@ type ApigeeClient interface {
 }
 
 func Client(org string) ApigeeClient {
-	if false {
+	// TODO: differentiate X from SaaS
+	if strings.HasPrefix(org, "organizations/") {
 		return &GCPClient{org}
 	} else {
 		return &EdgeClient{org}

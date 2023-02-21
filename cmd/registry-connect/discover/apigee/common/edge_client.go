@@ -16,8 +16,6 @@ package common
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/edge"
 	"google.golang.org/api/apigee/v1"
@@ -56,30 +54,23 @@ func (c *EdgeClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApig
 		return nil, err
 	}
 
-	proxyNames, _, err := client.Proxies.ListNames()
+	var deps []*apigee.GoogleCloudApigeeV1Deployment
+	ods, _, err := client.Deployments.OrganizationDeployments()
 	if err != nil {
 		return nil, err
 	}
 
-	var deps []*apigee.GoogleCloudApigeeV1Deployment
-	for _, n := range proxyNames {
-		d, _, err := client.Proxies.GetDeployment(n)
-		if err != nil {
-			return nil, err
-		}
-
-		r, err := client.Proxies.GetDeployedRevision(n)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, ed := range d.Environments {
-			s := strings.Split(ed.Name, "/")
-			deps = append(deps, &apigee.GoogleCloudApigeeV1Deployment{
-				ApiProxy:    n,
-				Environment: s[len(s)-1],
-				Revision:    fmt.Sprintf("%d", r),
-			})
+	for _, e := range ods.Environments {
+		for _, p := range e.APIProxies {
+			for _, r := range p.Revisions {
+				dep := &apigee.GoogleCloudApigeeV1Deployment{
+					ApiProxy:    p.Name,
+					Environment: e.Name,
+					Revision:    r.Name,
+					State:       r.State,
+				}
+				deps = append(deps, dep)
+			}
 		}
 	}
 	return deps, err
@@ -106,19 +97,18 @@ func (c *EdgeClient) EnvMap(ctx context.Context) (*EnvMap, error) {
 			return nil, err
 		}
 
+		uniqueHostnames := map[string]bool{}
 		for _, vhName := range vhNames {
 			vh, _, err := client.Environments.GetVirtualHost(envName, vhName)
 			if err != nil {
 				return nil, err
 			}
-
-			dedup := map[string]interface{}{}
 			for _, e := range vh.HostAliases {
-				dedup[e] = true
+				uniqueHostnames[e] = true
 			}
-			for k := range dedup {
-				m.hostnames[envName] = append(m.hostnames[envName], k)
-			}
+		}
+		for k := range uniqueHostnames {
+			m.hostnames[envName] = append(m.hostnames[envName], k)
 		}
 	}
 

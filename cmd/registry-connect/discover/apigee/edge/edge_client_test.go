@@ -302,6 +302,7 @@ func newMutualTLSServer() *httptest.Server {
 
 // errorContains checks if the error string contains the wanted pattern
 func errorContains(t *testing.T, out error, want string) {
+	t.Helper()
 	if out == nil {
 		if want != "" {
 			t.Errorf("got no error want %s", want)

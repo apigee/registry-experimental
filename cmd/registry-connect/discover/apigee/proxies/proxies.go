@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/common"
+	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/edge"
 	"github.com/apigee/registry/cmd/registry/patch"
 	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/models"
@@ -41,6 +42,7 @@ func Command() *cobra.Command {
 			return exportProxies(ctx, client)
 		},
 	}
+	cmd.Flags().BoolVar(&edge.Debug, "debug", false, "debug")
 	return cmd
 }
 

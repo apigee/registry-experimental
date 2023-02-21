@@ -40,8 +40,7 @@ type ProxiesService interface {
 	Import(proxyName string, source string) (*ProxyRevision, *Response, error)
 	Deploy(string, string, Revision) (*ProxyRevisionDeployment, *Response, error)
 	Undeploy(string, string, Revision) (*ProxyRevisionDeployment, *Response, error)
-	// GetDeployment(proxy string) (*EnvironmentDeployment, *Response, error)
-	GetDeployment(proxy string) (*ProxyDeployment, *Response, error)
+	GetDeployment(proxy string) (*EnvironmentDeployment, *Response, error)
 	GetDeployedRevision(proxy string) (*Revision, error)
 	GetGCPDeployments(proxy string) ([]GCPDeployment, *Response, error)
 	GetGCPDeployedRevision(proxy string) (*Revision, error)
@@ -418,21 +417,18 @@ func (s *ProxiesServiceOp) Deploy(proxyName, env string, rev Revision) (*ProxyRe
 	return &deployment, resp, e
 }
 
-// GetDeployment retrieves the information about the deployment of an API Proxy in an environment.
+// GetEnvDeployment retrieves the information about the deployment of an API Proxy in an environment.
 // DOES NOT WORK WITH GCP API!
-// func (s *ProxiesServiceOp) GetDeployment(proxy string) (*EnvironmentDeployment, *Response, error) {
-func (s *ProxiesServiceOp) GetDeployment(proxy string) (*ProxyDeployment, *Response, error) {
+func (s *ProxiesServiceOp) GetDeployment(proxy string) (*EnvironmentDeployment, *Response, error) {
 	if s.client.IsGCPManaged {
 		return nil, nil, errors.New("not compatible with GCP Experience")
 	}
 	urlPath := path.Join(proxiesPath, proxy, "deployments")
-	// req, e := s.client.NewRequest("GET", urlPath, nil)
-	req, e := s.client.NewRequestNoEnv("GET", urlPath, nil)
+	req, e := s.client.NewRequest("GET", urlPath, nil)
 	if e != nil {
 		return nil, nil, e
 	}
-	deployment := ProxyDeployment{}
-	// deployment := EnvironmentDeployment{}
+	deployment := EnvironmentDeployment{}
 	resp, e := s.client.Do(req, &deployment)
 	if e != nil {
 		return nil, resp, e
@@ -442,18 +438,18 @@ func (s *ProxiesServiceOp) GetDeployment(proxy string) (*ProxyDeployment, *Respo
 
 // GetDeployedRevision returns the Revision that is deployed to an environment.
 func (s *ProxiesServiceOp) GetDeployedRevision(proxy string) (*Revision, error) {
-	// deployment, resp, err := s.GetDeployment(proxy)
-	// if err != nil && (resp == nil || resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden) {
-	// 	return nil, err
-	// }
-	// if resp.StatusCode == http.StatusNotFound || resp.StatusCode == http.StatusBadRequest {
-	// 	return nil, nil
-	// }
-	// for _, rev := range deployment.Revision {
-	// 	if rev.State == "deployed" {
-	// 		return &rev.Number, nil
-	// 	}
-	// }
+	deployment, resp, err := s.GetDeployment(proxy)
+	if err != nil && (resp == nil || resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden) {
+		return nil, err
+	}
+	if resp.StatusCode == http.StatusNotFound || resp.StatusCode == http.StatusBadRequest {
+		return nil, nil
+	}
+	for _, rev := range deployment.Revision {
+		if rev.State == "deployed" {
+			return &rev.Number, nil
+		}
+	}
 
 	return nil, nil
 }

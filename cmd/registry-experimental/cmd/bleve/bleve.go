@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package compute
+package bleve
 
 import (
-	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/compute/summary"
 	"github.com/spf13/cobra"
 )
 
+var bleveDir string
+
 func Command() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "compute",
-		Short: "Compute properties of resources in the API Registry",
+		Use:   "bleve",
+		Short: "Experimental search features built using blevesearch.com",
 	}
-
-	cmd.AddCommand(descriptorCommand())
-	cmd.AddCommand(summary.Command())
-
-	cmd.PersistentFlags().String("filter", "", "Filter selected resources")
+	cmd.AddCommand(indexCommand())
+	cmd.AddCommand(searchCommand())
+	cmd.PersistentFlags().StringVar(&bleveDir, "bleve", "registry.bleve", "path to local bleve search index")
 	return cmd
 }

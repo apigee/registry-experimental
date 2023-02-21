@@ -16,6 +16,8 @@ package common
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"google.golang.org/api/apigee/v1"
 )
@@ -57,5 +59,63 @@ func (c *GCPClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApige
 }
 
 func (c *GCPClient) EnvMap(ctx context.Context) (*EnvMap, error) {
-	return nil, nil
+	groups, err := c.envgroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	m := &EnvMap{
+		hostnames: make(map[string][]string),
+		envgroup:  make(map[string]string),
+	}
+
+	for _, group := range groups {
+		envgroup := fmt.Sprintf("%s/envgroups/%s", c.org, group.Name)
+		attachments, err := c.attachments(ctx, envgroup)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, attachment := range attachments {
+			for _, hostname := range group.Hostnames {
+				m.hostnames[attachment.Environment] = append(m.hostnames[attachment.Environment], hostname)
+				m.envgroup[hostname] = envgroup
+			}
+		}
+	}
+
+	return m, nil
+}
+
+func (c *GCPClient) ProxyURL(ctx context.Context, proxy *apigee.GoogleCloudApigeeV1ApiProxy) string {
+	project := strings.TrimPrefix(c.org, "organizations/")
+	return fmt.Sprintf("https://console.cloud.google.com/apigee/proxies/%s/overview?project=%s", proxy.Name, project)
+}
+
+func (c *GCPClient) envgroups(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1EnvironmentGroup, error) {
+	apg, err := apigee.NewService(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := apg.Organizations.Envgroups.List(c.org).Context(ctx).Do()
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.EnvironmentGroups, nil
+}
+
+func (c *GCPClient) attachments(ctx context.Context, group string) ([]*apigee.GoogleCloudApigeeV1EnvironmentGroupAttachment, error) {
+	apg, err := apigee.NewService(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := apg.Organizations.Envgroups.Attachments.List(group).Context(ctx).Do()
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.EnvironmentGroupAttachments, nil
 }

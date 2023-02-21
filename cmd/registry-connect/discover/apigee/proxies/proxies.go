@@ -61,7 +61,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 				Metadata: models.Metadata{
 					Name: common.Label(proxy.Name),
 					Annotations: map[string]string{
-						"apigee-proxy": fmt.Sprintf("organizations/%s/apis/%s", client.Org(), proxy.Name),
+						"apigee-proxy": fmt.Sprintf("%s/apis/%s", client.Org(), proxy.Name),
 					},
 					Labels: map[string]string{
 						"apihub-kind":          "proxy",
@@ -94,14 +94,11 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 			api.Data.ApiVersions = append(api.Data.ApiVersions, v)
 		}
 
-		// TODO: SaaS, OPDK?
-		// Apigee X
-		proxyURL := fmt.Sprintf("https://console.cloud.google.com/apigee/proxies/%s/overview?project=%s", proxy.Name, client.Org())
 		rl := &rpc.ReferenceList{
 			References: []*rpc.ReferenceList_Reference{{
 				Id:          proxy.Name,
 				DisplayName: proxy.Name + " (Apigee)",
-				Uri:         proxyURL,
+				Uri:         client.ProxyURL(ctx, proxy),
 			}},
 		}
 		node, err := artifactNode(rl)

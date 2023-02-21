@@ -16,6 +16,7 @@ package common
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/edge"
 	"google.golang.org/api/apigee/v1"
@@ -26,7 +27,7 @@ type EdgeClient struct {
 }
 
 func (c *EdgeClient) Org() string {
-	return c.org
+	return "organizations/" + c.org
 }
 
 func (c *EdgeClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProxy, error) {
@@ -42,7 +43,15 @@ func (c *EdgeClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1
 
 	var proxies []*apigee.GoogleCloudApigeeV1ApiProxy
 	for _, n := range names {
-		proxies = append(proxies, &apigee.GoogleCloudApigeeV1ApiProxy{Name: n})
+		p, _, err := client.Proxies.Get(n)
+		if err != nil {
+			return nil, err
+		}
+
+		proxies = append(proxies, &apigee.GoogleCloudApigeeV1ApiProxy{
+			Name:             n,
+			LatestRevisionId: p.Revisions[len(p.Revisions)-1].String(),
+		})
 	}
 
 	return proxies, nil
@@ -113,4 +122,9 @@ func (c *EdgeClient) EnvMap(ctx context.Context) (*EnvMap, error) {
 	}
 
 	return m, err
+}
+
+// TODO: OPDK
+func (c *EdgeClient) ProxyURL(ctx context.Context, proxy *apigee.GoogleCloudApigeeV1ApiProxy) string {
+	return fmt.Sprintf("https://apigee.com/platform/%s/proxies/%s/overview/%s", c.org, proxy.Name, proxy.LatestRevisionId)
 }

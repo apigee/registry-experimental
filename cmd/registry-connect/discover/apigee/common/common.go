@@ -26,10 +26,11 @@ type ApigeeClient interface {
 	Proxies(context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProxy, error)
 	Deployments(context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error)
 	EnvMap(context.Context) (*EnvMap, error)
+	ProxyURL(context.Context, *apigee.GoogleCloudApigeeV1ApiProxy) string
 }
 
 func Client(org string) ApigeeClient {
-	// TODO: differentiate X from SaaS
+	// TODO: differentiate X from SaaS (and OPDK) properly
 	if strings.HasPrefix(org, "organizations/") {
 		return &GCPClient{org}
 	} else {

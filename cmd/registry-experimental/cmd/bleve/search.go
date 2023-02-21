@@ -24,12 +24,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var number int
+var limit int
 var output string
 
 func searchCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "search",
+		Use:   "search QUERY",
 		Short: "Search a local search index",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -43,7 +43,7 @@ func searchCommand() *cobra.Command {
 			// search for some text
 			query := bleve.NewQueryStringQuery(args[0])
 			search := bleve.NewSearchRequest(query)
-			search.Size = number
+			search.Size = limit
 			search.Highlight = bleve.NewHighlightWithStyle("ansi")
 			searchResults, err := index.Search(search)
 			if err != nil {
@@ -81,10 +81,11 @@ func searchCommand() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVarP(&output, "output", "o", "text", "output type (text|json|name)")
-	cmd.Flags().IntVarP(&number, "number", "n", 10, "number of results")
+	cmd.Flags().IntVarP(&limit, "limit", "l", 10, "maximum number of results to return")
 	return cmd
 }
 
+// reduce shortens hit ids to project-local names.
 func reduce(name string) string {
 	re := regexp.MustCompile(`^projects\/.*\/locations\/global\/(.*)$`)
 	matches := re.FindAllStringSubmatch(name, 1)

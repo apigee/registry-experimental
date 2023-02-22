@@ -57,6 +57,10 @@ func (c *EdgeClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1
 	return proxies, nil
 }
 
+func (c *EdgeClient) Proxy(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProxy, error) {
+	return nil, fmt.Errorf("Not implemented")
+}
+
 func (c *EdgeClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error) {
 	client, err := edge.ConfiguredClient(c.org)
 	if err != nil {
@@ -127,4 +131,12 @@ func (c *EdgeClient) EnvMap(ctx context.Context) (*EnvMap, error) {
 // TODO: OPDK
 func (c *EdgeClient) ProxyURL(ctx context.Context, proxy *apigee.GoogleCloudApigeeV1ApiProxy) string {
 	return fmt.Sprintf("https://apigee.com/platform/%s/proxies/%s/overview/%s", c.org, proxy.Name, proxy.LatestRevisionId)
+}
+
+func (c *EdgeClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProduct, error) {
+	return nil, fmt.Errorf("Not implemented")
+}
+
+func (c *EdgeClient) Product(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProduct, error) {
+	return nil, fmt.Errorf("Not implemented")
 }

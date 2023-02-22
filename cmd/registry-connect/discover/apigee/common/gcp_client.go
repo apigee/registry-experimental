@@ -27,7 +27,7 @@ type GCPClient struct {
 }
 
 func (c *GCPClient) Org() string {
-	return c.org
+	return strings.TrimPrefix(c.org, "organizations/")
 }
 
 func (c *GCPClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProxy, error) {
@@ -42,6 +42,21 @@ func (c *GCPClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1A
 	}
 
 	return resp.Proxies, nil
+}
+
+func (c *GCPClient) Proxy(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProxy, error) {
+	apg, err := apigee.NewService(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	name = fmt.Sprintf("%s/apis/%s", c.org, name)
+	resp, err := apg.Organizations.Apis.Get(name).Context(ctx).Do()
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, err
 }
 
 func (c *GCPClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error) {
@@ -88,8 +103,7 @@ func (c *GCPClient) EnvMap(ctx context.Context) (*EnvMap, error) {
 }
 
 func (c *GCPClient) ProxyURL(ctx context.Context, proxy *apigee.GoogleCloudApigeeV1ApiProxy) string {
-	project := strings.TrimPrefix(c.org, "organizations/")
-	return fmt.Sprintf("https://console.cloud.google.com/apigee/proxies/%s/overview?project=%s", proxy.Name, project)
+	return fmt.Sprintf("https://console.cloud.google.com/apigee/proxies/%s/overview?project=%s", proxy.Name, c.Org())
 }
 
 func (c *GCPClient) envgroups(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1EnvironmentGroup, error) {
@@ -118,4 +132,33 @@ func (c *GCPClient) attachments(ctx context.Context, group string) ([]*apigee.Go
 	}
 
 	return resp.EnvironmentGroupAttachments, nil
+}
+
+func (c *GCPClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProduct, error) {
+	apg, err := apigee.NewService(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := apg.Organizations.Apiproducts.List(c.org).Do()
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.ApiProduct, err
+}
+
+func (c *GCPClient) Product(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProduct, error) {
+	apg, err := apigee.NewService(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	name = fmt.Sprintf("%s/apiproducts/%s", c.org, name)
+	resp, err := apg.Organizations.Apiproducts.Get(name).Context(ctx).Do()
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, err
 }

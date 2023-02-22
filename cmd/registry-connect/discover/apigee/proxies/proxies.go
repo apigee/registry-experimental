@@ -20,13 +20,11 @@ import (
 	"os"
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/common"
-	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/edge"
 	"github.com/apigee/registry/cmd/registry/patch"
 	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/models"
 	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/encoding/protojson"
 	"gopkg.in/yaml.v3"
 )
 
@@ -42,7 +40,6 @@ func Command() *cobra.Command {
 			return exportProxies(ctx, client)
 		},
 	}
-	cmd.Flags().BoolVar(&edge.Debug, "debug", false, "debug")
 	return cmd
 }
 
@@ -52,14 +49,20 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 		return err
 	}
 
-	apis := map[string]*models.Api{}
-	for _, proxy := range proxies {
+	apis := []*models.Api{}
+	apisByName := map[string]*models.Api{}
+	for _, p := range proxies {
+		proxy, err := client.Proxy(ctx, p.Name)
+		if err != nil {
+			return err
+		}
+
 		api := &models.Api{
 			Header: models.Header{
 				ApiVersion: patch.RegistryV1,
 				Kind:       "API",
 				Metadata: models.Metadata{
-					Name: common.Label(proxy.Name),
+					Name: fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name),
 					Annotations: map[string]string{
 						"apigee-proxy": fmt.Sprintf("%s/apis/%s", client.Org(), proxy.Name),
 					},
@@ -70,7 +73,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 				},
 			},
 			Data: models.ApiData{
-				DisplayName: proxy.Name,
+				DisplayName: fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name),
 			},
 		}
 
@@ -82,7 +85,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 					Metadata: models.Metadata{
 						Name: r,
 						Annotations: map[string]string{
-							"apigee-proxy-revision": r,
+							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), proxy.Name, r),
 						},
 					},
 				},
@@ -101,7 +104,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 				Uri:         client.ProxyURL(ctx, proxy),
 			}},
 		}
-		node, err := artifactNode(rl)
+		node, err := common.ArtifactNode(rl)
 		if err != nil {
 			return err
 		}
@@ -118,17 +121,18 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 		}
 		api.Data.Artifacts = append(api.Data.Artifacts, a)
 
-		apis[proxy.Name] = api
+		apis = append(apis, api)
+		apisByName[proxy.Name] = api
 	}
 
-	err = addDeployments(ctx, client, apis)
+	err = addDeployments(ctx, client, apisByName)
 	if err != nil {
 		return err
 	}
 
 	items := &struct {
 		ApiVersion string
-		Items      interface{}
+		Items      []*models.Api
 	}{
 		ApiVersion: patch.RegistryV1,
 		Items:      apis,
@@ -136,8 +140,12 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 	return yaml.NewEncoder(os.Stdout).Encode(items)
 }
 
-func addDeployments(ctx context.Context, client common.ApigeeClient, apis map[string]*models.Api) error {
-	env, err := client.EnvMap(ctx)
+func addDeployments(ctx context.Context, client common.ApigeeClient, apisByName map[string]*models.Api) error {
+	if len(apisByName) == 0 {
+		return nil
+	}
+
+	envMap, err := client.EnvMap(ctx)
 	if err != nil {
 		return err
 	}
@@ -148,19 +156,19 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apis map[st
 	}
 
 	for _, dep := range deps {
-		hostnames, ok := env.Hostnames(dep.Environment)
+		hostnames, ok := envMap.Hostnames(dep.Environment)
 		if !ok {
 			log.Warnf(ctx, "Failed to find hostnames for environment %s", dep.Environment)
 			continue
 		}
 
 		for _, hostname := range hostnames {
-			api, ok := apis[dep.ApiProxy]
+			api, ok := apisByName[dep.ApiProxy]
 			if !ok {
 				return fmt.Errorf("unknown proxy: %q for deployment", dep.ApiProxy)
 			}
 
-			envgroup, _ := env.Envgroup(hostname)
+			envgroup, _ := envMap.Envgroup(hostname)
 			deployment := &models.ApiDeployment{
 				Header: models.Header{
 					ApiVersion: patch.RegistryV1,
@@ -168,8 +176,8 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apis map[st
 					Metadata: models.Metadata{
 						Name: common.Label(hostname),
 						Annotations: map[string]string{
-							"apigee-proxy-revision": fmt.Sprintf("%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
-							"apigee-environment":    fmt.Sprintf("%s/environments/%s", client.Org(), dep.Environment),
+							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
+							"apigee-environment":    fmt.Sprintf("organizations/%s/environments/%s", client.Org(), dep.Environment),
 							"apigee-envgroup":       envgroup,
 						},
 					},
@@ -185,56 +193,6 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apis map[st
 		}
 	}
 	return nil
-}
-
-func artifactNode(m *rpc.ReferenceList) (*yaml.Node, error) {
-	var node *yaml.Node
-	// Marshal the artifact content as JSON using the protobuf marshaller.
-	s, err := protojson.MarshalOptions{
-		UseEnumNumbers:  false,
-		EmitUnpopulated: false,
-		Indent:          "  ",
-		UseProtoNames:   false,
-	}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	// Unmarshal the JSON with yaml.v3 so that we can re-marshal it as YAML.
-	var doc yaml.Node
-	err = yaml.Unmarshal([]byte(s), &doc)
-	if err != nil {
-		return nil, err
-	}
-	// The top-level node is a "document" node. We need to marshal the node below it.
-	node = doc.Content[0]
-	// Restyle the YAML representation so that it will be serialized with YAML defaults.
-	styleForYAML(node)
-	// We exclude the id and kind fields from YAML serializations.
-	node = removeIdAndKind(node)
-	return node, nil
-}
-
-// styleForYAML sets the style field on a tree of yaml.Nodes for YAML export.
-func styleForYAML(node *yaml.Node) {
-	node.Style = 0
-	for _, n := range node.Content {
-		styleForYAML(n)
-	}
-}
-
-func removeIdAndKind(node *yaml.Node) *yaml.Node {
-	if node.Kind == yaml.MappingNode {
-		content := make([]*yaml.Node, 0)
-		for i := 0; i < len(node.Content); i += 2 {
-			k := node.Content[i]
-			if k.Value != "id" && k.Value != "kind" {
-				content = append(content, node.Content[i])
-				content = append(content, node.Content[i+1])
-			}
-		}
-		node.Content = content
-	}
-	return node
 }
 
 /*

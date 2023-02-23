@@ -34,7 +34,7 @@ var Version = "dev"
 
 func Command() *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:   "products",
+		Use:   "products ORGANIZATION",
 		Short: "Export Apigee Products",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {

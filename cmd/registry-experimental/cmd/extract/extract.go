@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 
+	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/apigee/registry/cmd/registry/compress"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/mime"
@@ -114,6 +115,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			if description == nil {
 				description = &empty
 			}
+			*description = markdownify(*description)
 
 			title := yqQueryString(&node, "info.title")
 			if title != nil {
@@ -431,4 +433,13 @@ func yqDescribe(node *yaml.Node) string {
 		return err.Error()
 	}
 	return string(bytes)
+}
+
+func markdownify(text string) string {
+	converter := md.NewConverter("", true, nil)
+	markdown, err := converter.ConvertString(text)
+	if err != nil {
+		return text
+	}
+	return markdown
 }

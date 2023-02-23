@@ -12,52 +12,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package compute
+package bleve
 
 import (
 	"context"
 	"fmt"
 	"sync"
 
+	"github.com/apigee/registry/cmd/registry/compress"
 	"github.com/apigee/registry/cmd/registry/tasks"
-	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/log"
+	"github.com/apigee/registry/pkg/mime"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/blevesearch/bleve"
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/proto"
-
-	oas2 "github.com/google/gnostic/openapiv2"
-	oas3 "github.com/google/gnostic/openapiv3"
 )
 
 var bleveMutex sync.Mutex
 
-func searchIndexCommand() *cobra.Command {
-	return &cobra.Command{
-		Use:   "search-index",
-		Short: "Compute a local search index of specs (experimental)",
-		Args:  cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			ctx := cmd.Context()
-			filter, err := cmd.Flags().GetString("filter")
-			if err != nil {
-				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")
-			}
+var filter string
+var jobs int
 
+func indexCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "index PATTERN",
+		Short: "Add documents to a local search index",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
 			client, err := connection.NewRegistryClient(ctx)
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
+				return fmt.Errorf("failed to get client: %s", err)
 			}
+			c, err := connection.ActiveConfig()
+			if err != nil {
+				return err
+			}
+			pattern := c.FQName(args[0])
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPool(ctx, 64)
+			taskQueue, wait := tasks.WorkerPoolWithWarnings(ctx, jobs)
 			defer wait()
 			// Generate tasks.
-			name := args[0]
-			if spec, err := names.ParseSpec(name); err == nil {
+			if spec, err := names.ParseSpec(pattern); err == nil {
 				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
 					taskQueue <- &indexSpecTask{
 						client:   client,
@@ -66,13 +65,17 @@ func searchIndexCommand() *cobra.Command {
 					return nil
 				})
 				if err != nil {
-					log.FromContext(ctx).WithError(err).Fatal("Failed to list specs")
+					return fmt.Errorf("failed to list specs: %s", err)
 				}
 			} else {
-				log.FromContext(ctx).Fatalf("We don't know how to index %s", name)
+				return fmt.Errorf("unsupported pattern: %s", pattern)
 			}
+			return nil
 		},
 	}
+	cmd.Flags().StringVar(&filter, "filter", "", "filter selected resources")
+	cmd.Flags().IntVarP(&jobs, "jobs", "j", 10, "number of actions to perform concurrently")
+	return cmd
 }
 
 type indexSpecTask struct {
@@ -92,36 +95,29 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	name := spec.GetName()
 	data, err := visitor.GetBytesForSpec(ctx, task.client, spec)
 	if err != nil {
 		return nil
 	}
-	var message proto.Message
-	if types.IsOpenAPIv2(spec.GetMimeType()) {
-		document, err := oas2.ParseDocument(data)
+	var message interface{}
+	switch {
+	case spec.GetMimeType() == "text/plain" ||
+		mime.IsOpenAPIv2(spec.GetMimeType()) ||
+		mime.IsOpenAPIv3(spec.GetMimeType()) ||
+		mime.IsDiscovery(spec.GetMimeType()):
+		message = map[string]string{spec.GetFilename(): string(data)}
+	case mime.IsProto(spec.GetMimeType()):
+		m, err := compress.UnzipArchiveToMap(data)
 		if err != nil {
-			return fmt.Errorf("errors parsing %s", name)
+			return err
 		}
-		// remove some fields to simplify the search index
-		document.Paths = nil
-		document.Definitions = nil
-		document.Responses = nil
-		document.Parameters = nil
-		document.Security = nil
-		document.SecurityDefinitions = nil
-		message = document
-	} else if types.IsOpenAPIv3(spec.GetMimeType()) {
-		document, err := oas3.ParseDocument(data)
-		if err != nil {
-			return fmt.Errorf("errors parsing %s", name)
+		// for bleve, the map content must be strings
+		m2 := make(map[string]string)
+		for k, v := range m {
+			m2[k] = string(v)
 		}
-		// remove some fields to simplify the search index
-		document.Paths = nil
-		document.Components = nil
-		document.Security = nil
-		message = document
-	} else {
+		message = m2
+	default:
 		return fmt.Errorf("unable to generate descriptor for style %s", spec.GetMimeType())
 	}
 
@@ -129,7 +125,6 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	bleveMutex.Lock()
 	defer bleveMutex.Unlock()
 	// Open the index, creating a new one if necessary.
-	const bleveDir = "registry.bleve"
 	index, err := bleve.Open(bleveDir)
 	if err != nil {
 		mapping := bleve.NewIndexMapping()

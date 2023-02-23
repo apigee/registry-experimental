@@ -15,12 +15,12 @@
 package cmd
 
 import (
+	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/bleve"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/compute"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/count"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/export"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/extract"
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/generate"
-	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/search"
 	pkgconf "github.com/apigee/registry/pkg/config"
 	"github.com/spf13/cobra"
 )
@@ -37,11 +37,11 @@ func Command() *cobra.Command {
 	}
 	cmd.PersistentFlags().AddFlagSet(pkgconf.Flags)
 
+	cmd.AddCommand(bleve.Command())
 	cmd.AddCommand(compute.Command())
 	cmd.AddCommand(count.Command())
 	cmd.AddCommand(export.Command())
 	cmd.AddCommand(extract.Command())
 	cmd.AddCommand(generate.Command())
-	cmd.AddCommand(search.Command())
 	return cmd
 }

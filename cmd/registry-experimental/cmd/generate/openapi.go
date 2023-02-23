@@ -25,9 +25,9 @@ import (
 
 	"github.com/apigee/registry/cmd/registry/compress"
 	"github.com/apigee/registry/cmd/registry/tasks"
-	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/log"
+	"github.com/apigee/registry/pkg/mime"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
@@ -109,15 +109,15 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	relation := task.newSpecID
 	var openapi string
 	switch {
-	case types.IsOpenAPIv2(spec.GetMimeType()) || types.IsOpenAPIv3(spec.GetMimeType()):
+	case mime.IsOpenAPIv2(spec.GetMimeType()) || mime.IsOpenAPIv3(spec.GetMimeType()):
 		return nil
-	case types.IsProto(spec.GetMimeType()) && types.IsZipArchive(spec.GetMimeType()):
+	case mime.IsProto(spec.GetMimeType()) && mime.IsZipArchive(spec.GetMimeType()):
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromZippedProtos(ctx, spec.Name, data)
 		if err != nil {
 			return fmt.Errorf("error processing protos %s: %s", spec.Name, err)
 		}
-	case types.IsDiscovery(spec.GetMimeType()):
+	case mime.IsDiscovery(spec.GetMimeType()):
 		log.FromContext(ctx).Debugf("Computing %s/specs/%s", spec.Name, relation)
 		openapi, err = openAPIFromDiscovery(ctx, spec.Name, data)
 		if err != nil {

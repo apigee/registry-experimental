@@ -72,14 +72,14 @@ type summaryVisitor struct {
 	visitor.Unsupported
 	ctx            context.Context
 	registryClient connection.RegistryClient
-	adminClient    connection.AdminClient
 }
 
 type Summary struct {
-	ApiCount        int `yaml:"apiCount,omitempty"`
-	VersionCount    int `yaml:"versionCount,omitempty"`
-	SpecCount       int `yaml:"specCount,omitempty"`
-	DeploymentCount int `yaml:"deploymentCount,omitempty"`
+	ApiCount        int            `yaml:"apis,omitempty"`
+	VersionCount    int            `yaml:"versions,omitempty"`
+	SpecCount       int            `yaml:"specs,omitempty"`
+	DeploymentCount int            `yaml:"deployments,omitempty"`
+	MimeTypes       map[string]int `yaml:"mimetypes"`
 }
 
 func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
@@ -108,10 +108,12 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 			return err
 		}
 		specCount := 0
+		mimeTypes := make(map[string]int)
 		if err := visitor.ListSpecs(v.ctx, v.registryClient,
 			projectName.Api("-").Version("-").Spec("-"), "", false,
 			func(ctx context.Context, message *rpc.ApiSpec) error {
 				specCount++
+				mimeTypes[message.MimeType]++
 				return nil
 			}); err != nil {
 			return err
@@ -130,6 +132,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 			VersionCount:    versionCount,
 			SpecCount:       specCount,
 			DeploymentCount: deploymentCount,
+			MimeTypes:       mimeTypes,
 		}
 		bytes, err := yaml.Marshal(summary)
 		if err != nil {
@@ -137,6 +140,62 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 		}
 		artifact := &rpc.Artifact{
 			Name:     projectName.Artifact("summary").String(),
+			MimeType: "application/yaml;type=Summary",
+			Contents: bytes,
+		}
+		return visitor.SetArtifact(v.ctx, v.registryClient, artifact)
+	}
+}
+
+func (v *summaryVisitor) ApiHandler() visitor.ApiHandler {
+	return func(ctx context.Context, message *rpc.Api) error {
+		fmt.Printf("%s\n", message.Name)
+		apiName, err := names.ParseApi(message.Name)
+		if err != nil {
+			return err
+		}
+		versionCount := 0
+		if err := visitor.ListVersions(v.ctx, v.registryClient,
+			apiName.Version("-"), "",
+			func(ctx context.Context, message *rpc.ApiVersion) error {
+				versionCount++
+				return nil
+			}); err != nil {
+			return err
+		}
+		specCount := 0
+		mimeTypes := make(map[string]int)
+		if err := visitor.ListSpecs(v.ctx, v.registryClient,
+			apiName.Version("-").Spec("-"), "", false,
+			func(ctx context.Context, message *rpc.ApiSpec) error {
+				specCount++
+				mimeTypes[message.MimeType]++
+				return nil
+			}); err != nil {
+			return err
+		}
+		deploymentCount := 0
+		if err := visitor.ListDeployments(v.ctx, v.registryClient,
+			apiName.Deployment("-"), "",
+			func(ctx context.Context, message *rpc.ApiDeployment) error {
+				deploymentCount++
+				return nil
+			}); err != nil {
+			return err
+		}
+		summary := &Summary{
+			ApiCount:        1,
+			VersionCount:    versionCount,
+			SpecCount:       specCount,
+			DeploymentCount: deploymentCount,
+			MimeTypes:       mimeTypes,
+		}
+		bytes, err := yaml.Marshal(summary)
+		if err != nil {
+			return err
+		}
+		artifact := &rpc.Artifact{
+			Name:     apiName.Artifact("summary").String(),
 			MimeType: "application/yaml;type=Summary",
 			Contents: bytes,
 		}

@@ -20,10 +20,10 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
+	"github.com/apigee/registry-experimental/pkg/yamlquery"
 	"github.com/apigee/registry/cmd/registry/compress"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/mime"
@@ -80,7 +80,7 @@ var empty = ""
 
 func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 	return func(ctx context.Context, spec *rpc.ApiSpec) error {
-		fmt.Printf("%s %s\n", spec.Name, spec.MimeType)
+		fmt.Printf("%s\n", spec.Name)
 		err := visitor.FetchSpecContents(v.ctx, v.registryClient, spec)
 		if err != nil {
 			return err
@@ -98,42 +98,24 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 				return err
 			}
 
-			openapi := yqQueryString(&node, "openapi")
-			if openapi != nil {
-				fmt.Printf("openapi %s\n", *openapi)
-			}
+			openapi := yamlquery.QueryString(&node, "openapi")
 
-			swagger := yqQueryString(&node, "swagger")
-			if swagger != nil {
-				fmt.Printf("swagger %s\n", *swagger)
-			}
+			swagger := yamlquery.QueryString(&node, "swagger")
 
-			description := yqQueryString(&node, "info.description")
-			if description != nil {
-				fmt.Printf("description %s\n", *description)
-			}
+			description := yamlquery.QueryString(&node, "info.description")
 			if description == nil {
 				description = &empty
 			}
 			*description = markdownify(*description)
 
-			title := yqQueryString(&node, "info.title")
-			if title != nil {
-				fmt.Printf("title %s\n", *title)
-			}
+			title := yamlquery.QueryString(&node, "info.title")
 			if title == nil {
 				title = &empty
 			}
 
-			provider := yqQueryString(&node, "info.x-providerName")
-			if provider != nil {
-				fmt.Printf("provider %s\n", *provider)
-			}
+			provider := yamlquery.QueryString(&node, "info.x-providerName")
 
-			categories := yqQueryNode(&node, "info.x-apisguru-categories")
-			if categories != nil {
-				fmt.Printf("categories:\n%s\n", yqDescribe(categories))
-			}
+			categories := yamlquery.QueryNode(&node, "info.x-apisguru-categories")
 
 			// Set API (displayName, description) from (title, description).
 			specName, _ := names.ParseSpec(spec.Name)
@@ -152,7 +134,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			}
 			labels["openapi"] = "true"
 			delete(labels, "style-openapi")
-			labels["categories"] = strings.Join(yqQueryStringArray(categories), ",")
+			labels["categories"] = strings.Join(yamlquery.QueryStringArray(categories), ",")
 			if provider != nil {
 				labels["provider"] = *provider
 			}
@@ -202,28 +184,19 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 				return err
 			}
 			styleForYAML(&node)
-			//fmt.Printf("discovery:\n%s\n", yqDescribe(&node))
+			//fmt.Printf("discovery:\n%s\n", yamlquery.Describe(&node))
 
-			description := yqQueryString(&node, "description")
-			if description != nil {
-				fmt.Printf("description %s\n", *description)
-			}
+			description := yamlquery.QueryString(&node, "description")
 			if description == nil {
 				description = &empty
 			}
 
-			title := yqQueryString(&node, "canonicalName")
-			if title != nil {
-				fmt.Printf("title %s\n", *title)
-			}
+			title := yamlquery.QueryString(&node, "canonicalName")
 			if title == nil {
 				title = &empty
 			}
 
-			provider := yqQueryString(&node, "ownerDomain")
-			if provider != nil {
-				fmt.Printf("provider %s\n", *provider)
-			}
+			provider := yamlquery.QueryString(&node, "ownerDomain")
 
 			// Set API (displayName, description) from (title, description).
 			specName, _ := names.ParseSpec(spec.Name)
@@ -363,76 +336,6 @@ func styleForYAML(node *yaml.Node) {
 	for _, n := range node.Content {
 		styleForYAML(n)
 	}
-}
-
-func yqQueryNode(node *yaml.Node, path string) *yaml.Node {
-	return query(node, strings.Split(path, "."))
-}
-
-func yqQueryString(node *yaml.Node, path string) *string {
-	if n := query(node, strings.Split(path, ".")); n == nil {
-		return nil
-	} else {
-		if n.Kind == yaml.ScalarNode {
-			return &n.Value
-		} else {
-			bytes, _ := yaml.Marshal(n)
-			s := string(bytes)
-			return &s
-		}
-	}
-}
-
-func yqQueryStringArray(node *yaml.Node) []string {
-	if node == nil || node.Kind != yaml.SequenceNode {
-		return nil
-	}
-	results := []string{}
-	for _, n := range node.Content {
-		results = append(results, n.Value)
-	}
-	return results
-}
-
-func query(node *yaml.Node, path []string) *yaml.Node {
-	if len(path) == 0 {
-		return node
-	}
-	switch node.Kind {
-	case yaml.DocumentNode:
-		for _, c := range node.Content {
-			if n := query(c, path); n != nil {
-				return n
-			}
-		}
-	case yaml.SequenceNode:
-		index, err := strconv.Atoi(path[0])
-		if err != nil {
-			return nil
-		}
-		return query(node.Content[index], path[1:])
-	case yaml.MappingNode:
-		for i := 0; i < len(node.Content); i += 2 {
-			if node.Content[i].Value == path[0] {
-				return query(node.Content[i+1], path[1:])
-			}
-		}
-	case yaml.ScalarNode:
-		return node
-	case yaml.AliasNode:
-		return nil
-	default:
-		return nil
-	}
-	return nil
-}
-
-func yqDescribe(node *yaml.Node) string {
-	bytes, err := yaml.Marshal(node)
-	if err != nil {
-		return err.Error()
-	}
-	return string(bytes)
 }
 
 func markdownify(text string) string {

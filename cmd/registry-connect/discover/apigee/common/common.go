@@ -18,7 +18,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/apigee/registry/rpc"
+	"github.com/apigee/registry/pkg/application/apihub"
 	"google.golang.org/api/apigee/v1"
 	"google.golang.org/protobuf/encoding/protojson"
 	"gopkg.in/yaml.v3"
@@ -73,7 +73,7 @@ func Label(s string) string {
 	return strings.ToLower(s)
 }
 
-func ArtifactNode(m *rpc.ReferenceList) (*yaml.Node, error) {
+func ArtifactNode(m *apihub.ReferenceList) (*yaml.Node, error) {
 	var node *yaml.Node
 	// Marshal the artifact content as JSON using the protobuf marshaller.
 	s, err := protojson.MarshalOptions{

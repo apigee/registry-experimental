@@ -21,9 +21,9 @@ import (
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/common"
 	"github.com/apigee/registry/cmd/registry/patch"
+	"github.com/apigee/registry/pkg/application/apihub"
+	"github.com/apigee/registry/pkg/encoding"
 	"github.com/apigee/registry/pkg/log"
-	"github.com/apigee/registry/pkg/models"
-	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -49,19 +49,19 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 		return err
 	}
 
-	apis := []*models.Api{}
-	apisByName := map[string]*models.Api{}
+	apis := []*encoding.Api{}
+	apisByName := map[string]*encoding.Api{}
 	for _, p := range proxies {
 		proxy, err := client.Proxy(ctx, p.Name)
 		if err != nil {
 			return err
 		}
 
-		api := &models.Api{
-			Header: models.Header{
+		api := &encoding.Api{
+			Header: encoding.Header{
 				ApiVersion: patch.RegistryV1,
 				Kind:       "API",
-				Metadata: models.Metadata{
+				Metadata: encoding.Metadata{
 					Name: fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name),
 					Annotations: map[string]string{
 						"apigee-proxy": fmt.Sprintf("%s/apis/%s", client.Org(), proxy.Name),
@@ -72,24 +72,24 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 					},
 				},
 			},
-			Data: models.ApiData{
+			Data: encoding.ApiData{
 				DisplayName: fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name),
 			},
 		}
 
 		for _, r := range proxy.Revision {
-			v := &models.ApiVersion{
-				Header: models.Header{
+			v := &encoding.ApiVersion{
+				Header: encoding.Header{
 					ApiVersion: patch.RegistryV1,
 					Kind:       "Version",
-					Metadata: models.Metadata{
+					Metadata: encoding.Metadata{
 						Name: r,
 						Annotations: map[string]string{
 							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), proxy.Name, r),
 						},
 					},
 				},
-				Data: models.ApiVersionData{
+				Data: encoding.ApiVersionData{
 					DisplayName: r,
 					Description: r,
 				},
@@ -97,8 +97,8 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 			api.Data.ApiVersions = append(api.Data.ApiVersions, v)
 		}
 
-		rl := &rpc.ReferenceList{
-			References: []*rpc.ReferenceList_Reference{{
+		rl := &apihub.ReferenceList{
+			References: []*apihub.ReferenceList_Reference{{
 				Id:          proxy.Name,
 				DisplayName: proxy.Name + " (Apigee)",
 				Uri:         client.ProxyURL(ctx, proxy),
@@ -109,11 +109,11 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 			return err
 		}
 
-		a := &models.Artifact{
-			Header: models.Header{
+		a := &encoding.Artifact{
+			Header: encoding.Header{
 				ApiVersion: patch.RegistryV1,
 				Kind:       "ReferenceList",
-				Metadata: models.Metadata{
+				Metadata: encoding.Metadata{
 					Name: "apihub-related",
 				},
 			},
@@ -132,7 +132,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 
 	items := &struct {
 		ApiVersion string
-		Items      []*models.Api
+		Items      []*encoding.Api
 	}{
 		ApiVersion: patch.RegistryV1,
 		Items:      apis,
@@ -140,7 +140,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 	return yaml.NewEncoder(os.Stdout).Encode(items)
 }
 
-func addDeployments(ctx context.Context, client common.ApigeeClient, apisByName map[string]*models.Api) error {
+func addDeployments(ctx context.Context, client common.ApigeeClient, apisByName map[string]*encoding.Api) error {
 	if len(apisByName) == 0 {
 		return nil
 	}
@@ -169,11 +169,11 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apisByName 
 			}
 
 			envgroup, _ := envMap.Envgroup(hostname)
-			deployment := &models.ApiDeployment{
-				Header: models.Header{
+			deployment := &encoding.ApiDeployment{
+				Header: encoding.Header{
 					ApiVersion: patch.RegistryV1,
 					Kind:       "Deployment",
-					Metadata: models.Metadata{
+					Metadata: encoding.Metadata{
 						Name: common.Label(hostname),
 						Annotations: map[string]string{
 							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
@@ -182,7 +182,7 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apisByName 
 						},
 					},
 				},
-				Data: models.ApiDeploymentData{
+				Data: encoding.ApiDeploymentData{
 					DisplayName: fmt.Sprintf("%s (%s)", dep.Environment, hostname),
 					// TODO: should use proxy base path instead of name
 					EndpointURI: fmt.Sprintf("https://%s/%s", hostname, dep.ApiProxy),

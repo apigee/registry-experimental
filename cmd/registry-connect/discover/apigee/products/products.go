@@ -21,9 +21,9 @@ import (
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/common"
 	"github.com/apigee/registry/cmd/registry/patch"
+	"github.com/apigee/registry/pkg/application/apihub"
+	"github.com/apigee/registry/pkg/encoding"
 	"github.com/apigee/registry/pkg/log"
-	"github.com/apigee/registry/pkg/models"
-	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
 	"google.golang.org/api/apigee/v1"
 	"gopkg.in/yaml.v3"
@@ -63,19 +63,19 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 		proxyByName[p.Name] = p
 	}
 
-	apis := []*models.Api{}
-	apisByProxy := map[string][]*models.Api{}
+	apis := []*encoding.Api{}
+	apisByProxy := map[string][]*encoding.Api{}
 	for _, p := range products {
 		product, err := client.Product(ctx, p.Name)
 		if err != nil {
 			return err
 		}
 
-		api := &models.Api{
-			Header: models.Header{
+		api := &encoding.Api{
+			Header: encoding.Header{
 				ApiVersion: patch.RegistryV1,
 				Kind:       "API",
-				Metadata: models.Metadata{
+				Metadata: encoding.Metadata{
 					Name: common.Label(product.Name),
 					Annotations: map[string]string{
 						"apigee-product": fmt.Sprintf("organizations/%s/apiproducts/%s", client.Org(), product.Name),
@@ -87,7 +87,7 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 					},
 				},
 			},
-			Data: models.ApiData{
+			Data: encoding.ApiData{
 				DisplayName: product.Name,
 				Description: fmt.Sprintf("%s API Product for internal/admin users.", product.Name),
 			},
@@ -96,17 +96,17 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 
 		proxies := boundProxies(product)
 		if len(proxies) > 0 {
-			related := &rpc.ReferenceList{}
-			dependencies := &rpc.ReferenceList{}
+			related := &apihub.ReferenceList{}
+			dependencies := &apihub.ReferenceList{}
 			for _, p := range proxies {
 				apisByProxy[p] = append(apisByProxy[p], api)
 
-				related.References = append(related.References, &rpc.ReferenceList_Reference{
+				related.References = append(related.References, &apihub.ReferenceList_Reference{
 					Id:       fmt.Sprintf("%s-%s-proxy", client.Org(), p),
 					Resource: fmt.Sprintf("projects/%s/locations/global/apis/%s-%s-proxy", client.Org(), client.Org(), p),
 				})
 
-				dependencies.References = append(dependencies.References, &rpc.ReferenceList_Reference{
+				dependencies.References = append(dependencies.References, &apihub.ReferenceList_Reference{
 					Id:          p,
 					DisplayName: p + " (Apigee)",
 					Uri:         client.ProxyURL(ctx, proxyByName[p]),
@@ -116,11 +116,11 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 			if err != nil {
 				return err
 			}
-			a := &models.Artifact{
-				Header: models.Header{
+			a := &encoding.Artifact{
+				Header: encoding.Header{
 					ApiVersion: patch.RegistryV1,
 					Kind:       "ReferenceList",
-					Metadata: models.Metadata{
+					Metadata: encoding.Metadata{
 						Name: "apihub-related",
 					},
 				},
@@ -132,11 +132,11 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 			if err != nil {
 				return err
 			}
-			a = &models.Artifact{
-				Header: models.Header{
+			a = &encoding.Artifact{
+				Header: encoding.Header{
 					ApiVersion: patch.RegistryV1,
 					Kind:       "ReferenceList",
-					Metadata: models.Metadata{
+					Metadata: encoding.Metadata{
 						Name: "apihub-dependencies",
 					},
 				},
@@ -153,7 +153,7 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 
 	items := &struct {
 		ApiVersion string
-		Items      []*models.Api
+		Items      []*encoding.Api
 	}{
 		ApiVersion: patch.RegistryV1,
 		Items:      apis,
@@ -163,7 +163,7 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 }
 
 // product -> proxies -> deployments
-func addDeployments(ctx context.Context, client common.ApigeeClient, apisByProxy map[string][]*models.Api) error {
+func addDeployments(ctx context.Context, client common.ApigeeClient, apisByProxy map[string][]*encoding.Api) error {
 	if len(apisByProxy) == 0 {
 		return nil
 	}
@@ -202,11 +202,11 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apisByProxy
 
 			for _, api := range apis {
 				envgroup, _ := envMap.Envgroup(hostname)
-				deployment := &models.ApiDeployment{
-					Header: models.Header{
+				deployment := &encoding.ApiDeployment{
+					Header: encoding.Header{
 						ApiVersion: patch.RegistryV1,
 						Kind:       "Deployment",
-						Metadata: models.Metadata{
+						Metadata: encoding.Metadata{
 							Name: common.Label(hostname),
 							Annotations: map[string]string{
 								"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
@@ -215,7 +215,7 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apisByProxy
 							},
 						},
 					},
-					Data: models.ApiDeploymentData{
+					Data: encoding.ApiDeploymentData{
 						DisplayName: fmt.Sprintf("%s (%s)", dep.Environment, hostname),
 						// TODO: should use proxy base path instead of name
 						EndpointURI: fmt.Sprintf("https://%s/%s", hostname, dep.ApiProxy),

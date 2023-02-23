@@ -87,7 +87,7 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 				},
 			},
 			Data: encoding.ApiData{
-				DisplayName: product.Name,
+				DisplayName: fmt.Sprintf("%s-%s-product", client.Org(), product.Name),
 				Description: fmt.Sprintf("%s API Product for internal/admin users.", product.Name),
 			},
 		}

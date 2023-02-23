@@ -17,7 +17,7 @@ The output from this command can be piped to `registry apply -` like so:
     registry-connect discover apigee products ORGANIZATION | registry apply -
 
 Alternatively, the output may be sent to a file for inspection or processing,
-at which point `registry apply -f FILE` can be run against it to apply it 
+at which point `registry apply -f FILE` can be run against it to apply it
 to the registry. Example:
 
     registry-connect discover apigee products ORGANIZATION > apigee-apis.yaml

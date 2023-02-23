@@ -103,6 +103,7 @@ type EdgeClient struct {
 	Proxies      ProxiesService
 	Deployments  DeploymentsService
 	Environments EnvironmentsService
+	Products     ProductsService
 
 	IsGCPManaged bool
 
@@ -271,6 +272,7 @@ func NewEdgeClient(o *EdgeClientOptions) (*EdgeClient, error) {
 	c.Proxies = &ProxiesServiceOp{client: c}
 	c.Environments = &EnvironmentsServiceOp{client: c}
 	c.Deployments = &DeploymentsServiceOp{client: c}
+	c.Products = &ProductsServiceOp{client: c}
 
 	if !o.Auth.SkipAuth {
 		var e error

@@ -27,7 +27,7 @@ type EdgeClient struct {
 }
 
 func (c *EdgeClient) Org() string {
-	return "organizations/" + c.org
+	return c.org
 }
 
 func (c *EdgeClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProxy, error) {
@@ -58,7 +58,23 @@ func (c *EdgeClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1
 }
 
 func (c *EdgeClient) Proxy(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProxy, error) {
-	return nil, fmt.Errorf("Not implemented")
+	client, err := edge.ConfiguredClient(c.org)
+	if err != nil {
+		return nil, err
+	}
+
+	p, _, err := client.Proxies.Get(name)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: more?
+	proxy := &apigee.GoogleCloudApigeeV1ApiProxy{
+		Name:             p.Name,
+		LatestRevisionId: p.Revisions[len(p.Revisions)-1].String(),
+	}
+
+	return proxy, nil
 }
 
 func (c *EdgeClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error) {
@@ -134,9 +150,42 @@ func (c *EdgeClient) ProxyURL(ctx context.Context, proxy *apigee.GoogleCloudApig
 }
 
 func (c *EdgeClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProduct, error) {
-	return nil, fmt.Errorf("Not implemented")
+	client, err := edge.ConfiguredClient(c.org)
+	if err != nil {
+		return nil, err
+	}
+
+	names, _, err := client.Products.ListNames()
+	if err != nil {
+		return nil, err
+	}
+
+	var products []*apigee.GoogleCloudApigeeV1ApiProduct
+	for _, n := range names {
+		products = append(products, &apigee.GoogleCloudApigeeV1ApiProduct{
+			Name: n,
+		})
+	}
+
+	return products, nil
 }
 
 func (c *EdgeClient) Product(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProduct, error) {
-	return nil, fmt.Errorf("Not implemented")
+	client, err := edge.ConfiguredClient(c.org)
+	if err != nil {
+		return nil, err
+	}
+
+	p, _, err := client.Products.Get(name)
+	if err != nil {
+		return nil, err
+	}
+
+	product := &apigee.GoogleCloudApigeeV1ApiProduct{
+		Name:           p.Name,
+		Proxies:        p.Proxies,
+		OperationGroup: &apigee.GoogleCloudApigeeV1OperationGroup{},
+	}
+
+	return product, nil
 }

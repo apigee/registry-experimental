@@ -94,53 +94,56 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 		}
 		apis = append(apis, api)
 
-		related := &rpc.ReferenceList{}
-		dependencies := &rpc.ReferenceList{}
-		for _, p := range boundProxies(product) {
-			apisByProxy[p] = append(apisByProxy[p], api)
+		proxies := boundProxies(product)
+		if len(proxies) > 0 {
+			related := &rpc.ReferenceList{}
+			dependencies := &rpc.ReferenceList{}
+			for _, p := range proxies {
+				apisByProxy[p] = append(apisByProxy[p], api)
 
-			related.References = append(related.References, &rpc.ReferenceList_Reference{
-				Id:       fmt.Sprintf("%s-%s-proxy", client.Org(), p),
-				Resource: fmt.Sprintf("projects/%s/locations/global/apis/%s-%s-proxy", client.Org(), client.Org(), p),
-			})
+				related.References = append(related.References, &rpc.ReferenceList_Reference{
+					Id:       fmt.Sprintf("%s-%s-proxy", client.Org(), p),
+					Resource: fmt.Sprintf("projects/%s/locations/global/apis/%s-%s-proxy", client.Org(), client.Org(), p),
+				})
 
-			dependencies.References = append(dependencies.References, &rpc.ReferenceList_Reference{
-				Id:          p,
-				DisplayName: p + " (Apigee)",
-				Uri:         client.ProxyURL(ctx, proxyByName[p]),
-			})
-		}
-		node, err := common.ArtifactNode(related)
-		if err != nil {
-			return err
-		}
-		a := &models.Artifact{
-			Header: models.Header{
-				ApiVersion: patch.RegistryV1,
-				Kind:       "ReferenceList",
-				Metadata: models.Metadata{
-					Name: "apihub-related",
+				dependencies.References = append(dependencies.References, &rpc.ReferenceList_Reference{
+					Id:          p,
+					DisplayName: p + " (Apigee)",
+					Uri:         client.ProxyURL(ctx, proxyByName[p]),
+				})
+			}
+			node, err := common.ArtifactNode(related)
+			if err != nil {
+				return err
+			}
+			a := &models.Artifact{
+				Header: models.Header{
+					ApiVersion: patch.RegistryV1,
+					Kind:       "ReferenceList",
+					Metadata: models.Metadata{
+						Name: "apihub-related",
+					},
 				},
-			},
-			Data: *node,
-		}
-		api.Data.Artifacts = append(api.Data.Artifacts, a)
+				Data: *node,
+			}
+			api.Data.Artifacts = append(api.Data.Artifacts, a)
 
-		node, err = common.ArtifactNode(dependencies)
-		if err != nil {
-			return err
-		}
-		a = &models.Artifact{
-			Header: models.Header{
-				ApiVersion: patch.RegistryV1,
-				Kind:       "ReferenceList",
-				Metadata: models.Metadata{
-					Name: "apihub-dependencies",
+			node, err = common.ArtifactNode(dependencies)
+			if err != nil {
+				return err
+			}
+			a = &models.Artifact{
+				Header: models.Header{
+					ApiVersion: patch.RegistryV1,
+					Kind:       "ReferenceList",
+					Metadata: models.Metadata{
+						Name: "apihub-dependencies",
+					},
 				},
-			},
-			Data: *node,
+				Data: *node,
+			}
+			api.Data.Artifacts = append(api.Data.Artifacts, a)
 		}
-		api.Data.Artifacts = append(api.Data.Artifacts, a)
 	}
 
 	err = addDeployments(ctx, client, apisByProxy)
@@ -193,7 +196,7 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apisByProxy
 		for _, hostname := range hostnames {
 			apis, ok := apisByProxy[dep.ApiProxy]
 			if !ok || len(apis) == 0 {
-				log.Warnf(ctx, "unknown product: %q for deployment", dep.ApiProxy)
+				log.Warnf(ctx, "unknown product: %q for deployment: %#v", dep.ApiProxy, dep)
 				continue
 			}
 

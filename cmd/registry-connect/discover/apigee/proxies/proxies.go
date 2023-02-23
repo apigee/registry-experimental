@@ -20,7 +20,6 @@ import (
 	"os"
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/common"
-	"github.com/apigee/registry/cmd/registry/patch"
 	"github.com/apigee/registry/pkg/application/apihub"
 	"github.com/apigee/registry/pkg/encoding"
 	"github.com/apigee/registry/pkg/log"
@@ -49,7 +48,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 		return err
 	}
 
-	apis := []*encoding.Api{}
+	var apis []interface{}
 	apisByName := map[string]*encoding.Api{}
 	for _, p := range proxies {
 		proxy, err := client.Proxy(ctx, p.Name)
@@ -59,7 +58,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 
 		api := &encoding.Api{
 			Header: encoding.Header{
-				ApiVersion: patch.RegistryV1,
+				ApiVersion: encoding.RegistryV1,
 				Kind:       "API",
 				Metadata: encoding.Metadata{
 					Name: fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name),
@@ -80,7 +79,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 		for _, r := range proxy.Revision {
 			v := &encoding.ApiVersion{
 				Header: encoding.Header{
-					ApiVersion: patch.RegistryV1,
+					ApiVersion: encoding.RegistryV1,
 					Kind:       "Version",
 					Metadata: encoding.Metadata{
 						Name: r,
@@ -111,7 +110,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 
 		a := &encoding.Artifact{
 			Header: encoding.Header{
-				ApiVersion: patch.RegistryV1,
+				ApiVersion: encoding.RegistryV1,
 				Kind:       "ReferenceList",
 				Metadata: encoding.Metadata{
 					Name: "apihub-related",
@@ -130,12 +129,9 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 		return err
 	}
 
-	items := &struct {
-		ApiVersion string
-		Items      []*encoding.Api
-	}{
-		ApiVersion: patch.RegistryV1,
-		Items:      apis,
+	items := &encoding.List{
+		Header: encoding.Header{ApiVersion: encoding.RegistryV1},
+		Items:  apis,
 	}
 	return yaml.NewEncoder(os.Stdout).Encode(items)
 }
@@ -171,7 +167,7 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apisByName 
 			envgroup, _ := envMap.Envgroup(hostname)
 			deployment := &encoding.ApiDeployment{
 				Header: encoding.Header{
-					ApiVersion: patch.RegistryV1,
+					ApiVersion: encoding.RegistryV1,
 					Kind:       "Deployment",
 					Metadata: encoding.Metadata{
 						Name: common.Label(hostname),

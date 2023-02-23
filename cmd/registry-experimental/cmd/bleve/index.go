@@ -21,9 +21,9 @@ import (
 
 	"github.com/apigee/registry/cmd/registry/compress"
 	"github.com/apigee/registry/cmd/registry/tasks"
-	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/log"
+	"github.com/apigee/registry/pkg/mime"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
@@ -102,11 +102,11 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	var message interface{}
 	switch {
 	case spec.GetMimeType() == "text/plain" ||
-		types.IsOpenAPIv2(spec.GetMimeType()) ||
-		types.IsOpenAPIv3(spec.GetMimeType()) ||
-		types.IsDiscovery(spec.GetMimeType()):
+		mime.IsOpenAPIv2(spec.GetMimeType()) ||
+		mime.IsOpenAPIv3(spec.GetMimeType()) ||
+		mime.IsDiscovery(spec.GetMimeType()):
 		message = map[string]string{spec.GetFilename(): string(data)}
-	case types.IsProto(spec.GetMimeType()):
+	case mime.IsProto(spec.GetMimeType()):
 		m, err := compress.UnzipArchiveToMap(data)
 		if err != nil {
 			return err

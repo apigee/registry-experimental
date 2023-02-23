@@ -63,7 +63,7 @@ class StyleGuideGenerator(object):
                             "linter": "api-linter",
                             "linter_rulename": "::".join([e.strip() for e in parsed_yaml["rule"]["name"]]),
                             "severity": "ERROR",
-                            "doc_uri" : "linter.aip.dev"+parsed_yaml["permalink"].strip()
+                            "doc_uri" : "https://linter.aip.dev"+parsed_yaml["permalink"].strip()
                         }
                     )
                 except Exception as e:

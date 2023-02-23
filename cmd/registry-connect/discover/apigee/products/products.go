@@ -112,7 +112,7 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 					Uri:         client.ProxyURL(ctx, proxyByName[p]),
 				})
 			}
-			node, err := common.ArtifactNode(related)
+			node, err := encoding.NodeForMessage(related)
 			if err != nil {
 				return err
 			}
@@ -128,7 +128,7 @@ func exportProducts(ctx context.Context, client common.ApigeeClient) error {
 			}
 			api.Data.Artifacts = append(api.Data.Artifacts, a)
 
-			node, err = common.ArtifactNode(dependencies)
+			node, err = encoding.NodeForMessage(dependencies)
 			if err != nil {
 				return err
 			}

@@ -104,7 +104,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 				Uri:         client.ProxyURL(ctx, proxy),
 			}},
 		}
-		node, err := common.ArtifactNode(rl)
+		node, err := encoding.NodeForMessage(rl)
 		if err != nil {
 			return err
 		}

@@ -25,9 +25,9 @@ import (
 
 	"github.com/apigee/registry/cmd/registry/compress"
 	"github.com/apigee/registry/cmd/registry/tasks"
-	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/log"
+	"github.com/apigee/registry/pkg/mime"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
@@ -105,25 +105,25 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	subject := spec.GetName()
 	var typeURL string
 	var document proto.Message
-	if types.IsOpenAPIv2(spec.GetMimeType()) {
+	if mime.IsOpenAPIv2(spec.GetMimeType()) {
 		typeURL = "gnostic.openapiv2.Document"
 		document, err = oas2.ParseDocument(data)
 		if err != nil {
 			return err
 		}
-	} else if types.IsOpenAPIv3(spec.GetMimeType()) {
+	} else if mime.IsOpenAPIv3(spec.GetMimeType()) {
 		typeURL = "gnostic.openapiv3.Document"
 		document, err = oas3.ParseDocument(data)
 		if err != nil {
 			return err
 		}
-	} else if types.IsDiscovery(spec.GetMimeType()) {
+	} else if mime.IsDiscovery(spec.GetMimeType()) {
 		typeURL = "gnostic.discoveryv1.Document"
 		document, err = discovery.ParseDocument(data)
 		if err != nil {
 			return err
 		}
-	} else if types.IsProto(spec.GetMimeType()) && types.IsZipArchive(spec.GetMimeType()) {
+	} else if mime.IsProto(spec.GetMimeType()) && mime.IsZipArchive(spec.GetMimeType()) {
 		typeURL = "google.protobuf.FileDescriptorSet"
 		document, err = descriptorFromZippedProtos(ctx, spec.Name, data)
 		if err != nil {
@@ -140,7 +140,7 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	// this will probably require some representation of compression type in the typeURL
 	artifact := &rpc.Artifact{
 		Name:     subject + "/artifacts/" + relation,
-		MimeType: types.MimeTypeForMessageType(typeURL),
+		MimeType: mime.MimeTypeForMessageType(typeURL),
 		Contents: messageData,
 	}
 	return visitor.SetArtifact(ctx, task.client, artifact)

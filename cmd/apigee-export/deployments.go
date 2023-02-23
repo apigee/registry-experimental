@@ -20,8 +20,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/apigee/registry/pkg/encoding"
 	"github.com/apigee/registry/pkg/log"
-	"github.com/apigee/registry/pkg/models"
 	"github.com/spf13/cobra"
 	"google.golang.org/api/apigee/v1"
 	"gopkg.in/yaml.v2"
@@ -54,11 +54,11 @@ func exportDeployments(cmd *cobra.Command, args []string) {
 	}
 
 	for _, dep := range deps {
-		api := &models.Api{
-			Header: models.Header{
+		api := &encoding.Api{
+			Header: encoding.Header{
 				ApiVersion: "apigeeregistry/v1",
 				Kind:       "API",
-				Metadata: models.Metadata{
+				Metadata: encoding.Metadata{
 					Name: clean(dep.ApiProxy),
 					Annotations: map[string]string{
 						"apigee-organization": org,
@@ -66,9 +66,9 @@ func exportDeployments(cmd *cobra.Command, args []string) {
 					},
 				},
 			},
-			Data: models.ApiData{
+			Data: encoding.ApiData{
 				DisplayName:    dep.ApiProxy,
-				ApiDeployments: make([]*models.ApiDeployment, 0, len(deps)),
+				ApiDeployments: make([]*encoding.ApiDeployment, 0, len(deps)),
 			},
 		}
 
@@ -85,11 +85,11 @@ func exportDeployments(cmd *cobra.Command, args []string) {
 				continue
 			}
 
-			api.Data.ApiDeployments = append(api.Data.ApiDeployments, &models.ApiDeployment{
-				Header: models.Header{
+			api.Data.ApiDeployments = append(api.Data.ApiDeployments, &encoding.ApiDeployment{
+				Header: encoding.Header{
 					ApiVersion: "apigeeregistry/v1",
 					Kind:       "Deployment",
-					Metadata: models.Metadata{
+					Metadata: encoding.Metadata{
 						Name: clean(hostname),
 						Annotations: map[string]string{
 							"apigee-organization":   org,
@@ -99,7 +99,7 @@ func exportDeployments(cmd *cobra.Command, args []string) {
 						},
 					},
 				},
-				Data: models.ApiDeploymentData{
+				Data: encoding.ApiDeploymentData{
 					DisplayName: dep.Environment,
 					EndpointURI: hostname,
 				},

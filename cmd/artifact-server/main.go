@@ -21,8 +21,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/apigee/registry/cmd/registry/types"
+	"github.com/apigee/registry/pkg/application/apihub"
+	"github.com/apigee/registry/pkg/application/controller"
+	"github.com/apigee/registry/pkg/application/scoring"
+	"github.com/apigee/registry/pkg/application/style"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/mime"
 	"github.com/apigee/registry/rpc"
 	"golang.org/x/exp/slices"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -42,20 +46,20 @@ var messageTypes map[string]proto.Message = map[string]proto.Message{
 	"gnostic.metrics.Vocabulary":                                 &metrics.Vocabulary{},
 	"gnostic.openapiv2.Document":                                 &oas2.Document{},
 	"gnostic.openapiv3.Document":                                 &oas3.Document{},
-	"google.cloud.apigeeregistry.v1.style.Lint":                  &rpc.Lint{},
-	"google.cloud.apigeeregistry.v1.style.LintStats":             &rpc.LintStats{},
-	"google.cloud.apigeeregistry.v1.apihub.DisplaySettings":      &rpc.DisplaySettings{},
-	"google.cloud.apigeeregistry.v1.apihub.Lifecycle":            &rpc.Lifecycle{},
-	"google.cloud.apigeeregistry.v1.apihub.ReferenceList":        &rpc.ReferenceList{},
-	"google.cloud.apigeeregistry.v1.apihub.TaxonomyList":         &rpc.TaxonomyList{},
-	"google.cloud.apigeeregistry.v1.controller.Manifest":         &rpc.Manifest{},
-	"google.cloud.apigeeregistry.v1.controller.Receipt":          &rpc.Receipt{},
-	"google.cloud.apigeeregistry.v1.scoring.Score":               &rpc.Score{},
-	"google.cloud.apigeeregistry.v1.scoring.ScoreCard":           &rpc.ScoreCard{},
-	"google.cloud.apigeeregistry.v1.scoring.ScoreCardDefinition": &rpc.ScoreCardDefinition{},
-	"google.cloud.apigeeregistry.v1.scoring.ScoreDefinition":     &rpc.ScoreDefinition{},
-	"google.cloud.apigeeregistry.v1.style.ConformanceReport":     &rpc.ConformanceReport{},
-	"google.cloud.apigeeregistry.v1.style.StyleGuide":            &rpc.StyleGuide{},
+	"google.cloud.apigeeregistry.v1.style.Lint":                  &style.Lint{},
+	"google.cloud.apigeeregistry.v1.style.LintStats":             &style.LintStats{},
+	"google.cloud.apigeeregistry.v1.apihub.DisplaySettings":      &apihub.DisplaySettings{},
+	"google.cloud.apigeeregistry.v1.apihub.Lifecycle":            &apihub.Lifecycle{},
+	"google.cloud.apigeeregistry.v1.apihub.ReferenceList":        &apihub.ReferenceList{},
+	"google.cloud.apigeeregistry.v1.apihub.TaxonomyList":         &apihub.TaxonomyList{},
+	"google.cloud.apigeeregistry.v1.controller.Manifest":         &controller.Manifest{},
+	"google.cloud.apigeeregistry.v1.controller.Receipt":          &controller.Receipt{},
+	"google.cloud.apigeeregistry.v1.scoring.Score":               &scoring.Score{},
+	"google.cloud.apigeeregistry.v1.scoring.ScoreCard":           &scoring.ScoreCard{},
+	"google.cloud.apigeeregistry.v1.scoring.ScoreCardDefinition": &scoring.ScoreCardDefinition{},
+	"google.cloud.apigeeregistry.v1.scoring.ScoreDefinition":     &scoring.ScoreDefinition{},
+	"google.cloud.apigeeregistry.v1.style.ConformanceReport":     &style.ConformanceReport{},
+	"google.cloud.apigeeregistry.v1.style.StyleGuide":            &style.StyleGuide{},
 	"google.protobuf.FileDescriptorSet":                          &descriptorpb.FileDescriptorSet{},
 }
 
@@ -76,7 +80,7 @@ func handleRequest(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "%s\n", contents.GetData())
 		return
 	}
-	messageType, err := types.MessageTypeForMimeType(contents.GetContentType())
+	messageType, err := mime.MessageTypeForMimeType(contents.GetContentType())
 	if err != nil {
 		writeError(w, err, http.StatusInternalServerError)
 		return

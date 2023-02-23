@@ -26,8 +26,8 @@ import (
 	"strings"
 
 	"github.com/apigee/registry/cmd/registry/compress"
-	"github.com/apigee/registry/cmd/registry/types"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/mime"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
@@ -87,13 +87,13 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			return err
 		}
 		bytes := spec.Contents
-		if types.IsGZipCompressed(spec.MimeType) {
+		if mime.IsGZipCompressed(spec.MimeType) {
 			bytes, err = compress.GUnzippedBytes(bytes)
 			if err != nil {
 				return err
 			}
 		}
-		if types.IsOpenAPIv2(spec.MimeType) || types.IsOpenAPIv3(spec.MimeType) {
+		if mime.IsOpenAPIv2(spec.MimeType) || mime.IsOpenAPIv3(spec.MimeType) {
 			var node yaml.Node
 			if err := yaml.Unmarshal(bytes, &node); err != nil {
 				return err
@@ -174,14 +174,14 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			// Set the spec mimetype (this should not bump the revision!).
 			if openapi != nil || swagger != nil {
 				var compression string
-				if types.IsGZipCompressed(spec.MimeType) {
+				if mime.IsGZipCompressed(spec.MimeType) {
 					compression = "+gzip"
 				}
 				var mimeType string
 				if openapi != nil {
-					mimeType = types.OpenAPIMimeType(compression, *openapi)
+					mimeType = mime.OpenAPIMimeType(compression, *openapi)
 				} else if swagger != nil {
-					mimeType = types.OpenAPIMimeType(compression, *swagger)
+					mimeType = mime.OpenAPIMimeType(compression, *swagger)
 				}
 				specName, _ := names.ParseSpec(spec.Name)
 				_, err := v.registryClient.UpdateApiSpec(v.ctx,
@@ -197,7 +197,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 				}
 			}
 		}
-		if types.IsDiscovery(spec.MimeType) {
+		if mime.IsDiscovery(spec.MimeType) {
 			var node yaml.Node
 			if err := yaml.Unmarshal(bytes, &node); err != nil {
 				return err
@@ -261,7 +261,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			}
 
 		}
-		if types.IsProto(spec.MimeType) {
+		if mime.IsProto(spec.MimeType) {
 			// create a tmp directory
 			root, err := os.MkdirTemp("", "extract-protos-")
 			if err != nil {

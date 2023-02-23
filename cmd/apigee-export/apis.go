@@ -20,8 +20,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/apigee/registry/pkg/encoding"
 	"github.com/apigee/registry/pkg/log"
-	"github.com/apigee/registry/pkg/models"
 	"github.com/spf13/cobra"
 	"google.golang.org/api/apigee/v1"
 	"gopkg.in/yaml.v2"
@@ -49,11 +49,11 @@ func exportApis(cmd *cobra.Command, args []string) {
 	}
 
 	for _, proxy := range apis {
-		api := &models.Api{
-			Header: models.Header{
+		api := &encoding.Api{
+			Header: encoding.Header{
 				ApiVersion: "apigeeregistry/v1",
 				Kind:       "API",
-				Metadata: models.Metadata{
+				Metadata: encoding.Metadata{
 					Name: clean(proxy.Name),
 					Annotations: map[string]string{
 						"apigee-organization": org,
@@ -61,7 +61,7 @@ func exportApis(cmd *cobra.Command, args []string) {
 					},
 				},
 			},
-			Data: models.ApiData{
+			Data: encoding.ApiData{
 				DisplayName: proxy.Name,
 			},
 		}
@@ -104,7 +104,7 @@ func apis(ctx context.Context, org string) ([]*apigee.GoogleCloudApigeeV1ApiProx
 	return resp.Proxies, nil
 }
 
-func annotateAPI(api *models.Api) {
+func annotateAPI(api *encoding.Api) {
 	if api.Header.Metadata.Labels == nil {
 		api.Header.Metadata.Labels = make(map[string]string)
 	}
@@ -112,25 +112,25 @@ func annotateAPI(api *models.Api) {
 	api.Header.Metadata.Labels["apihub-style"] = "apihub-openapi"
 	api.Header.Metadata.Labels["apihub-target-users"] = "team_internal_partner_public"
 	api.Header.Metadata.Labels["apihub-team"] = "demo-customer"
-	api.Data.ApiVersions = []*models.ApiVersion{{
-		Header: models.Header{
+	api.Data.ApiVersions = []*encoding.ApiVersion{{
+		Header: encoding.Header{
 			ApiVersion: "apigeeregistry/v1",
 			Kind:       "Version",
-			Metadata: models.Metadata{
+			Metadata: encoding.Metadata{
 				Name: "v1",
 				Annotations: map[string]string{
 					"apihub-end-of-life-type": "apihub-unknown",
 				},
 			},
 		},
-		Data: models.ApiVersionData{
+		Data: encoding.ApiVersionData{
 			DisplayName: "v1",
 			State:       "production",
-			ApiSpecs: []*models.ApiSpec{{
-				Header: models.Header{
+			ApiSpecs: []*encoding.ApiSpec{{
+				Header: encoding.Header{
 					ApiVersion: "apigeeregistry/v1",
 					Kind:       "Spec",
-					Metadata: models.Metadata{
+					Metadata: encoding.Metadata{
 						Name: "unknown",
 					},
 				},

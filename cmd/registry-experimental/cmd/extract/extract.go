@@ -21,10 +21,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 
+	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/apigee/registry/cmd/registry/compress"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/mime"
@@ -438,18 +438,11 @@ func yqDescribe(node *yaml.Node) string {
 
 func markdownify(text string) string {
 	log.Printf("checking %s", text)
-	re := regexp.MustCompile(`<a href="([^"]*)">([^<]*)</a>`)
-	for {
-		m := re.FindStringSubmatch(text)
-		if m == nil {
-			break
-		}
-		log.Printf("%+v", m)
-		markdownLink := "[" + m[2] + "](" + m[1] + ")"
-		log.Printf("replacing %s", m[0])
-		log.Printf("with %s", markdownLink)
-		text = strings.Replace(text, m[0], markdownLink, 1)
+	converter := md.NewConverter("", true, nil)
+	markdown, err := converter.ConvertString(text)
+	if err != nil {
+		return text
 	}
-	log.Printf("returning %s", text)
-	return text
+	log.Printf("returning %s", markdown)
+	return markdown
 }

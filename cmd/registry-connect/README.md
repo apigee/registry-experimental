@@ -1,36 +1,40 @@
-# apigee-export
+# registry-connect
 
-`apigee-export` is a command-line tool for extracting proxy data from an
+`registry-connect` is a command-line tool for extracting proxy data from an
 Apigee X instance to be applied onto an API Registry.
 
 ## Usage
 
-`apigee-export apis ORGANIZATION [DIRECTORY]`
-`apigee-export deployments ORGANIZATION [DIRECTORY]`
+Running one of these commands retrieves either products or proxies, respectively,
+from an Apigee X or SaaS runtime instance and formats it as API Registry-compatible
+YAML:
 
-Running this command exports Registry-compatible YAML files from an Apigee X
-instance into the specified DIRECTORY. (If no DIRECTORY is specified, it will
-only print to the console.)
+    registry-connect discover apigee products ORGANIZATION
+    registry-connect discover apigee proxies ORGANIZATION
 
-Once `apigee-export` has been successfully run, the entire exported directory or
-individual files can be imported into an API Registry instance by running:
+The output from this command can be piped to `registry apply -` like so:
 
-`registry apply -f DIRECTORY|FILE`
+    registry-connect discover apigee products ORGANIZATION | registry apply -
+
+Alternatively, the output may be sent to a file for inspection or processing,
+at which point `registry apply -f FILE` can be run against it to apply it 
+to the registry. Example:
+
+    registry-connect discover apigee products ORGANIZATION > apigee-apis.yaml
+    registry apply -f apigee-apis.yaml
 
 See `registry apply --help` for more information.
 
 ## Authentication
 
-`apigee-export` uses
+`registry-connect` uses
 [Application Default Credentials](https://cloud.google.com/docs/authentication/application-default-credentials)
 to connect to Apigee X. These are stored in your local environment when you login with `gcloud`:
 
 `gcloud auth application-default login`
 
-**MacOS note:** To run the `apigee-export` tool on MacOS, you may need to
+**MacOS note:** To run the `registry-connect` tool on MacOS, you may need to
 [unquarantine](https://discussions.apple.com/thread/3145071) it by running the
 following on the command line:
 
-```sh
-xattr -d com.apple.quarantine apigee-export
-```
+    xattr -d com.apple.quarantine registry-connect

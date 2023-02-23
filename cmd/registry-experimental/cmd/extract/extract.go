@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -437,12 +436,10 @@ func yqDescribe(node *yaml.Node) string {
 }
 
 func markdownify(text string) string {
-	log.Printf("checking %s", text)
 	converter := md.NewConverter("", true, nil)
 	markdown, err := converter.ConvertString(text)
 	if err != nil {
 		return text
 	}
-	log.Printf("returning %s", markdown)
 	return markdown
 }

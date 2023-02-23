@@ -33,6 +33,18 @@ func TestSummary(t *testing.T) {
 	ctx := context.Background()
 	registryClient, _ := grpctest.SetupRegistry(ctx, t, "summary-test",
 		[]seeder.RegistryResource{
+			&rpc.ApiSpec{
+				Name:     "projects/summary-test/locations/global/apis/a1/versions/v1/specs/s1",
+				MimeType: "text/plain",
+			},
+			&rpc.ApiSpec{
+				Name:     "projects/summary-test/locations/global/apis/a2/versions/v1/specs/s1",
+				MimeType: "text/plain",
+			},
+			&rpc.ApiSpec{
+				Name:     "projects/summary-test/locations/global/apis/a2/versions/v1/specs/s2",
+				MimeType: "application/json",
+			},
 			&rpc.Artifact{
 				Name: "projects/summary-test/locations/global/apis/a1/versions/v1/specs/s1/artifacts/x1",
 			},
@@ -46,30 +58,68 @@ func TestSummary(t *testing.T) {
 				Name: "projects/summary-test/locations/global/apis/a2/deployments/d1/artifacts/x1",
 			},
 		})
-	cmd := Command()
-	cmd.SetArgs([]string{"projects/summary-test"})
-	if err := cmd.Execute(); err != nil {
-		t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
-	}
-	contents, err := registryClient.GetArtifactContents(ctx,
-		&rpc.GetArtifactContentsRequest{Name: "projects/summary-test/locations/global/artifacts/summary"})
-	if err != nil {
-		t.Fatalf("Artifact could not be read %s", err)
-	}
-	var s Summary
-	if err := yaml.Unmarshal(contents.Data, &s); err != nil {
-		t.Fatalf("Artifact could not be parsed %s", err)
-	}
-	if s.ApiCount != 2 {
-		t.Errorf("Incorrect API count, expected 2, got %d", s.ApiCount)
-	}
-	if s.VersionCount != 2 {
-		t.Errorf("Incorrect version count, expected 2, got %d", s.VersionCount)
-	}
-	if s.SpecCount != 3 {
-		t.Errorf("Incorrect spec count, expected 3, got %d", s.SpecCount)
-	}
-	if s.DeploymentCount != 1 {
-		t.Errorf("Incorrect deployment count, expected 1, got %d", s.DeploymentCount)
-	}
+
+	t.Run("project-summary", func(t *testing.T) {
+		cmd := Command()
+		cmd.SetArgs([]string{"projects/summary-test"})
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
+		}
+		contents, err := registryClient.GetArtifactContents(ctx,
+			&rpc.GetArtifactContentsRequest{Name: "projects/summary-test/locations/global/artifacts/summary"})
+		if err != nil {
+			t.Fatalf("Artifact could not be read %s", err)
+		}
+		var s Summary
+		if err := yaml.Unmarshal(contents.Data, &s); err != nil {
+			t.Fatalf("Artifact could not be parsed %s", err)
+		}
+		if s.ApiCount != 2 {
+			t.Errorf("Incorrect API count, expected 2, got %d", s.ApiCount)
+		}
+		if s.VersionCount != 2 {
+			t.Errorf("Incorrect version count, expected 2, got %d", s.VersionCount)
+		}
+		if s.SpecCount != 3 {
+			t.Errorf("Incorrect spec count, expected 3, got %d", s.SpecCount)
+		}
+		if s.DeploymentCount != 1 {
+			t.Errorf("Incorrect deployment count, expected 1, got %d", s.DeploymentCount)
+		}
+		if len(s.MimeTypes) != 2 {
+			t.Errorf("Incorrect mime_type count, expected 2, got %d", len(s.MimeTypes))
+		}
+	})
+
+	t.Run("api-summary", func(t *testing.T) {
+		cmd := Command()
+		cmd.SetArgs([]string{"projects/summary-test/locations/global/apis/a2"})
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
+		}
+		contents, err := registryClient.GetArtifactContents(ctx,
+			&rpc.GetArtifactContentsRequest{Name: "projects/summary-test/locations/global/apis/a2/artifacts/summary"})
+		if err != nil {
+			t.Fatalf("Artifact could not be read %s", err)
+		}
+		var s Summary
+		if err := yaml.Unmarshal(contents.Data, &s); err != nil {
+			t.Fatalf("Artifact could not be parsed %s", err)
+		}
+		if s.ApiCount != 1 {
+			t.Errorf("Incorrect API count, expected 1, got %d", s.ApiCount)
+		}
+		if s.VersionCount != 1 {
+			t.Errorf("Incorrect version count, expected 1, got %d", s.VersionCount)
+		}
+		if s.SpecCount != 2 {
+			t.Errorf("Incorrect spec count, expected 2, got %d", s.SpecCount)
+		}
+		if s.DeploymentCount != 1 {
+			t.Errorf("Incorrect deployment count, expected 1, got %d", s.DeploymentCount)
+		}
+		if len(s.MimeTypes) != 2 {
+			t.Errorf("Incorrect mime_type count, expected 2, got %d", len(s.MimeTypes))
+		}
+	})
 }

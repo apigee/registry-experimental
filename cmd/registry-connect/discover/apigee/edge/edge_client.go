@@ -31,44 +31,7 @@ import (
 	"path"
 
 	"github.com/bgentry/go-netrc/netrc"
-	"github.com/spf13/pflag"
 )
-
-var (
-	Username   string
-	Password   string
-	MFAToken   string
-	Debug      bool
-	SkipVerify bool
-)
-
-func ConfiguredClient(org string) (*EdgeClient, error) {
-	opts := &EdgeClientOptions{
-		InsecureSkipVerify: true,
-		Org:                org,
-		// Env:                "",
-		Auth: &EdgeAuth{
-			SkipAuth: false,
-			Username: Username,
-			Password: Password,
-			MFAToken: MFAToken,
-		},
-		Debug: Debug,
-	}
-
-	return NewEdgeClient(opts)
-}
-
-func EdgeClientFlagset() *pflag.FlagSet {
-	flags := pflag.NewFlagSet("registry", pflag.ExitOnError)
-	flags.BoolVar(&Debug, "debug", false, "Debug mode")
-	flags.BoolVar(&SkipVerify, "skipverify", false, "Skip server certificate verify")
-	flags.StringVarP(&Username, "username", "u", "", "Apigee username (Edge & OPDK)")
-	flags.StringVarP(&Password, "password", "p", "", "Apigee password (Edge & OPDK)")
-	flags.StringVarP(&MFAToken, "mfa", "", "", "Apigee multi-factor authorization token (Edge & OPDK)")
-
-	return flags
-}
 
 const (
 	libraryVersion  = "0.1.0"

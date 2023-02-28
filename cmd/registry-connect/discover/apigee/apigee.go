@@ -15,7 +15,9 @@
 package apigee
 
 import (
-	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/edge"
+	"fmt"
+
+	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/client"
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/products"
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/proxies"
 	"github.com/spf13/cobra"
@@ -26,7 +28,29 @@ func Command() *cobra.Command {
 		Use:   "apigee",
 		Short: "Registry commands relating to Apigee runtime",
 	}
-	cmd.PersistentFlags().AddFlagSet(edge.EdgeClientFlagset())
+
+	cmd.PersistentFlags().BoolVar(&client.Config.Debug, "debug", false, "debug mode")
+	cmd.PersistentFlags().BoolVar(&client.Config.SkipVerify, "skipverify", false, "skip server certificate verify")
+	cmd.PersistentFlags().StringVarP(&client.Config.Username, "username", "u", "", "username")
+	cmd.PersistentFlags().StringVarP(&client.Config.Password, "password", "p", "", "password")
+	cmd.PersistentFlags().StringVarP(&client.Config.MFAToken, "mfa", "", "", "multi-factor authorization token")
+	cmd.PersistentFlags().BoolVarP(&client.Config.OPDK, "opdk", "", false, "edge private cloud installation")
+	cmd.PersistentFlags().BoolVarP(&client.Config.Edge, "edge", "", false, "hosted edge installation")
+	cmd.PersistentFlags().StringVarP(&client.Config.MgmtURL, "mgmt", "", "", "management server endpoint (opdk only)")
+
+	cmd.MarkFlagsMutuallyExclusive("opdk", "edge")
+	cmd.MarkFlagsRequiredTogether("opdk", "mgmt")
+
+	cmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		if client.Config.OPDK && client.Config.MgmtURL == "" {
+			return fmt.Errorf("--mgmt must be set with --opdk")
+		}
+		if !client.Config.OPDK && client.Config.MgmtURL != "" {
+			return fmt.Errorf("--mgmt can only be set with --opdk")
+		}
+
+		return nil
+	}
 
 	cmd.AddCommand(proxies.Command())
 	cmd.AddCommand(products.Command())

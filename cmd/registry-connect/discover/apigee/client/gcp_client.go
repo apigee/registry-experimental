@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package common
+package client
 
 import (
 	"context"
@@ -21,6 +21,10 @@ import (
 
 	"google.golang.org/api/apigee/v1"
 )
+
+func NewGCPClient() (*GCPClient, error) {
+	return &GCPClient{Config.Org}, nil
+}
 
 type GCPClient struct {
 	org string

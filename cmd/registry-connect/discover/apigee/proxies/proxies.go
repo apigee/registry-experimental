@@ -18,8 +18,9 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
-	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/common"
+	apigee "github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/client"
 	"github.com/apigee/registry/pkg/application/apihub"
 	"github.com/apigee/registry/pkg/encoding"
 	"github.com/apigee/registry/pkg/log"
@@ -34,15 +35,18 @@ func Command() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			ctx := cmd.Context()
-			org := args[0]
-			client := common.Client(org)
+			apigee.Config.Org = args[0]
+			client, err := apigee.NewClient()
+			if err != nil {
+				return err
+			}
 			return exportProxies(ctx, client)
 		},
 	}
 	return cmd
 }
 
-func exportProxies(ctx context.Context, client common.ApigeeClient) error {
+func exportProxies(ctx context.Context, client apigee.Client) error {
 	proxies, err := client.Proxies(ctx)
 	if err != nil {
 		return err
@@ -136,7 +140,7 @@ func exportProxies(ctx context.Context, client common.ApigeeClient) error {
 	return yaml.NewEncoder(os.Stdout).Encode(items)
 }
 
-func addDeployments(ctx context.Context, client common.ApigeeClient, apisByName map[string]*encoding.Api) error {
+func addDeployments(ctx context.Context, client apigee.Client, apisByName map[string]*encoding.Api) error {
 	if len(apisByName) == 0 {
 		return nil
 	}
@@ -170,7 +174,7 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apisByName 
 					ApiVersion: encoding.RegistryV1,
 					Kind:       "Deployment",
 					Metadata: encoding.Metadata{
-						Name: common.Label(hostname),
+						Name: label(hostname),
 						Annotations: map[string]string{
 							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
 							"apigee-environment":    fmt.Sprintf("organizations/%s/environments/%s", client.Org(), dep.Environment),
@@ -189,6 +193,12 @@ func addDeployments(ctx context.Context, client common.ApigeeClient, apisByName 
 		}
 	}
 	return nil
+}
+
+func label(s string) string {
+	s = strings.ReplaceAll(s, "/", "-")
+	s = strings.ReplaceAll(s, ".", "-")
+	return strings.ToLower(s)
 }
 
 /*

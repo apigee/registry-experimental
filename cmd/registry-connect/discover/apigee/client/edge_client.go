@@ -172,8 +172,8 @@ func (c *EdgeClient) EnvMap(ctx context.Context) (*EnvMap, error) {
 }
 
 // TODO: Won't work with OPDK
-func (c *EdgeClient) ProxyURL(ctx context.Context, proxy *apigee.GoogleCloudApigeeV1ApiProxy) string {
-	return fmt.Sprintf("https://apigee.com/platform/%s/proxies/%s/overview/%s", c.org, proxy.Name, proxy.LatestRevisionId)
+func (c *EdgeClient) ProxyConsoleURL(ctx context.Context, proxy *apigee.GoogleCloudApigeeV1ApiProxy) string {
+	return fmt.Sprintf("https://apigee.com/platform/%s/proxies/%s/overview/%s", c.Org(), proxy.Name, proxy.LatestRevisionId)
 }
 
 func (c *EdgeClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProduct, error) {

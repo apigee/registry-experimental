@@ -108,7 +108,7 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 				dependencies.References = append(dependencies.References, &apihub.ReferenceList_Reference{
 					Id:          p,
 					DisplayName: p + " (Apigee)",
-					Uri:         client.ProxyURL(ctx, proxyByName[p]),
+					Uri:         client.ProxyConsoleURL(ctx, proxyByName[p]),
 				})
 			}
 			node, err := encoding.NodeForMessage(related)
@@ -212,8 +212,8 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxy map[s
 					},
 					Data: encoding.ApiDeploymentData{
 						DisplayName: fmt.Sprintf("%s (%s)", dep.Environment, hostname),
-						// TODO: should use proxy base path instead of name
-						EndpointURI: fmt.Sprintf("https://%s/%s", hostname, dep.ApiProxy),
+						// TODO - https://{org-name}-{env-name}.apigee.net/{base-path}/{resource-path} ?
+						// EndpointURI: client.DeploymentEndpointURI(ctx, hostname, dep),
 					},
 				}
 				api.Data.ApiDeployments = append(api.Data.ApiDeployments, deployment)

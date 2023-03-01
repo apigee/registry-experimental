@@ -74,7 +74,33 @@ func (c *GCPClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApige
 		return nil, err
 	}
 
-	return resp.Deployments, nil
+	// list is minimal data, ensure detailed information
+	var deps []*apigee.GoogleCloudApigeeV1Deployment
+	for _, d := range resp.Deployments {
+		name := fmt.Sprintf("organizations/%s/environments/%s/apis/%s/revisions/%s", c.Org(), d.Environment, d.ApiProxy, d.Revision)
+		dep, err := apg.Organizations.Environments.Apis.Revisions.GetDeployments(name).Context(ctx).Do()
+		if err != nil {
+			return nil, err
+		}
+		deps = append(deps, dep)
+	}
+
+	return deps, nil
+}
+
+func (c *GCPClient) Deployment(ctx context.Context, env, proxy, rev string) (*apigee.GoogleCloudApigeeV1Deployment, error) {
+	apg, err := apigee.NewService(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	name := fmt.Sprintf("organizations/%s/environments/%s/apis/%s/revisions/%s", c.Org(), env, proxy, rev)
+	dep, err := apg.Organizations.Environments.Apis.Revisions.GetDeployments(name).Context(ctx).Do()
+	if err != nil {
+		return nil, err
+	}
+
+	return dep, nil
 }
 
 func (c *GCPClient) EnvMap(ctx context.Context) (*EnvMap, error) {
@@ -106,7 +132,7 @@ func (c *GCPClient) EnvMap(ctx context.Context) (*EnvMap, error) {
 	return m, nil
 }
 
-func (c *GCPClient) ProxyURL(ctx context.Context, proxy *apigee.GoogleCloudApigeeV1ApiProxy) string {
+func (c *GCPClient) ProxyConsoleURL(ctx context.Context, proxy *apigee.GoogleCloudApigeeV1ApiProxy) string {
 	return fmt.Sprintf("https://console.cloud.google.com/apigee/proxies/%s/overview?project=%s", proxy.Name, c.Org())
 }
 

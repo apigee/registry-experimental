@@ -92,11 +92,11 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 		if len(proxyNames) > 0 {
 			related := &apihub.ReferenceList{
 				DisplayName: "Related resources",
-				Description: "Related resources",
+				Description: "Links to resources in the registry.",
 			}
 			dependencies := &apihub.ReferenceList{
-				DisplayName: "Dependent resources",
-				Description: "Dependent resources",
+				DisplayName: "Apigee Dependencies",
+				Description: "Links to dependant Apigee resources.",
 			}
 			for _, proxyName := range proxyNames {
 				apisByProxy[proxyName] = append(apisByProxy[proxyName], api)

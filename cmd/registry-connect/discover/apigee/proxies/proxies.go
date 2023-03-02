@@ -95,14 +95,16 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 			api.Data.ApiVersions = append(api.Data.ApiVersions, v)
 		}
 
-		rl := &apihub.ReferenceList{
+		dependencies := &apihub.ReferenceList{
+			DisplayName: "Apigee Dependencies",
+			Description: "Links to dependant Apigee resources.",
 			References: []*apihub.ReferenceList_Reference{{
 				Id:          proxy.Name,
 				DisplayName: proxy.Name + " (Apigee)",
 				Uri:         client.ProxyConsoleURL(ctx, proxy),
 			}},
 		}
-		node, err := encoding.NodeForMessage(rl)
+		node, err := encoding.NodeForMessage(dependencies)
 		if err != nil {
 			return err
 		}
@@ -112,7 +114,7 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 				ApiVersion: encoding.RegistryV1,
 				Kind:       "ReferenceList",
 				Metadata: encoding.Metadata{
-					Name: "apihub-related",
+					Name: "apihub-dependencies",
 				},
 			},
 			Data: *node,
@@ -236,7 +238,7 @@ items:
       artifacts:
         - kind: ReferenceList
           metadata:
-            name: apihub-related
+            name: apihub-dependencies
           data:
             references:
               - id: helloworld

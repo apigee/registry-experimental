@@ -12,60 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package common
+package apigee
 
 import (
 	"context"
-	"strings"
 
+	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/client"
 	"google.golang.org/api/apigee/v1"
 )
 
-type ApigeeClient interface {
+type Client interface {
 	Org() string
 	Proxies(context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProxy, error)
 	Proxy(context.Context, string) (*apigee.GoogleCloudApigeeV1ApiProxy, error)
 	Deployments(context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error)
-	EnvMap(context.Context) (*EnvMap, error)
+	EnvMap(context.Context) (*client.EnvMap, error)
 	ProxyURL(context.Context, *apigee.GoogleCloudApigeeV1ApiProxy) string
 	Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProduct, error)
 	Product(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProduct, error)
-}
-
-func Client(org string) ApigeeClient {
-	// TODO: differentiate X from SaaS (and OPDK) properly
-	if strings.HasPrefix(org, "organizations/") {
-		return &GCPClient{org}
-	} else {
-		return &EdgeClient{org}
-	}
-}
-
-type EnvMap struct {
-	hostnames map[string][]string
-	envgroup  map[string]string // only valid for X
-}
-
-func (m *EnvMap) Hostnames(env string) ([]string, bool) {
-	if m.hostnames == nil {
-		return nil, false
-	}
-
-	v, ok := m.hostnames[env]
-	return v, ok
-}
-
-func (m *EnvMap) Envgroup(hostname string) (string, bool) {
-	if m.envgroup == nil {
-		return "", false
-	}
-
-	v, ok := m.envgroup[hostname]
-	return v, ok
-}
-
-func Label(s string) string {
-	s = strings.ReplaceAll(s, "/", "-")
-	s = strings.ReplaceAll(s, ".", "-")
-	return strings.ToLower(s)
 }

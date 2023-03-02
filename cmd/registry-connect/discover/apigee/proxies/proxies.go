@@ -54,12 +54,7 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 
 	var apis []interface{}
 	apisByName := map[string]*encoding.Api{}
-	for _, p := range proxies {
-		proxy, err := client.Proxy(ctx, p.Name)
-		if err != nil {
-			return err
-		}
-
+	for _, proxy := range proxies {
 		api := &encoding.Api{
 			Header: encoding.Header{
 				ApiVersion: encoding.RegistryV1,
@@ -184,8 +179,7 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByName map[st
 				},
 				Data: encoding.ApiDeploymentData{
 					DisplayName: fmt.Sprintf("%s (%s)", dep.Environment, hostname),
-					// TODO - https://{org-name}-{env-name}.apigee.net/{base-path}/{resource-path} ?
-					// EndpointURI: client.DeploymentEndpointURI(ctx, hostname, dep),
+					EndpointURI: hostname, // TODO: full resource path?
 				},
 			}
 

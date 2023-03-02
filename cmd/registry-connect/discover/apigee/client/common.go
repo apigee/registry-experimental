@@ -47,12 +47,10 @@ func NewClient() (Client, error) {
 type Client interface {
 	Org() string
 	Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProxy, error)
-	Proxy(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProxy, error)
 	ProxyConsoleURL(ctx context.Context, proxy *apigee.GoogleCloudApigeeV1ApiProxy) string
 	Deployments(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error)
 	EnvMap(ctx context.Context) (*EnvMap, error)
 	Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProduct, error)
-	Product(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProduct, error)
 }
 
 type EnvMap struct {

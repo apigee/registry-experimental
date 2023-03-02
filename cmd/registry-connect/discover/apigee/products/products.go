@@ -64,12 +64,7 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 
 	var apis []interface{}
 	apisByProxy := map[string][]*encoding.Api{}
-	for _, p := range products {
-		product, err := client.Product(ctx, p.Name)
-		if err != nil {
-			return err
-		}
-
+	for _, product := range products {
 		api := &encoding.Api{
 			Header: encoding.Header{
 				ApiVersion: encoding.RegistryV1,
@@ -93,22 +88,28 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 		}
 		apis = append(apis, api)
 
-		proxies := boundProxies(product)
-		if len(proxies) > 0 {
-			related := &apihub.ReferenceList{}
-			dependencies := &apihub.ReferenceList{}
-			for _, p := range proxies {
-				apisByProxy[p] = append(apisByProxy[p], api)
+		proxyNames := boundProxies(product)
+		if len(proxyNames) > 0 {
+			related := &apihub.ReferenceList{
+				DisplayName: "Related resources",
+				Description: "Related resources",
+			}
+			dependencies := &apihub.ReferenceList{
+				DisplayName: "Dependent resources",
+				Description: "Dependent resources",
+			}
+			for _, proxyName := range proxyNames {
+				apisByProxy[proxyName] = append(apisByProxy[proxyName], api)
 
 				related.References = append(related.References, &apihub.ReferenceList_Reference{
-					Id:       fmt.Sprintf("%s-%s-proxy", client.Org(), p),
-					Resource: fmt.Sprintf("projects/%s/locations/global/apis/%s-%s-proxy", client.Org(), client.Org(), p),
+					Id:       fmt.Sprintf("%s-%s-proxy", client.Org(), proxyName),
+					Resource: fmt.Sprintf("projects/%s/locations/global/apis/%s-%s-proxy", client.Org(), client.Org(), proxyName),
 				})
 
 				dependencies.References = append(dependencies.References, &apihub.ReferenceList_Reference{
-					Id:          p,
-					DisplayName: p + " (Apigee)",
-					Uri:         client.ProxyConsoleURL(ctx, proxyByName[p]),
+					Id:          proxyName,
+					DisplayName: proxyName + " (Apigee)",
+					Uri:         client.ProxyConsoleURL(ctx, proxyByName[proxyName]),
 				})
 			}
 			node, err := encoding.NodeForMessage(related)
@@ -212,8 +213,7 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxy map[s
 					},
 					Data: encoding.ApiDeploymentData{
 						DisplayName: fmt.Sprintf("%s (%s)", dep.Environment, hostname),
-						// TODO - https://{org-name}-{env-name}.apigee.net/{base-path}/{resource-path} ?
-						// EndpointURI: client.DeploymentEndpointURI(ctx, hostname, dep),
+						EndpointURI: hostname, // TODO: full resource path?
 					},
 				}
 				api.Data.ApiDeployments = append(api.Data.ApiDeployments, deployment)

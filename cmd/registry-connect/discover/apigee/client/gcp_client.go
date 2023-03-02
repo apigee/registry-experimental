@@ -40,27 +40,23 @@ func (c *GCPClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1A
 		return nil, err
 	}
 
-	resp, err := apg.Organizations.Apis.List(c.org).Context(ctx).Do()
+	name := fmt.Sprintf("organizations/%s", c.Org())
+	resp, err := apg.Organizations.Apis.List(name).Context(ctx).Do()
 	if err != nil {
 		return nil, err
 	}
 
-	return resp.Proxies, nil
-}
-
-func (c *GCPClient) Proxy(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProxy, error) {
-	apg, err := apigee.NewService(ctx)
-	if err != nil {
-		return nil, err
+	var proxies []*apigee.GoogleCloudApigeeV1ApiProxy
+	for _, p := range resp.Proxies {
+		name = fmt.Sprintf("organizations/%s/apis/%s", c.Org(), p.Name)
+		proxy, err := apg.Organizations.Apis.Get(name).Context(ctx).Do()
+		if err != nil {
+			return nil, err
+		}
+		proxies = append(proxies, proxy)
 	}
 
-	name = fmt.Sprintf("%s/apis/%s", c.org, name)
-	resp, err := apg.Organizations.Apis.Get(name).Context(ctx).Do()
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, err
+	return proxies, nil
 }
 
 func (c *GCPClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error) {
@@ -69,7 +65,8 @@ func (c *GCPClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApige
 		return nil, err
 	}
 
-	resp, err := apg.Organizations.Deployments.List(c.org).Context(ctx).Do()
+	name := fmt.Sprintf("organizations/%s", c.Org())
+	resp, err := apg.Organizations.Deployments.List(name).Context(ctx).Do()
 	if err != nil {
 		return nil, err
 	}
@@ -88,21 +85,6 @@ func (c *GCPClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApige
 	return deps, nil
 }
 
-func (c *GCPClient) Deployment(ctx context.Context, env, proxy, rev string) (*apigee.GoogleCloudApigeeV1Deployment, error) {
-	apg, err := apigee.NewService(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	name := fmt.Sprintf("organizations/%s/environments/%s/apis/%s/revisions/%s", c.Org(), env, proxy, rev)
-	dep, err := apg.Organizations.Environments.Apis.Revisions.GetDeployments(name).Context(ctx).Do()
-	if err != nil {
-		return nil, err
-	}
-
-	return dep, nil
-}
-
 func (c *GCPClient) EnvMap(ctx context.Context) (*EnvMap, error) {
 	groups, err := c.envgroups(ctx)
 	if err != nil {
@@ -115,8 +97,8 @@ func (c *GCPClient) EnvMap(ctx context.Context) (*EnvMap, error) {
 	}
 
 	for _, group := range groups {
-		envgroup := fmt.Sprintf("%s/envgroups/%s", c.org, group.Name)
-		attachments, err := c.attachments(ctx, envgroup)
+		name := fmt.Sprintf("organizations/%s/envgroups/%s", c.Org(), group.Name)
+		attachments, err := c.attachments(ctx, name)
 		if err != nil {
 			return nil, err
 		}
@@ -124,7 +106,7 @@ func (c *GCPClient) EnvMap(ctx context.Context) (*EnvMap, error) {
 		for _, attachment := range attachments {
 			for _, hostname := range group.Hostnames {
 				m.hostnames[attachment.Environment] = append(m.hostnames[attachment.Environment], hostname)
-				m.envgroup[hostname] = envgroup
+				m.envgroup[hostname] = name
 			}
 		}
 	}
@@ -142,7 +124,8 @@ func (c *GCPClient) envgroups(ctx context.Context) ([]*apigee.GoogleCloudApigeeV
 		return nil, err
 	}
 
-	resp, err := apg.Organizations.Envgroups.List(c.org).Context(ctx).Do()
+	name := fmt.Sprintf("organizations/%s", c.Org())
+	resp, err := apg.Organizations.Envgroups.List(name).Context(ctx).Do()
 	if err != nil {
 		return nil, err
 	}
@@ -170,25 +153,21 @@ func (c *GCPClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1
 		return nil, err
 	}
 
-	resp, err := apg.Organizations.Apiproducts.List(c.org).Do()
+	name := fmt.Sprintf("organizations/%s", c.Org())
+	list, err := apg.Organizations.Apiproducts.List(name).Do()
 	if err != nil {
 		return nil, err
 	}
 
-	return resp.ApiProduct, err
-}
-
-func (c *GCPClient) Product(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProduct, error) {
-	apg, err := apigee.NewService(ctx)
-	if err != nil {
-		return nil, err
+	var products []*apigee.GoogleCloudApigeeV1ApiProduct
+	for _, p := range list.ApiProduct {
+		name := fmt.Sprintf("organizations/%s/apiproducts/%s", c.Org(), p.Name)
+		product, err := apg.Organizations.Apiproducts.Get(name).Context(ctx).Do()
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, product)
 	}
 
-	name = fmt.Sprintf("%s/apiproducts/%s", c.org, name)
-	resp, err := apg.Organizations.Apiproducts.Get(name).Context(ctx).Do()
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, err
+	return products, err
 }

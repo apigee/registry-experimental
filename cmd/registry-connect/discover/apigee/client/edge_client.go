@@ -58,50 +58,31 @@ func (c *EdgeClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1
 		return nil, err
 	}
 
-	names, _, err := client.Proxies.ListNames()
+	proxyNames, _, err := client.Proxies.ListNames()
 	if err != nil {
 		return nil, err
 	}
 
 	var proxies []*apigee.GoogleCloudApigeeV1ApiProxy
-	for _, n := range names {
-		p, _, err := client.Proxies.Get(n)
+	for _, proxyName := range proxyNames {
+		proxy, _, err := client.Proxies.Get(proxyName)
 		if err != nil {
 			return nil, err
 		}
 
+		revisions := []string{}
+		for _, r := range proxy.Revisions {
+			revisions = append(revisions, r.String())
+		}
+
 		proxies = append(proxies, &apigee.GoogleCloudApigeeV1ApiProxy{
-			Name:             n,
-			LatestRevisionId: p.Revisions[len(p.Revisions)-1].String(),
+			Name:             proxy.Name,
+			LatestRevisionId: proxy.Revisions[len(proxy.Revisions)-1].String(),
+			Revision:         revisions,
 		})
 	}
 
 	return proxies, nil
-}
-
-func (c *EdgeClient) Proxy(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProxy, error) {
-	client, err := c.newService(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	p, _, err := client.Proxies.Get(name)
-	if err != nil {
-		return nil, err
-	}
-
-	revisions := []string{}
-	for _, r := range p.Revisions {
-		revisions = append(revisions, r.String())
-	}
-
-	proxy := &apigee.GoogleCloudApigeeV1ApiProxy{
-		Name:             p.Name,
-		LatestRevisionId: revisions[len(revisions)-1],
-		Revision:         revisions,
-	}
-
-	return proxy, nil
 }
 
 func (c *EdgeClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error) {
@@ -189,30 +170,17 @@ func (c *EdgeClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV
 
 	var products []*apigee.GoogleCloudApigeeV1ApiProduct
 	for _, n := range names {
+		p, _, err := client.Products.Get(n)
+		if err != nil {
+			return nil, err
+		}
+
 		products = append(products, &apigee.GoogleCloudApigeeV1ApiProduct{
-			Name: n,
+			Name:           p.Name,
+			Proxies:        p.Proxies,
+			OperationGroup: &apigee.GoogleCloudApigeeV1OperationGroup{},
 		})
 	}
 
 	return products, nil
-}
-
-func (c *EdgeClient) Product(ctx context.Context, name string) (*apigee.GoogleCloudApigeeV1ApiProduct, error) {
-	client, err := c.newService(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	p, _, err := client.Products.Get(name)
-	if err != nil {
-		return nil, err
-	}
-
-	product := &apigee.GoogleCloudApigeeV1ApiProduct{
-		Name:           p.Name,
-		Proxies:        p.Proxies,
-		OperationGroup: &apigee.GoogleCloudApigeeV1OperationGroup{},
-	}
-
-	return product, nil
 }

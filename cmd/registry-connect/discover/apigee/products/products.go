@@ -63,7 +63,7 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 	}
 
 	var apis []interface{}
-	apisByProxy := map[string][]*encoding.Api{}
+	apisByProxyName := map[string][]*encoding.Api{}
 	for _, product := range products {
 		api := &encoding.Api{
 			Header: encoding.Header{
@@ -99,17 +99,22 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 				Description: "Links to dependant Apigee resources.",
 			}
 			for _, proxyName := range proxyNames {
-				apisByProxy[proxyName] = append(apisByProxy[proxyName], api)
+				apisByProxyName[proxyName] = append(apisByProxyName[proxyName], api)
 
 				related.References = append(related.References, &apihub.ReferenceList_Reference{
 					Id:       fmt.Sprintf("%s-%s-proxy", client.Org(), proxyName),
 					Resource: fmt.Sprintf("projects/%s/locations/global/apis/%s-%s-proxy", client.Org(), client.Org(), proxyName),
 				})
 
+				proxy := proxyByName[proxyName]
+				if proxy == nil {
+					log.FromContext(ctx).Warnf("proxy %q bound but not found", proxyName)
+					continue
+				}
 				dependencies.References = append(dependencies.References, &apihub.ReferenceList_Reference{
 					Id:          proxyName,
 					DisplayName: proxyName + " (Apigee)",
-					Uri:         client.ProxyConsoleURL(ctx, proxyByName[proxyName]),
+					Uri:         client.ProxyConsoleURL(ctx, proxy),
 				})
 			}
 			node, err := encoding.NodeForMessage(related)
@@ -146,7 +151,7 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 		}
 	}
 
-	err = addDeployments(ctx, client, apisByProxy)
+	err = addDeployments(ctx, client, apisByProxyName)
 	if err != nil {
 		return err
 	}
@@ -159,8 +164,8 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 }
 
 // product -> proxies -> deployments
-func addDeployments(ctx context.Context, client apigee.Client, apisByProxy map[string][]*encoding.Api) error {
-	if len(apisByProxy) == 0 {
+func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName map[string][]*encoding.Api) error {
+	if len(apisByProxyName) == 0 {
 		return nil
 	}
 	ps, err := client.Proxies(ctx)
@@ -190,9 +195,9 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxy map[s
 		}
 
 		for _, hostname := range hostnames {
-			apis, ok := apisByProxy[dep.ApiProxy]
+			apis, ok := apisByProxyName[dep.ApiProxy]
 			if !ok || len(apis) == 0 {
-				log.Warnf(ctx, "unknown product: %q for deployment: %#v", dep.ApiProxy, dep)
+				log.Warnf(ctx, "Unknown proxy: %q for deployment: %#v", dep.ApiProxy, dep)
 				continue
 			}
 

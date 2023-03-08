@@ -53,7 +53,7 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 	}
 
 	var apis []interface{}
-	apisByName := map[string]*encoding.Api{}
+	apisByProxyName := map[string]*encoding.Api{}
 	for _, proxy := range proxies {
 		api := &encoding.Api{
 			Header: encoding.Header{
@@ -122,10 +122,10 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 		api.Data.Artifacts = append(api.Data.Artifacts, a)
 
 		apis = append(apis, api)
-		apisByName[proxy.Name] = api
+		apisByProxyName[proxy.Name] = api
 	}
 
-	err = addDeployments(ctx, client, apisByName)
+	err = addDeployments(ctx, client, apisByProxyName)
 	if err != nil {
 		return err
 	}
@@ -137,8 +137,8 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 	return yaml.NewEncoder(os.Stdout).Encode(items)
 }
 
-func addDeployments(ctx context.Context, client apigee.Client, apisByName map[string]*encoding.Api) error {
-	if len(apisByName) == 0 {
+func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName map[string]*encoding.Api) error {
+	if len(apisByProxyName) == 0 {
 		return nil
 	}
 
@@ -160,9 +160,10 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByName map[st
 		}
 
 		for _, hostname := range hostnames {
-			api, ok := apisByName[dep.ApiProxy]
+			api, ok := apisByProxyName[dep.ApiProxy]
 			if !ok {
-				return fmt.Errorf("unknown proxy: %q for deployment", dep.ApiProxy)
+				log.Warnf(ctx, "Unknown proxy: %q for deployment: %#v", dep.ApiProxy, dep)
+				continue
 			}
 
 			envgroup, _ := envMap.Envgroup(hostname)

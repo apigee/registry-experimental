@@ -70,13 +70,13 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 				ApiVersion: encoding.RegistryV1,
 				Kind:       "API",
 				Metadata: encoding.Metadata{
-					Name: fmt.Sprintf("%s-%s-product", client.Org(), product.Name),
+					Name: name(fmt.Sprintf("%s-%s-product", client.Org(), product.Name)),
 					Annotations: map[string]string{
 						"apigee-product": fmt.Sprintf("organizations/%s/apiproducts/%s", client.Org(), product.Name),
 					},
 					Labels: map[string]string{
 						"apihub-kind":          "product",
-						"apihub-business-unit": client.Org(),
+						"apihub-business-unit": label(client.Org()),
 						"apihub-target-users":  "internal",
 					},
 				},
@@ -208,7 +208,7 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 						ApiVersion: encoding.RegistryV1,
 						Kind:       "Deployment",
 						Metadata: encoding.Metadata{
-							Name: label(hostname),
+							Name: name(hostname),
 							Annotations: map[string]string{
 								"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
 								"apigee-environment":    fmt.Sprintf("organizations/%s/environments/%s", client.Org(), dep.Environment),
@@ -241,6 +241,14 @@ func boundProxies(prod *api.GoogleCloudApigeeV1ApiProduct) []string {
 func label(s string) string {
 	s = strings.ReplaceAll(s, "/", "-")
 	s = strings.ReplaceAll(s, ".", "-")
+	return strings.ToLower(s)
+}
+
+func name(s string) string {
+	s = strings.ReplaceAll(s, "/", "-")
+	s = strings.ReplaceAll(s, " ", "-")
+	s = strings.ReplaceAll(s, ".", "-")
+	s = strings.ReplaceAll(s, "_", "-")
 	return strings.ToLower(s)
 }
 

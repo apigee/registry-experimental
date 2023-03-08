@@ -60,13 +60,13 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 				ApiVersion: encoding.RegistryV1,
 				Kind:       "API",
 				Metadata: encoding.Metadata{
-					Name: fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name),
+					Name: name(fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name)),
 					Annotations: map[string]string{
 						"apigee-proxy": fmt.Sprintf("%s/apis/%s", client.Org(), proxy.Name),
 					},
 					Labels: map[string]string{
 						"apihub-kind":          "proxy",
-						"apihub-business-unit": client.Org(),
+						"apihub-business-unit": label(client.Org()),
 					},
 				},
 			},
@@ -81,7 +81,7 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 					ApiVersion: encoding.RegistryV1,
 					Kind:       "Version",
 					Metadata: encoding.Metadata{
-						Name: r,
+						Name: name(r),
 						Annotations: map[string]string{
 							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), proxy.Name, r),
 						},
@@ -195,6 +195,14 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 func label(s string) string {
 	s = strings.ReplaceAll(s, "/", "-")
 	s = strings.ReplaceAll(s, ".", "-")
+	return strings.ToLower(s)
+}
+
+func name(s string) string {
+	s = strings.ReplaceAll(s, "/", "-")
+	s = strings.ReplaceAll(s, " ", "-")
+	s = strings.ReplaceAll(s, ".", "-")
+	s = strings.ReplaceAll(s, "_", "-")
 	return strings.ToLower(s)
 }
 

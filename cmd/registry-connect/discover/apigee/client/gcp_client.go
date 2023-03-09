@@ -118,6 +118,10 @@ func (c *GCPClient) ProxyConsoleURL(ctx context.Context, proxy *apigee.GoogleClo
 	return fmt.Sprintf("https://console.cloud.google.com/apigee/proxies/%s/overview?project=%s", proxy.Name, c.Org())
 }
 
+func (c *GCPClient) ProductConsoleURL(ctx context.Context, product *apigee.GoogleCloudApigeeV1ApiProduct) string {
+	return fmt.Sprintf("https://console.cloud.google.com/apigee/apiproducts/product/%s/overview?project=%s", product.Name, c.Org())
+}
+
 func (c *GCPClient) envgroups(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1EnvironmentGroup, error) {
 	apg, err := apigee.NewService(ctx)
 	if err != nil {

@@ -30,6 +30,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var project string // TODO: remove when a relative ReferenceList_Reference.Resource works in Hub
+
 func Command() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "products ORGANIZATION",
@@ -45,6 +47,8 @@ func Command() *cobra.Command {
 			return exportProducts(ctx, client)
 		},
 	}
+	cmd.Flags().StringVarP(&project, "project", "", "", "hub project id (temporary)")
+	_ = cmd.MarkFlagRequired("project")
 	return cmd
 }
 
@@ -83,11 +87,21 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 				},
 			},
 			Data: encoding.ApiData{
-				DisplayName: fmt.Sprintf("%s-%s-product", client.Org(), product.Name),
+				DisplayName: fmt.Sprintf("%s product: %s", client.Org(), product.Name),
 				Description: fmt.Sprintf("%s API Product for internal/admin users.", product.Name),
 			},
 		}
 		apis = append(apis, api)
+
+		dependencies := &apihub.ReferenceList{
+			DisplayName: "Apigee Dependencies",
+			Description: "Links to dependant Apigee resources.",
+		}
+		dependencies.References = append(dependencies.References, &apihub.ReferenceList_Reference{
+			Id:          product.Name,
+			DisplayName: product.Name + " (Apigee)",
+			Uri:         client.ProductConsoleURL(ctx, product),
+		})
 
 		proxyNames := boundProxies(product)
 		if len(proxyNames) > 0 {
@@ -95,16 +109,13 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 				DisplayName: "Related resources",
 				Description: "Links to resources in the registry.",
 			}
-			dependencies := &apihub.ReferenceList{
-				DisplayName: "Apigee Dependencies",
-				Description: "Links to dependant Apigee resources.",
-			}
 			for _, proxyName := range proxyNames {
 				apisByProxyName[proxyName] = append(apisByProxyName[proxyName], api)
 
 				related.References = append(related.References, &apihub.ReferenceList_Reference{
-					Id:       fmt.Sprintf("%s-%s-proxy", client.Org(), proxyName),
-					Resource: fmt.Sprintf("projects/%s/locations/global/apis/%s-%s-proxy", client.Org(), client.Org(), proxyName),
+					Id:          fmt.Sprintf("%s-%s-proxy", client.Org(), proxyName),
+					DisplayName: fmt.Sprintf("%s proxy: %s", client.Org(), proxyName),
+					Resource:    fmt.Sprintf("projects/%s/locations/global/apis/%s-%s-proxy", project, client.Org(), proxyName),
 				})
 
 				proxy := proxyByName[proxyName]
@@ -214,6 +225,9 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 								"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
 								"apigee-environment":    fmt.Sprintf("organizations/%s/environments/%s", client.Org(), dep.Environment),
 								"apigee-envgroup":       envgroup,
+							},
+							Labels: map[string]string{
+								"apihub-gateway": "apihub-google-cloud-apigee",
 							},
 						},
 					},

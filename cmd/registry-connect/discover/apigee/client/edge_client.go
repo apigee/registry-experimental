@@ -151,6 +151,10 @@ func (c *EdgeClient) ProxyConsoleURL(ctx context.Context, proxy *apigee.GoogleCl
 	return fmt.Sprintf("https://apigee.com/platform/%s/proxies/%s/overview/%s", c.Org(), proxy.Name, proxy.LatestRevisionId)
 }
 
+func (c *EdgeClient) ProductConsoleURL(ctx context.Context, product *apigee.GoogleCloudApigeeV1ApiProduct) string {
+	return fmt.Sprintf("https://apigee.com/platform/%s/products/%s", c.Org(), product.Name)
+}
+
 func (c *EdgeClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProduct, error) {
 	client := c.service
 

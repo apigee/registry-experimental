@@ -30,6 +30,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var project string // TODO: remove when a relative ReferenceList_Reference.Resource works in Hub
+
 func Command() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "products ORGANIZATION",
@@ -45,6 +47,8 @@ func Command() *cobra.Command {
 			return exportProducts(ctx, client)
 		},
 	}
+	cmd.Flags().StringVarP(&project, "project", "", "", "hub project id (temporary)")
+	_ = cmd.MarkFlagRequired("project")
 	return cmd
 }
 
@@ -111,7 +115,7 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 				related.References = append(related.References, &apihub.ReferenceList_Reference{
 					Id:          fmt.Sprintf("%s-%s-proxy", client.Org(), proxyName),
 					DisplayName: fmt.Sprintf("%s proxy: %s", client.Org(), proxyName),
-					Resource:    fmt.Sprintf("projects/timburks-test/locations/global/apis/%s-%s-proxy", client.Org(), proxyName),
+					Resource:    fmt.Sprintf("projects/%s/locations/global/apis/%s-%s-proxy", project, client.Org(), proxyName),
 				})
 
 				proxy := proxyByName[proxyName]

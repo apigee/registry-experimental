@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package discover
+package apigateway
 
 import (
-	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigateway"
-	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee"
+	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigateway/gateways"
 	"github.com/spf13/cobra"
 )
 
 func Command() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "discover",
-		Short: "Commands to retrieve and format external data as API Registry YAML.",
-		Args:  cobra.NoArgs,
+	var cmd = &cobra.Command{
+		Use:   "apigateway",
+		Short: "Registry commands relating to API Gateway",
 	}
-	cmd.AddCommand(apigee.Command())
-	cmd.AddCommand(apigateway.Command())
+	cmd.AddCommand(gateways.Command())
 	return cmd
 }

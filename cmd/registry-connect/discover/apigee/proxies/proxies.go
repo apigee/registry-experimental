@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	apigee "github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/client"
@@ -53,20 +54,20 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 	}
 
 	var apis []interface{}
-	apisByName := map[string]*encoding.Api{}
+	apisByProxyName := map[string]*encoding.Api{}
 	for _, proxy := range proxies {
 		api := &encoding.Api{
 			Header: encoding.Header{
 				ApiVersion: encoding.RegistryV1,
 				Kind:       "API",
 				Metadata: encoding.Metadata{
-					Name: fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name),
+					Name: name(fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name)),
 					Annotations: map[string]string{
 						"apigee-proxy": fmt.Sprintf("%s/apis/%s", client.Org(), proxy.Name),
 					},
 					Labels: map[string]string{
 						"apihub-kind":          "proxy",
-						"apihub-business-unit": client.Org(),
+						"apihub-business-unit": label(client.Org()),
 					},
 				},
 			},
@@ -81,7 +82,7 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 					ApiVersion: encoding.RegistryV1,
 					Kind:       "Version",
 					Metadata: encoding.Metadata{
-						Name: r,
+						Name: name(r),
 						Annotations: map[string]string{
 							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), proxy.Name, r),
 						},
@@ -122,10 +123,10 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 		api.Data.Artifacts = append(api.Data.Artifacts, a)
 
 		apis = append(apis, api)
-		apisByName[proxy.Name] = api
+		apisByProxyName[proxy.Name] = api
 	}
 
-	err = addDeployments(ctx, client, apisByName)
+	err = addDeployments(ctx, client, apisByProxyName)
 	if err != nil {
 		return err
 	}
@@ -137,8 +138,8 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 	return yaml.NewEncoder(os.Stdout).Encode(items)
 }
 
-func addDeployments(ctx context.Context, client apigee.Client, apisByName map[string]*encoding.Api) error {
-	if len(apisByName) == 0 {
+func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName map[string]*encoding.Api) error {
+	if len(apisByProxyName) == 0 {
 		return nil
 	}
 
@@ -160,9 +161,10 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByName map[st
 		}
 
 		for _, hostname := range hostnames {
-			api, ok := apisByName[dep.ApiProxy]
+			api, ok := apisByProxyName[dep.ApiProxy]
 			if !ok {
-				return fmt.Errorf("unknown proxy: %q for deployment", dep.ApiProxy)
+				log.Warnf(ctx, "Unknown proxy: %q for deployment: %#v", dep.ApiProxy, dep)
+				continue
 			}
 
 			envgroup, _ := envMap.Envgroup(hostname)
@@ -192,9 +194,11 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByName map[st
 }
 
 func label(s string) string {
-	s = strings.ReplaceAll(s, "/", "-")
-	s = strings.ReplaceAll(s, ".", "-")
-	return strings.ToLower(s)
+	return strings.ToLower(regexp.MustCompile(`([^A-Za-z0-9-_]+)`).ReplaceAllString(s, "-"))
+}
+
+func name(s string) string {
+	return strings.ToLower(regexp.MustCompile(`([^A-Za-z0-9-]+)`).ReplaceAllString(s, "-"))
 }
 
 /*

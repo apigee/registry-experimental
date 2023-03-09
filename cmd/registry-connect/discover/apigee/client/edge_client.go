@@ -22,12 +22,15 @@ import (
 	"google.golang.org/api/apigee/v1"
 )
 
-func NewEdgeClient() (*EdgeClient, error) {
-	return &EdgeClient{Config.Org}, nil
+func NewEdgeClient() (client *EdgeClient, err error) {
+	client = &EdgeClient{Config.Org, nil}
+	client.service, err = client.newService(context.Background())
+	return client, err
 }
 
 type EdgeClient struct {
-	org string
+	org     string
+	service *edge.EdgeClient
 }
 
 func (c *EdgeClient) newService(ctx context.Context) (*edge.EdgeClient, error) {
@@ -53,10 +56,7 @@ func (c *EdgeClient) Org() string {
 }
 
 func (c *EdgeClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProxy, error) {
-	client, err := c.newService(ctx)
-	if err != nil {
-		return nil, err
-	}
+	client := c.service
 
 	proxyNames, _, err := client.Proxies.ListNames()
 	if err != nil {
@@ -86,10 +86,7 @@ func (c *EdgeClient) Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1
 }
 
 func (c *EdgeClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error) {
-	client, err := c.newService(ctx)
-	if err != nil {
-		return nil, err
-	}
+	client := c.service
 
 	var deps []*apigee.GoogleCloudApigeeV1Deployment
 	ods, _, err := client.Deployments.OrganizationDeployments()
@@ -114,10 +111,7 @@ func (c *EdgeClient) Deployments(ctx context.Context) ([]*apigee.GoogleCloudApig
 }
 
 func (c *EdgeClient) EnvMap(ctx context.Context) (*EnvMap, error) {
-	client, err := c.newService(ctx)
-	if err != nil {
-		return nil, err
-	}
+	client := c.service
 
 	envNames, _, err := client.Environments.ListNames()
 	if err != nil {
@@ -158,10 +152,7 @@ func (c *EdgeClient) ProxyConsoleURL(ctx context.Context, proxy *apigee.GoogleCl
 }
 
 func (c *EdgeClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProduct, error) {
-	client, err := c.newService(ctx)
-	if err != nil {
-		return nil, err
-	}
+	client := c.service
 
 	names, _, err := client.Products.ListNames()
 	if err != nil {

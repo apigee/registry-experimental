@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	apigee "github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/client"
@@ -239,17 +240,11 @@ func boundProxies(prod *api.GoogleCloudApigeeV1ApiProduct) []string {
 }
 
 func label(s string) string {
-	s = strings.ReplaceAll(s, "/", "-")
-	s = strings.ReplaceAll(s, ".", "-")
-	return strings.ToLower(s)
+	return strings.ToLower(regexp.MustCompile(`([^A-Za-z0-9-_]+)`).ReplaceAllString(s, "-"))
 }
 
 func name(s string) string {
-	s = strings.ReplaceAll(s, "/", "-")
-	s = strings.ReplaceAll(s, " ", "-")
-	s = strings.ReplaceAll(s, ".", "-")
-	s = strings.ReplaceAll(s, "_", "-")
-	return strings.ToLower(s)
+	return strings.ToLower(regexp.MustCompile(`([^A-Za-z0-9-]+)`).ReplaceAllString(s, "-"))
 }
 
 /*

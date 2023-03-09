@@ -48,6 +48,7 @@ type Client interface {
 	Org() string
 	Proxies(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProxy, error)
 	ProxyConsoleURL(ctx context.Context, proxy *apigee.GoogleCloudApigeeV1ApiProxy) string
+	ProductConsoleURL(ctx context.Context, product *apigee.GoogleCloudApigeeV1ApiProduct) string
 	Deployments(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error)
 	EnvMap(ctx context.Context) (*EnvMap, error)
 	Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProduct, error)

@@ -72,7 +72,7 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 				},
 			},
 			Data: encoding.ApiData{
-				DisplayName: fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name),
+				DisplayName: fmt.Sprintf("%s proxy: %s", client.Org(), proxy.Name),
 			},
 		}
 
@@ -178,6 +178,9 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
 							"apigee-environment":    fmt.Sprintf("organizations/%s/environments/%s", client.Org(), dep.Environment),
 							"apigee-envgroup":       envgroup,
+						},
+						Labels: map[string]string{
+							"apihub-gateway": "apihub-google-cloud-apigee",
 						},
 					},
 				},

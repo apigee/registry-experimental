@@ -21,19 +21,24 @@ const productsPath = "apiproducts"
 // https://apidocs.apigee.com/docs/api-products/1/routes/organizations/%7Borg_name%7D/apiproducts/get
 
 type ApiProduct struct {
-	APIResources   []string  `json:"apiResources"`
-	ApprovalType   string    `json:"approvalType"`
-	CreatedAt      Timestamp `json:"createdAt,omitempty"`
-	CreatedBy      string    `json:"createdBy,omitempty"`
-	Description    string    `json:"description"`
-	DisplayName    string    `json:"displayName"`
-	Environments   []string  `json:"environments"`
-	LastModifiedAt Timestamp `json:"lastModifiedAt,omitempty"`
-	LastModifiedBy string    `json:"lastModifiedBy,omitempty"`
-	Name           string    `json:"name"`
-	Proxies        []string  `json:"proxies"`
-	Scopes         []string  `json:"scopes"`
-	// Attributes     []Attribute `json:"attributes"`
+	APIResources   []string    `json:"apiResources"`
+	ApprovalType   string      `json:"approvalType"`
+	CreatedAt      Timestamp   `json:"createdAt,omitempty"`
+	CreatedBy      string      `json:"createdBy,omitempty"`
+	Description    string      `json:"description"`
+	DisplayName    string      `json:"displayName"`
+	Environments   []string    `json:"environments"`
+	LastModifiedAt Timestamp   `json:"lastModifiedAt,omitempty"`
+	LastModifiedBy string      `json:"lastModifiedBy,omitempty"`
+	Name           string      `json:"name"`
+	Proxies        []string    `json:"proxies"`
+	Scopes         []string    `json:"scopes"`
+	Attributes     []Attribute `json:"attributes"`
+}
+
+type Attribute struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }
 
 // ProductsService is an interface for interfacing with the Apigee Edge Admin API

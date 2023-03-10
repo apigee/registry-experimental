@@ -170,10 +170,20 @@ func (c *EdgeClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV
 			return nil, err
 		}
 
+		var attrs []*apigee.GoogleCloudApigeeV1Attribute
+		for _, a := range p.Attributes {
+			attr := &apigee.GoogleCloudApigeeV1Attribute{
+				Name:  a.Name,
+				Value: a.Value,
+			}
+			attrs = append(attrs, attr)
+		}
+
 		products = append(products, &apigee.GoogleCloudApigeeV1ApiProduct{
 			Name:           p.Name,
 			Proxies:        p.Proxies,
 			OperationGroup: &apigee.GoogleCloudApigeeV1OperationGroup{},
+			Attributes:     attrs,
 		})
 	}
 

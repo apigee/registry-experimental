@@ -14,8 +14,8 @@
 
 builds:
 - id: default
-  main: ./cmd/apigee-export
-  binary: apigee-export
+  main: ./cmd/registry-connect
+  binary: registry-connect
   goos:
   - linux
   - windows

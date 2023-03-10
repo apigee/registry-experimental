@@ -70,6 +70,14 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 	var apis []interface{}
 	apisByProxyName := map[string][]*encoding.Api{}
 	for _, product := range products {
+		access := ""
+		for _, a := range product.Attributes {
+			if a.Name == "access" {
+				access = a.Value
+				break
+			}
+		}
+
 		api := &encoding.Api{
 			Header: encoding.Header{
 				ApiVersion: encoding.RegistryV1,
@@ -82,7 +90,7 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 					Labels: map[string]string{
 						"apihub-kind":          "product",
 						"apihub-business-unit": label(client.Org()),
-						"apihub-target-users":  "internal",
+						"apihub-target-users":  access,
 					},
 				},
 			},

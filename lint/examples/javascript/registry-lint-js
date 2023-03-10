@@ -1,0 +1,3 @@
+#!/bin/sh
+
+node /home/FIXME/registry-experimental/lint/examples/javascript/src/index.js

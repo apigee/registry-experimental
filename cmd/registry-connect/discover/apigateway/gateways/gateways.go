@@ -230,11 +230,15 @@ func writeRegistryYAML(output, project string, gateway *Gateway, config *Gateway
 					Header: encoding.Header{
 						Metadata: encoding.Metadata{
 							Name: "gateway",
+							Labels: map[string]string{
+								"apihub-gateway": "apihub-google-cloud-api-gateway",
+							},
 						},
 					},
 					Data: encoding.ApiDeploymentData{
-						DisplayName: "gateway",
-						EndpointURI: "https://" + gateway.DefaultHostname,
+						DisplayName:     "gateway",
+						ApiSpecRevision: "v1/specs/" + specname,
+						EndpointURI:     "https://" + gateway.DefaultHostname,
 					},
 				},
 			},

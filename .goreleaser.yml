@@ -13,9 +13,23 @@
 # limitations under the License.
 
 builds:
-- id: default
+- id: registry-connect
   main: ./cmd/registry-connect
   binary: registry-connect
+  goos:
+  - linux
+  - windows
+  - darwin
+  goarch:
+  - amd64
+  env:
+  - CGO_ENABLED=0
+  ldflags:
+  - -s -w -X "main.Version={{.Env.RELEASE_VERSION}}"
+
+- id: registry-experimental
+  main: ./cmd/registry-experimental
+  binary: registry-experimental
   goos:
   - linux
   - windows
@@ -32,14 +46,13 @@ archives:
   format: tar.gz
   files:
   - LICENSE
-  - src: cmd/apigee-export/README.md
+  - src: cmd/registry-connect/README.md
     dst: .
     strip_parent: true
-  builds:
-  - default
   format_overrides:
   - goos: windows
     format: zip
+
 release:
   draft: true
   prerelease: true

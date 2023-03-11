@@ -9,7 +9,7 @@ require (
 	cloud.google.com/go/pubsub v1.25.1
 	github.com/GoogleCloudPlatform/cloudsql-proxy v1.32.0
 	github.com/apex/log v1.9.0
-	github.com/apigee/registry v0.6.5-0.20230223005634-9d9e8a3b452f
+	github.com/apigee/registry v0.6.8
 	github.com/blevesearch/bleve v1.0.14
 	github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1
 	github.com/gogo/googleapis v1.4.1
@@ -38,7 +38,7 @@ require (
 
 require (
 	cloud.google.com/go/iam v0.5.0 // indirect
-	github.com/JohannesKaufmann/html-to-markdown v1.3.6 // indirect
+	github.com/JohannesKaufmann/html-to-markdown v1.3.6
 	github.com/PuerkitoBio/goquery v1.8.0 // indirect
 	github.com/RoaringBitmap/roaring v0.4.23 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect

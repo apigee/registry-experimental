@@ -53,7 +53,7 @@ func openapiCommand() *cobra.Command {
 				return fmt.Errorf("failed to get client: %s", err)
 			}
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPoolWithWarnings(ctx, 1)
+			taskQueue, wait := tasks.WorkerPool(ctx, 1)
 			defer wait()
 
 			// Generate tasks.

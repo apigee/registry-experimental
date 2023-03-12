@@ -24,11 +24,11 @@ import (
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/mime"
-	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/blevesearch/bleve"
 	"github.com/spf13/cobra"
+	"google.golang.org/protobuf/proto"
 )
 
 var bleveMutex sync.Mutex
@@ -43,7 +43,7 @@ func indexCommand() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-			client, err := connection.NewRegistryClient(ctx)
+			registryClient, err := connection.NewRegistryClient(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to get client: %s", err)
 			}
@@ -55,22 +55,15 @@ func indexCommand() *cobra.Command {
 			// Initialize task queue.
 			taskQueue, wait := tasks.WorkerPool(ctx, jobs)
 			defer wait()
-			// Generate tasks.
-			if spec, err := names.ParseSpec(pattern); err == nil {
-				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
-					taskQueue <- &indexSpecTask{
-						client:   client,
-						specName: spec.Name,
-					}
-					return nil
-				})
-				if err != nil {
-					return fmt.Errorf("failed to list specs: %s", err)
-				}
-			} else {
-				return fmt.Errorf("unsupported pattern: %s", pattern)
+			v := &indexVisitor{
+				taskQueue:      taskQueue,
+				registryClient: registryClient,
 			}
-			return nil
+			return visitor.Visit(ctx, v, visitor.VisitorOptions{
+				RegistryClient: registryClient,
+				Pattern:        pattern,
+				Filter:         filter,
+			})
 		},
 	}
 	cmd.Flags().StringVar(&filter, "filter", "", "filter selected resources")
@@ -78,18 +71,44 @@ func indexCommand() *cobra.Command {
 	return cmd
 }
 
+type indexVisitor struct {
+	visitor.Unsupported
+	taskQueue      chan<- tasks.Task
+	registryClient connection.RegistryClient
+}
+
+func (v *indexVisitor) SpecHandler() visitor.SpecHandler {
+	return func(ctx context.Context, message *rpc.ApiSpec) error {
+		v.taskQueue <- &indexSpecTask{
+			client: v.registryClient,
+			name:   message.Name,
+		}
+		return nil
+	}
+}
+
+func (v *indexVisitor) ArtifactHandler() visitor.ArtifactHandler {
+	return func(ctx context.Context, message *rpc.Artifact) error {
+		v.taskQueue <- &indexArtifactTask{
+			client: v.registryClient,
+			name:   message.Name,
+		}
+		return nil
+	}
+}
+
 type indexSpecTask struct {
-	client   connection.RegistryClient
-	specName string
+	client connection.RegistryClient
+	name   string
 }
 
 func (task *indexSpecTask) String() string {
-	return "index " + task.specName
+	return "index " + task.name
 }
 
 func (task *indexSpecTask) Run(ctx context.Context) error {
 	request := &rpc.GetApiSpecRequest{
-		Name: task.specName,
+		Name: task.name,
 	}
 	spec, err := task.client.GetApiSpec(ctx, request)
 	if err != nil {
@@ -106,7 +125,7 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 		mime.IsOpenAPIv3(spec.GetMimeType()) ||
 		mime.IsDiscovery(spec.GetMimeType()):
 		message = map[string]string{spec.GetFilename(): string(data)}
-	case mime.IsProto(spec.GetMimeType()):
+	case mime.IsZipArchive(spec.GetMimeType()):
 		m, err := compress.UnzipArchiveToMap(data)
 		if err != nil {
 			return err
@@ -118,7 +137,7 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 		}
 		message = m2
 	default:
-		return fmt.Errorf("unable to generate descriptor for style %s", spec.GetMimeType())
+		return fmt.Errorf("unable to index style %s", spec.GetMimeType())
 	}
 
 	// The bleve index requires serialized updates.
@@ -135,6 +154,64 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	}
 	defer index.Close()
 	// Index the spec.
-	log.Debugf(ctx, "Indexing %s", task.specName)
-	return index.Index(task.specName, message)
+	log.Debugf(ctx, "Indexing %s", task.name)
+	return index.Index(task.name, message)
+}
+
+type indexArtifactTask struct {
+	client connection.RegistryClient
+	name   string
+}
+
+func (task *indexArtifactTask) String() string {
+	return "index " + task.name
+}
+
+func (task *indexArtifactTask) Run(ctx context.Context) error {
+	request := &rpc.GetArtifactRequest{
+		Name: task.name,
+	}
+	artifact, err := task.client.GetArtifact(ctx, request)
+	if err != nil {
+		return err
+	}
+	messageType, err := mime.MessageTypeForMimeType(artifact.GetMimeType())
+	if err != nil {
+		return err
+	}
+	switch messageType {
+	case "google.cloud.apigeeregistry.v1.apihub.FieldSet":
+		// supported
+	default:
+		return fmt.Errorf("unable to index type %s", messageType)
+	}
+	err = visitor.FetchArtifactContents(ctx, task.client, artifact)
+	if err != nil {
+		return nil
+	}
+	message, err := mime.MessageForMimeType(artifact.GetMimeType())
+	if err != nil {
+		return nil
+	}
+	err = proto.Unmarshal(artifact.GetContents(), message)
+	if err != nil {
+		return nil
+	}
+	// The bleve index requires serialized updates.
+	bleveMutex.Lock()
+	defer bleveMutex.Unlock()
+	// Open the index, creating a new one if necessary.
+	index, err := bleve.Open(bleveDir)
+	if err != nil {
+		mapping := bleve.NewIndexMapping()
+		index, err = bleve.New(bleveDir, mapping)
+		if err != nil {
+			return err
+		}
+	}
+	defer index.Close()
+	// Index the spec.
+	log.Debugf(ctx, "Indexing %s", task.name)
+	log.Debugf(ctx, "%+v", message)
+	return index.Index(task.name, message)
 }

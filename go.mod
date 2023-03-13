@@ -12,6 +12,7 @@ require (
 	github.com/apigee/registry v0.6.8
 	github.com/blevesearch/bleve v1.0.14
 	github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1
+	github.com/fatih/camelcase v1.0.0
 	github.com/gogo/googleapis v1.4.1
 	github.com/golang/protobuf v1.5.2
 	github.com/google/gnostic v0.6.9
@@ -20,6 +21,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.5.1
 	github.com/graphql-go/graphql v0.8.0
 	github.com/graphql-go/handler v0.2.3
+	github.com/kljensen/snowball v0.6.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.13.0

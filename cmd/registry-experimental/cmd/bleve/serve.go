@@ -26,6 +26,7 @@ import (
 )
 
 func serveCommand() *cobra.Command {
+	var port int
 	cmd := &cobra.Command{
 		Use:   "serve",
 		Short: "Serve a simple search API using a local bleve index",
@@ -33,23 +34,26 @@ func serveCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			router := gin.Default()
 			router.GET("/search", search)
-			router.Run("localhost:8080")
+			router.Run(fmt.Sprintf("0.0.0.0:%d", port))
 			return nil
 		},
 	}
+	cmd.Flags().IntVarP(&port, "port", "p", 8888, "port for server")
 	return cmd
 }
 
 func search(c *gin.Context) {
 	q := c.Query("q")
-	limit, err := strconv.Atoi(c.Query("l"))
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError,
-			gin.H{"message": fmt.Sprintf("invalid limit: %s", err)})
-		return
-	}
-	if limit == 0 {
-		limit = 10
+
+	limit := 10
+	if c.Query("l") != "" {
+		var err error
+		limit, err = strconv.Atoi(c.Query("l"))
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError,
+				gin.H{"message": fmt.Sprintf("invalid limit: %s", err)})
+			return
+		}
 	}
 	index, err := bleve.Open(bleveDir)
 	if err != nil {

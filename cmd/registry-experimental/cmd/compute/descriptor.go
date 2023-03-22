@@ -58,7 +58,7 @@ func descriptorCommand() *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPool(ctx, 1)
+			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, 1)
 			defer wait()
 			// Generate tasks.
 			name := args[0]

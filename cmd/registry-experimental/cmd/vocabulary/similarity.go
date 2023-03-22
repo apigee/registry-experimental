@@ -105,14 +105,18 @@ func similarityCommand() *cobra.Command {
 							}
 						}
 					}
-					// a = words unique to v1
-					// b = words unique to v2
-					// c = words common to v1 and v2
-					// total = a + b + 2 * c
-					// merged = a + b + c // this is the number of entries in the "counts" map
-					merged := len(counts)
-					// total - merged = c
-					common := total - merged
+					// Here we are using a map that collects the total number of unique words
+					// to find the number of words that are common to two collections.
+					// Why does this work?
+					// 		u1 = the number of words unique to v1
+					// 		u2 = the number of words unique to v2
+					// 		 c = the number of words common to v1 and v2
+					// The number of unique words (the size of the map) is unique = u1 + u2 + c.
+					unique := len(counts)
+					// The total number of words in both maps is total = u1 + u2 + 2*c.
+					// The number of words in common is total - merged = c.
+					common := total - unique
+					// We evaluate similarity as the fraction of all words that are shared.
 					// similarity = 2*c / total
 					similarity := 2.0 * float32(common) / float32(total)
 					fmt.Fprintf(cmd.OutOrStdout(), "%1.3f,", similarity)

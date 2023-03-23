@@ -13,6 +13,7 @@ require (
 	github.com/blevesearch/bleve v1.0.14
 	github.com/envoyproxy/go-control-plane v0.10.3
 	github.com/fatih/camelcase v1.0.0
+	github.com/getkin/kin-openapi v0.103.0
 	github.com/gogo/googleapis v1.4.1
 	github.com/golang/protobuf v1.5.2
 	github.com/google/gnostic v0.6.9
@@ -25,7 +26,8 @@ require (
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.13.0
-	golang.org/x/exp v0.0.0-20220915210609-840b3808d824
+	github.com/tufin/oasdiff v1.0.9
+	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
 	golang.org/x/net v0.6.0
 	golang.org/x/oauth2 v0.5.0
 	google.golang.org/api v0.110.0
@@ -39,8 +41,13 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.107.0 // indirect
+	cloud.google.com/go v0.110.0 // indirect
 	cloud.google.com/go/compute v1.18.0 // indirect
+	github.com/go-openapi/jsonpointer v0.19.6 // indirect
+	github.com/go-openapi/swag v0.22.3 // indirect
+	github.com/invopop/yaml v0.2.0 // indirect
+	github.com/josharian/intern v1.0.0 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 )
 
 require (

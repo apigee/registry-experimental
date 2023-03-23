@@ -19,9 +19,9 @@ import (
 
 	registry_rpc "github.com/apigee/registry/rpc"
 
+	longrunning "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	experimental_rpc "github.com/apigee/registry-experimental/rpc"
 	"github.com/apigee/registry-experimental/server/search/internal/indexer"
-	"google.golang.org/genproto/googleapis/longrunning"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/anypb"

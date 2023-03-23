@@ -55,7 +55,6 @@ func Command() *cobra.Command {
 				return err
 			}
 			v := &extractVisitor{
-				ctx:            ctx,
 				registryClient: registryClient,
 			}
 			return visitor.Visit(ctx, v, visitor.VisitorOptions{
@@ -72,7 +71,6 @@ func Command() *cobra.Command {
 
 type extractVisitor struct {
 	visitor.Unsupported
-	ctx            context.Context
 	registryClient connection.RegistryClient
 }
 
@@ -81,7 +79,7 @@ var empty = ""
 func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 	return func(ctx context.Context, spec *rpc.ApiSpec) error {
 		fmt.Printf("%s\n", spec.Name)
-		err := visitor.FetchSpecContents(v.ctx, v.registryClient, spec)
+		err := visitor.FetchSpecContents(ctx, v.registryClient, spec)
 		if err != nil {
 			return err
 		}
@@ -120,7 +118,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			// Set API (displayName, description) from (title, description).
 			specName, _ := names.ParseSpec(spec.Name)
 			apiName := specName.Api()
-			api, err := v.registryClient.GetApi(v.ctx,
+			api, err := v.registryClient.GetApi(ctx,
 				&rpc.GetApiRequest{
 					Name: apiName.String(),
 				},
@@ -138,7 +136,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			if provider != nil {
 				labels["provider"] = *provider
 			}
-			_, err = v.registryClient.UpdateApi(v.ctx,
+			_, err = v.registryClient.UpdateApi(ctx,
 				&rpc.UpdateApiRequest{
 					Api: &rpc.Api{
 						Name:        apiName.String(),
@@ -165,7 +163,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 					mimeType = mime.OpenAPIMimeType(compression, *swagger)
 				}
 				specName, _ := names.ParseSpec(spec.Name)
-				_, err := v.registryClient.UpdateApiSpec(v.ctx,
+				_, err := v.registryClient.UpdateApiSpec(ctx,
 					&rpc.UpdateApiSpecRequest{
 						ApiSpec: &rpc.ApiSpec{
 							Name:     specName.String(),
@@ -201,7 +199,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			// Set API (displayName, description) from (title, description).
 			specName, _ := names.ParseSpec(spec.Name)
 			apiName := specName.Api()
-			api, err := v.registryClient.GetApi(v.ctx,
+			api, err := v.registryClient.GetApi(ctx,
 				&rpc.GetApiRequest{
 					Name: apiName.String(),
 				},
@@ -218,7 +216,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			if provider != nil {
 				labels["provider"] = *provider
 			}
-			_, err = v.registryClient.UpdateApi(v.ctx,
+			_, err = v.registryClient.UpdateApi(ctx,
 				&rpc.UpdateApiRequest{
 					Api: &rpc.Api{
 						Name:        apiName.String(),
@@ -286,7 +284,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 
 			specName, _ := names.ParseSpec(spec.Name)
 			apiName := specName.Api()
-			api, err := v.registryClient.GetApi(v.ctx,
+			api, err := v.registryClient.GetApi(ctx,
 				&rpc.GetApiRequest{
 					Name: apiName.String(),
 				},
@@ -301,7 +299,7 @@ func (v *extractVisitor) SpecHandler() visitor.SpecHandler {
 			labels["grpc"] = "true"
 			delete(labels, "style-grpc")
 			labels["provider"] = "google.com"
-			_, err = v.registryClient.UpdateApi(v.ctx,
+			_, err = v.registryClient.UpdateApi(ctx,
 				&rpc.UpdateApiRequest{
 					Api: &rpc.Api{
 						Name:        apiName.String(),

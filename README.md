@@ -31,23 +31,9 @@ on your local environment.
 
 Steps to run this setup:
 
-1. Create a Google OAuth Client ID.
+1. Run the `docker compose up` command to start the server.
 
-   Use the following values for the
-   [form](https://console.cloud.google.com/apis/credentials/oauthclient):
-
-   - **Select the correct GCP Project.**
-   - Application Type : Web Application
-   - Name : API Registry
-   - Javascript Authorized origins : http://localhost:8888
-   - Authorized redirect URIs: http://localhost:8888
-
-2. Update the `GOOGLE_SIGNIN_CLIENTID` value, in `docker-compose.yml` file,
-   with the client ID from previous step.
-
-3. Run the `docker compose up` command to start the server.
-
-4. Point your [registry configuration](https://github.com/apigee/registry/wiki/registry-config)
+2. Point your [registry configuration](https://github.com/apigee/registry/wiki/registry-config)
    at your local instance.
    ```shell
        registry config configurations create local
@@ -55,7 +41,7 @@ Steps to run this setup:
        registry config set registry.insecure true
    ```
 
-5. Sample commands to create a project and a sample API.
+3. Sample commands to create a project and a sample API.
    ```shell
        registry rpc admin create-project --project_id=project1
        registry rpc create-api --api_id=api1 --parent=projects/project1/locations/global

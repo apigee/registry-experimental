@@ -53,7 +53,7 @@ func indexCommand() *cobra.Command {
 			}
 			pattern := c.FQName(args[0])
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPool(ctx, jobs)
+			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, jobs)
 			defer wait()
 			// Generate tasks.
 			if spec, err := names.ParseSpec(pattern); err == nil {

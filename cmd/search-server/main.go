@@ -22,6 +22,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	longrunning "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	experimental_rpc "github.com/apigee/registry-experimental/rpc"
 	"github.com/apigee/registry-experimental/server/search"
 	"github.com/apigee/registry/pkg/log"
@@ -29,7 +30,6 @@ import (
 	registry_rpc "github.com/apigee/registry/rpc"
 	"github.com/apigee/registry/server/registry"
 	"github.com/spf13/pflag"
-	"google.golang.org/genproto/googleapis/longrunning"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"gopkg.in/yaml.v2"

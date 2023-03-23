@@ -51,7 +51,6 @@ func Command() *cobra.Command {
 				return err
 			}
 			v := &summaryVisitor{
-				ctx:            ctx,
 				registryClient: registryClient,
 			}
 			return visitor.Visit(ctx, v, visitor.VisitorOptions{
@@ -70,7 +69,6 @@ func Command() *cobra.Command {
 
 type summaryVisitor struct {
 	visitor.Unsupported
-	ctx            context.Context
 	registryClient connection.RegistryClient
 }
 
@@ -90,7 +88,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 			return err
 		}
 		apiCount := 0
-		if err := visitor.ListAPIs(v.ctx, v.registryClient,
+		if err := visitor.ListAPIs(ctx, v.registryClient,
 			projectName.Api("-"), "",
 			func(ctx context.Context, api *rpc.Api) error {
 				apiCount++
@@ -99,7 +97,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 			return err
 		}
 		versionCount := 0
-		if err := visitor.ListVersions(v.ctx, v.registryClient,
+		if err := visitor.ListVersions(ctx, v.registryClient,
 			projectName.Api("-").Version("-"), "",
 			func(ctx context.Context, message *rpc.ApiVersion) error {
 				versionCount++
@@ -109,7 +107,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 		}
 		specCount := 0
 		mimeTypes := make(map[string]int)
-		if err := visitor.ListSpecs(v.ctx, v.registryClient,
+		if err := visitor.ListSpecs(ctx, v.registryClient,
 			projectName.Api("-").Version("-").Spec("-"), "", false,
 			func(ctx context.Context, message *rpc.ApiSpec) error {
 				specCount++
@@ -119,7 +117,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 			return err
 		}
 		deploymentCount := 0
-		if err := visitor.ListDeployments(v.ctx, v.registryClient,
+		if err := visitor.ListDeployments(ctx, v.registryClient,
 			projectName.Api("-").Deployment("-"), "",
 			func(ctx context.Context, message *rpc.ApiDeployment) error {
 				deploymentCount++
@@ -143,7 +141,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 			MimeType: "application/yaml;type=Summary",
 			Contents: bytes,
 		}
-		return visitor.SetArtifact(v.ctx, v.registryClient, artifact)
+		return visitor.SetArtifact(ctx, v.registryClient, artifact)
 	}
 }
 
@@ -155,7 +153,7 @@ func (v *summaryVisitor) ApiHandler() visitor.ApiHandler {
 			return err
 		}
 		versionCount := 0
-		if err := visitor.ListVersions(v.ctx, v.registryClient,
+		if err := visitor.ListVersions(ctx, v.registryClient,
 			apiName.Version("-"), "",
 			func(ctx context.Context, message *rpc.ApiVersion) error {
 				versionCount++
@@ -165,7 +163,7 @@ func (v *summaryVisitor) ApiHandler() visitor.ApiHandler {
 		}
 		specCount := 0
 		mimeTypes := make(map[string]int)
-		if err := visitor.ListSpecs(v.ctx, v.registryClient,
+		if err := visitor.ListSpecs(ctx, v.registryClient,
 			apiName.Version("-").Spec("-"), "", false,
 			func(ctx context.Context, message *rpc.ApiSpec) error {
 				specCount++
@@ -175,7 +173,7 @@ func (v *summaryVisitor) ApiHandler() visitor.ApiHandler {
 			return err
 		}
 		deploymentCount := 0
-		if err := visitor.ListDeployments(v.ctx, v.registryClient,
+		if err := visitor.ListDeployments(ctx, v.registryClient,
 			apiName.Deployment("-"), "",
 			func(ctx context.Context, message *rpc.ApiDeployment) error {
 				deploymentCount++
@@ -199,6 +197,6 @@ func (v *summaryVisitor) ApiHandler() visitor.ApiHandler {
 			MimeType: "application/yaml;type=Summary",
 			Contents: bytes,
 		}
-		return visitor.SetArtifact(v.ctx, v.registryClient, artifact)
+		return visitor.SetArtifact(ctx, v.registryClient, artifact)
 	}
 }

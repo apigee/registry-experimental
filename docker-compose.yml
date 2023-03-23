@@ -58,10 +58,9 @@ services:
     - registry-server
     depends_on:
     - registry-server
-  registry-app:
+  registry-viewer:
     image: ghcr.io/apigee/registry-viewer:main
     environment:
-    - GOOGLE_SIGNIN_CLIENTID=testClientId
     - REGISTRY_SERVICE=http://localhost:9999
     - SPEC_RENDERER_SERVICE=http://localhost:3000/render
     - PORT=8888

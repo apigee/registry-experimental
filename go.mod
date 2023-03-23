@@ -3,9 +3,7 @@ module github.com/apigee/registry-experimental
 go 1.18
 
 require (
-	cloud.google.com/go v0.107.0
 	cloud.google.com/go/cloudtasks v1.8.0
-	cloud.google.com/go/compute v1.18.0
 	cloud.google.com/go/compute/metadata v0.2.3
 	cloud.google.com/go/longrunning v0.4.1
 	cloud.google.com/go/pubsub v1.27.1
@@ -38,6 +36,11 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/postgres v1.3.10
 	gorm.io/gorm v1.24.0
+)
+
+require (
+	cloud.google.com/go v0.107.0 // indirect
+	cloud.google.com/go/compute v1.18.0 // indirect
 )
 
 require (

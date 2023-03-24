@@ -95,10 +95,11 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	data, err := visitor.GetBytesForSpec(ctx, task.client, spec)
+	err = visitor.FetchSpecContents(ctx, task.client, spec)
 	if err != nil {
 		return nil
 	}
+	data := spec.GetContents()
 	var message interface{}
 	switch {
 	case spec.GetMimeType() == "text/plain" ||

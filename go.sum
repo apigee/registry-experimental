@@ -102,6 +102,8 @@ github.com/aphistic/golf v0.0.0-20180712155816-02c07f170c5a/go.mod h1:3NqKYiepwy
 github.com/aphistic/sweet v0.2.0/go.mod h1:fWDlIh/isSE9n6EPsRmC0det+whmX6dJid3stzu0Xys=
 github.com/apigee/registry v0.6.9 h1:/KQmSLDTGu8lPbKPOFk/ciHjTbYXUfZ+bssRypk7jRs=
 github.com/apigee/registry v0.6.9/go.mod h1:m1Uo100lY9wH0Xwthe4VUnwT9O81P+sAMNRVxZPfhT4=
+github.com/apigee/registry v0.6.10-0.20230323234945-81552578775e h1:sfILC7U8IMzzFFyM1rYxeuaGDeEQu+0SzoC89fETiL0=
+github.com/apigee/registry v0.6.10-0.20230323234945-81552578775e/go.mod h1:m1Uo100lY9wH0Xwthe4VUnwT9O81P+sAMNRVxZPfhT4=
 github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6/go.mod h1:grANhF5doyWs3UAsr3K4I6qtAmlQcZDesFNEHPZAzj8=
 github.com/aws/aws-sdk-go v1.20.6/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
 github.com/aybabtme/rgbterm v0.0.0-20170906152045-cc83f3b3ce59/go.mod h1:q/89r3U2H7sSsE2t6Kca0lfwTK8JdoNGS/yzM/4iH5I=

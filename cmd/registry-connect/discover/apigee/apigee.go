@@ -26,7 +26,7 @@ import (
 func Command() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "apigee",
-		Short: "Registry commands relating to Apigee runtime",
+		Short: "Exports Apigee resources to YAML files compatible with API Registry.",
 	}
 
 	cmd.PersistentFlags().BoolVar(&client.Config.Debug, "debug", false, "debug mode")

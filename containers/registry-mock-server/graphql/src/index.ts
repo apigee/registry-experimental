@@ -36,14 +36,14 @@ const PORT = process.env.PORT || 3000;
 
 const client_options = <ClientOptions>{};
 
-if (process.env.APG_REGISTRY_INSECURE) {
-  if (process.env.APG_REGISTRY_INSECURE === '1') {
+if (process.env.REGISTRY_INSECURE) {
+  if (process.env.REGISTRY_INSECURE === '1') {
     client_options.sslCreds = credentials.createInsecure();
   }
 }
 
-if (process.env.APG_REGISTRY_ADDRESS) {
-  const items = process.env.APG_REGISTRY_ADDRESS.split(':');
+if (process.env.REGISTRY_ADDRESS) {
+  const items = process.env.REGISTRY_ADDRESS.split(':');
   client_options.apiEndpoint = items[0];
   client_options.port = items.length >= 1 ? parseInt(items[1]) : 443;
 }

@@ -25,8 +25,8 @@ const cors = require('cors')
 const storage = new Storage();
 
 var client_options = {};
-if (process.env.APG_REGISTRY_INSECURE
-    && process.env.APG_REGISTRY_INSECURE == "1") {
+if (process.env.REGISTRY_INSECURE
+    && process.env.REGISTRY_INSECURE == "1") {
   client_options.sslCreds = credentials.createInsecure();
 }
 
@@ -35,8 +35,8 @@ const GRAPHQL_MOCK_ENDPOINT = process.env.GRAPHQL_MOCK_ENDPOINT;
 const GRPC_DOC_ARTIFACT_NAME = process.env.GRPC_DOC_ARTIFACT_NAME
     || 'grpc-doc-url';
 
-if (process.env.APG_REGISTRY_ADDRESS) {
-  items = process.env.APG_REGISTRY_ADDRESS.split(":");
+if (process.env.REGISTRY_ADDRESS) {
+  items = process.env.REGISTRY_ADDRESS.split(":");
   client_options.apiEndpoint = items[0];
   client_options.port = items.length >= 1 ? items[1] : 443;
 }

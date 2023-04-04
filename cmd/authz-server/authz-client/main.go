@@ -43,7 +43,7 @@ func main() {
 	client := auth.NewAuthorizationClient(conn)
 
 	// Get the auth token from the environment.
-	token := os.Getenv("APG_REGISTRY_TOKEN")
+	token := os.Getenv("REGISTRY_TOKEN")
 
 	// Put the auth token in the headers that get sent with the CheckRequest.
 	headers := make(map[string]string)

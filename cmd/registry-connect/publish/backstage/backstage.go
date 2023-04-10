@@ -20,6 +20,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var ownerName, ownerDesc string
+
 func Command() *cobra.Command {
 	var filter string
 	var cmd = &cobra.Command{
@@ -47,5 +49,9 @@ func Command() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&filter, "filter", "", "filter selected apis")
+	cmd.Flags().StringVar(&ownerName, "owner-name", "", "Apigee contact name")
+	cmd.Flags().StringVar(&ownerDesc, "owner-desc", "", "Apigee contact description")
+	_ = cmd.MarkFlagRequired("owner-name")
+	_ = cmd.MarkFlagRequired("owner-desc")
 	return cmd
 }

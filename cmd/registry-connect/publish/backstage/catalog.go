@@ -58,9 +58,8 @@ func (c *catalog) Run(ctx context.Context) error {
 	return c.writeCatalog()
 }
 
-// TODO: configure an owner?
 func (c *catalog) apigeeOwner() (group *encoding.Envelope, err error) {
-	return c.createGroup("apigee-owner", "Apigee owner", "Apigee owner")
+	return c.createGroup("apg-owner", ownerName, ownerDesc)
 }
 
 func (c *catalog) createDeployment(d *rpc.ApiDeployment) (deployment *encoding.Envelope, err error) {
@@ -70,8 +69,7 @@ func (c *catalog) createDeployment(d *rpc.ApiDeployment) (deployment *encoding.E
 	}
 
 	var orgName, envName string
-	envLabel := d.Annotations["apigee-environment"]
-	if envLabel != "" {
+	if envLabel := d.Annotations["apigee-environment"]; envLabel != "" {
 		splits := strings.Split(envLabel, "/")
 		orgName = splits[1]
 		envName = splits[3]
@@ -79,8 +77,8 @@ func (c *catalog) createDeployment(d *rpc.ApiDeployment) (deployment *encoding.E
 	if orgName != "" && envName != "" {
 		if org, err = c.addEntity(&encoding.Metadata{
 			Name:        "apigee-org-" + orgName,
-			Title:       "Apigee Organization " + orgName,
-			Description: "Apigee Organization " + orgName,
+			Title:       "Apigee Org " + orgName,
+			Description: "Apigee Org " + orgName,
 		}, &encoding.Domain{
 			Owner: requiredRef(owner.Reference()),
 		}); err != nil {
@@ -88,9 +86,9 @@ func (c *catalog) createDeployment(d *rpc.ApiDeployment) (deployment *encoding.E
 		}
 
 		if env, err = c.addEntity(&encoding.Metadata{
-			Name:        "apigee-env-" + orgName + "-" + envName,
-			Title:       "Apigee Environment " + envName,
-			Description: "Apigee Environment " + envName,
+			Name:        "apg-env-" + orgName + "-" + envName,
+			Title:       "Apigee Env " + orgName + " " + envName,
+			Description: "Apigee Env " + envName + " in Org " + orgName,
 		}, &encoding.System{
 			Owner:  requiredRef(owner.Reference()),
 			Domain: org.Reference(),
@@ -99,9 +97,9 @@ func (c *catalog) createDeployment(d *rpc.ApiDeployment) (deployment *encoding.E
 		}
 
 		if gateway, err = c.addEntity(&encoding.Metadata{
-			Name:        "apigee-gateway-" + orgName + "-" + envName,
-			Title:       "Apigee Gateway " + orgName + "-" + envName,
-			Description: "Apigee Gateway " + orgName + "-" + envName,
+			Name:        "apg-gw-" + orgName,
+			Title:       "Apigee Gateway " + orgName,
+			Description: "Apigee Gateway in Org " + orgName + ", Env: " + envName,
 		}, &encoding.Component{
 			Type:      "Service",
 			Lifecycle: "production",
@@ -113,16 +111,17 @@ func (c *catalog) createDeployment(d *rpc.ApiDeployment) (deployment *encoding.E
 	}
 
 	depName, _ := names.ParseDeployment(d.Name)
-	id := depName.ApiID + "-" + depName.DeploymentID
+	depId := depName.ApiID + "-" + depName.DeploymentID
 	deployment, err = c.addEntity(&encoding.Metadata{
-		Name:        "apigee-deployment-" + id,
-		Title:       "Apigee Deployment " + d.DisplayName,
-		Description: "Apigee Deployment " + d.DisplayName,
+		Name:        "apg-dep-" + depId,
+		Title:       "Apigee Deployment " + firstOf(d.DisplayName, depId),
+		Description: "Apigee Deployment " + firstOf(d.DisplayName, depId) + " of API " + depName.ApiID,
 		Labels:      d.Labels,
 	}, &encoding.Component{
 		Type:           "Service",
-		Lifecycle:      "production",
+		Lifecycle:      required(""), // TODO: nothing to map from API Hub?
 		Owner:          requiredRef(owner.Reference()),
+		System:         env.Reference(),
 		SubComponentOf: gateway.Reference(),
 	})
 	_ = gateway
@@ -147,7 +146,7 @@ func (c *catalog) createGroups(ctx context.Context) error {
 		for _, t := range taxonomies.GetTaxonomies() {
 			if t.Id == "apihub-team" {
 				for _, team := range t.Elements {
-					group, err := c.createGroup(team.Id, team.DisplayName, team.Description)
+					group, err := c.createGroup("apg-"+team.Id, team.DisplayName, team.Description)
 					if err != nil {
 						return err
 					}
@@ -170,7 +169,7 @@ func (c *catalog) createGroup(name, title, description string) (*encoding.Envelo
 	}
 	return c.addEntity(&encoding.Metadata{
 		Name:        name,
-		Title:       title,
+		Title:       firstOf(title, name),
 		Description: description,
 	}, &encoding.Group{
 		Type: "team",
@@ -187,6 +186,13 @@ func (c *catalog) createAPIs(ctx context.Context) error {
 
 		var specContents string
 		style := strings.TrimPrefix(a.Labels["apihub-style"], "apihub-")
+		if style == "" {
+			if _, ok := a.Annotations["apigee-proxy"]; ok {
+				style = "apigee-proxy"
+			} else if _, ok := a.Annotations["apigee-product"]; ok {
+				style = "apigee-product"
+			}
+		}
 		lifecycle := a.Labels["apihub-lifecycle"]
 
 		primaryContact, err := c.createGroup(a.Labels["apihub-primary-contact"], a.Labels["apihub-primary-contact"], a.Labels["apihub-primary-contact-description"])
@@ -247,9 +253,9 @@ func (c *catalog) createAPIs(ctx context.Context) error {
 				Title: "API Hub",
 			}}
 			api, err := c.addEntity(&encoding.Metadata{
-				Name:        apiName.ApiID,
-				Title:       a.DisplayName,
-				Description: a.Description,
+				Name:        "apg-" + apiName.ApiID,
+				Title:       "Apigee " + firstOf(a.DisplayName, apiName.ApiID),
+				Description: firstOf(a.Description, a.DisplayName),
 				Labels:      a.Labels, // note: labels and links are not viewable in default backstage API plugin
 				Links:       apiHubLinks,
 			}, &encoding.Api{
@@ -399,4 +405,13 @@ func requiredRef(ref encoding.Reference) encoding.Reference {
 		return "unknown"
 	}
 	return ref
+}
+
+func firstOf(args ...string) string {
+	for _, a := range args {
+		if a != "" {
+			return a
+		}
+	}
+	return ""
 }

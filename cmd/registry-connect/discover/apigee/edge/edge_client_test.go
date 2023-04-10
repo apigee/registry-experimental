@@ -33,6 +33,15 @@ func oauthTestServer(t *testing.T) *httptest.Server {
 		AccessToken: "token",
 	}
 
+	m.HandleFunc("/noauth", (func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			w.WriteHeader(http.StatusUnauthorized)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}))
+
 	m.HandleFunc("/oauth", (func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
@@ -64,10 +73,12 @@ func TestNewEdgeClient(t *testing.T) {
 
 	var err error
 
+	SetOAuthURL(ts.URL + "/noauth")
+
 	_, err = NewEdgeClient(opts)
 	errorContains(t, err, "401")
 
-	SetOAuthURL(ts.URL + "/oauth") // intercept OAuth url
+	SetOAuthURL(ts.URL + "/oauth")
 
 	_, err = NewEdgeClient(opts)
 	if err != nil {

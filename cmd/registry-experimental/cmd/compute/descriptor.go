@@ -58,7 +58,7 @@ func descriptorCommand() *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPool(ctx, 1)
+			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, 1)
 			defer wait()
 			// Generate tasks.
 			name := args[0]
@@ -98,10 +98,11 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	name := spec.GetName()
 	relation := "descriptor"
 	log.Infof(ctx, "Computing %s/artifacts/%s", name, relation)
-	data, err := visitor.GetBytesForSpec(ctx, task.client, spec)
+	err = visitor.FetchSpecContents(ctx, task.client, spec)
 	if err != nil {
 		return nil
 	}
+	data := spec.GetContents()
 	subject := spec.GetName()
 	var typeURL string
 	var document proto.Message

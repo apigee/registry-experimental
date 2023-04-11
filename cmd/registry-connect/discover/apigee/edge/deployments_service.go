@@ -14,6 +14,10 @@
 
 package edge
 
+import (
+	"net/url"
+)
+
 const deploymentsPath = "deployments"
 
 // https://apidocs.apigee.com/docs/deployments/1/routes/organizations/%7Borg_name%7D/deployments/get
@@ -33,10 +37,10 @@ type DeploymentProxy struct {
 }
 
 type DeploymentRevision struct {
-	Configuration interface{}        `json:"configuration,omitempty"`
-	Name          string             `json:"name,omitempty"`
-	Servers       []DeploymentServer `json:"server,omitempty"`
-	State         string             `json:"state,omitempty"`
+	// Configuration interface{} `json:"configuration,omitempty"` // includeApiConfig = false, so this is not included
+	Name string `json:"name,omitempty"`
+	// Servers       []DeploymentServer `json:"server,omitempty"` // includeServerStatus = false, so this is not include
+	State string `json:"state,omitempty"`
 }
 
 type DeploymentConfiguration struct {
@@ -71,7 +75,11 @@ var _ DeploymentsService = &DeploymentsServiceOp{}
 
 func (s *DeploymentsServiceOp) OrganizationDeployments() (*OrganizationDeployments, *Response, error) {
 	deployments := &OrganizationDeployments{}
-	req, e := s.client.NewRequestNoEnv("GET", deploymentsPath, deployments)
+	q := url.Values{}
+	q.Set("includeServerStatus", "false")
+	q.Set("includeApiConfig", "false")
+	urlString := deploymentsPath + "?" + q.Encode()
+	req, e := s.client.NewRequestNoEnv("GET", urlString, deployments)
 	if e != nil {
 		return nil, nil, e
 	}

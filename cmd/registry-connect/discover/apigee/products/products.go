@@ -53,15 +53,19 @@ func Command() *cobra.Command {
 }
 
 func exportProducts(ctx context.Context, client apigee.Client) error {
+	log.FromContext(ctx).Infof("retrieving products")
 	products, err := client.Products(ctx)
 	if err != nil {
 		return err
 	}
+	log.FromContext(ctx).Infof("%d products discovered", len(products))
 
+	log.FromContext(ctx).Infof("retrieving proxies")
 	proxies, err := client.Proxies(ctx)
 	if err != nil {
 		return err
 	}
+	log.FromContext(ctx).Infof("%d proxies discovered", len(proxies))
 	proxyByName := map[string]*api.GoogleCloudApigeeV1ApiProxy{}
 	for _, p := range proxies {
 		proxyByName[p.Name] = p
@@ -70,6 +74,7 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 	var apis []interface{}
 	apisByProxyName := map[string][]*encoding.Api{}
 	for _, product := range products {
+		log.FromContext(ctx).Infof("encoding product %q", product.Name)
 		access := ""
 		for _, a := range product.Attributes {
 			if a.Name == "access" {
@@ -113,6 +118,7 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 
 		proxyNames := boundProxies(product)
 		if len(proxyNames) > 0 {
+			log.FromContext(ctx).Infof("encoding bound proxies %q", proxyNames)
 			related := &apihub.ReferenceList{
 				DisplayName: "Related resources",
 				Description: "Links to resources in the registry.",
@@ -180,7 +186,10 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 		Header: encoding.Header{ApiVersion: encoding.RegistryV1},
 		Items:  apis,
 	}
-	return yaml.NewEncoder(os.Stdout).Encode(items)
+	log.FromContext(ctx).Infof("encoding yaml output")
+	err = yaml.NewEncoder(os.Stdout).Encode(items)
+	log.FromContext(ctx).Infof("products export complete")
+	return err
 }
 
 // product -> proxies -> deployments
@@ -188,24 +197,18 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 	if len(apisByProxyName) == 0 {
 		return nil
 	}
-	ps, err := client.Proxies(ctx)
-	if err != nil {
-		return err
-	}
-	proxiesByName := map[string]*api.GoogleCloudApigeeV1ApiProxy{}
-	for _, p := range ps {
-		proxiesByName[p.Name] = p
-	}
-
+	log.FromContext(ctx).Infof("retrieving envmap")
 	envMap, err := client.EnvMap(ctx)
 	if err != nil {
 		return err
 	}
 
+	log.FromContext(ctx).Infof("retrieving deployments")
 	deps, err := client.Deployments(ctx)
 	if err != nil {
 		return err
 	}
+	log.FromContext(ctx).Infof("%d deployments discovered", len(deps))
 
 	for _, dep := range deps {
 		hostnames, ok := envMap.Hostnames(dep.Environment)

@@ -48,14 +48,17 @@ func Command() *cobra.Command {
 }
 
 func exportProxies(ctx context.Context, client apigee.Client) error {
+	log.FromContext(ctx).Infof("retrieving proxies")
 	proxies, err := client.Proxies(ctx)
 	if err != nil {
 		return err
 	}
+	log.FromContext(ctx).Infof("%d proxies discovered", len(proxies))
 
 	var apis []interface{}
 	apisByProxyName := map[string]*encoding.Api{}
 	for _, proxy := range proxies {
+		log.FromContext(ctx).Infof("encoding proxy %q", proxy.Name)
 		api := &encoding.Api{
 			Header: encoding.Header{
 				ApiVersion: encoding.RegistryV1,
@@ -77,6 +80,7 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 		}
 
 		for _, r := range proxy.Revision {
+			log.FromContext(ctx).Infof("encoding revision %q", r)
 			v := &encoding.ApiVersion{
 				Header: encoding.Header{
 					ApiVersion: encoding.RegistryV1,
@@ -135,7 +139,10 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 		Header: encoding.Header{ApiVersion: encoding.RegistryV1},
 		Items:  apis,
 	}
-	return yaml.NewEncoder(os.Stdout).Encode(items)
+	log.FromContext(ctx).Infof("encoding yaml output")
+	err = yaml.NewEncoder(os.Stdout).Encode(items)
+	log.FromContext(ctx).Infof("proxies export complete")
+	return err
 }
 
 func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName map[string]*encoding.Api) error {
@@ -143,27 +150,30 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 		return nil
 	}
 
+	log.FromContext(ctx).Infof("retrieving envmap")
 	envMap, err := client.EnvMap(ctx)
 	if err != nil {
 		return err
 	}
 
+	log.FromContext(ctx).Infof("retrieving deployments")
 	deps, err := client.Deployments(ctx)
 	if err != nil {
 		return err
 	}
+	log.FromContext(ctx).Infof("%d deployments discovered", len(deps))
 
 	for _, dep := range deps {
 		hostnames, ok := envMap.Hostnames(dep.Environment)
 		if !ok {
-			log.Warnf(ctx, "Failed to find hostnames for environment %s", dep.Environment)
+			log.FromContext(ctx).Warnf("failed to find hostnames for environment %s", dep.Environment)
 			continue
 		}
 
 		for _, hostname := range hostnames {
 			api, ok := apisByProxyName[dep.ApiProxy]
 			if !ok {
-				log.Warnf(ctx, "Unknown proxy: %q for deployment: %#v", dep.ApiProxy, dep)
+				log.FromContext(ctx).Warnf("unknown proxy: %q for deployment: %#v", dep.ApiProxy, dep)
 				continue
 			}
 

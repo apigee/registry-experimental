@@ -14,10 +14,13 @@
 
 package encoding
 
-type Api struct {
-	Type       string    `yaml:"type"`
-	Lifecycle  string    `yaml:"lifecycle"`
-	Owner      Reference `yaml:"owner"`
-	Definition string    `yaml:"definition"`
-	System     Reference `yaml:"system,omitempty"`
+type Component struct {
+	Type           string      `yaml:"type"`
+	Lifecycle      string      `yaml:"lifecycle"`
+	Owner          Reference   `yaml:"owner"`
+	System         Reference   `yaml:"system,omitempty"`
+	SubComponentOf Reference   `yaml:"subcomponentOf,omitempty"`
+	ProvidesApis   []Reference `yaml:"providesApis,omitempty"`
+	ConsumesApis   []Reference `yaml:"consumesApis,omitempty"`
+	DependsOn      []Reference `yaml:"dependsOn,omitempty"`
 }

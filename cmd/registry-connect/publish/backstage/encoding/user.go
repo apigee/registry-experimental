@@ -14,10 +14,7 @@
 
 package encoding
 
-type Api struct {
-	Type       string    `yaml:"type"`
-	Lifecycle  string    `yaml:"lifecycle"`
-	Owner      Reference `yaml:"owner"`
-	Definition string    `yaml:"definition"`
-	System     Reference `yaml:"system,omitempty"`
+type User struct {
+	MemberOf []Reference `yaml:"memberOf"`
+	Profile  interface{} `yaml:"profile,omitempty"`
 }

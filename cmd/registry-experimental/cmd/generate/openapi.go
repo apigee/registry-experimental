@@ -53,7 +53,7 @@ func openapiCommand() *cobra.Command {
 				return fmt.Errorf("failed to get client: %s", err)
 			}
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPool(ctx, 1)
+			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, 1)
 			defer wait()
 
 			// Generate tasks.
@@ -102,10 +102,11 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	data, err := visitor.GetBytesForSpec(ctx, task.client, spec)
+	err = visitor.FetchSpecContents(ctx, task.client, spec)
 	if err != nil {
 		return err
 	}
+	data := spec.GetContents()
 	relation := task.newSpecID
 	var openapi string
 	switch {

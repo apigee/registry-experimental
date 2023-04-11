@@ -58,10 +58,9 @@ services:
     - registry-server
     depends_on:
     - registry-server
-  registry-app:
+  registry-viewer:
     image: ghcr.io/apigee/registry-viewer:main
     environment:
-    - GOOGLE_SIGNIN_CLIENTID=testClientId
     - REGISTRY_SERVICE=http://localhost:9999
     - SPEC_RENDERER_SERVICE=http://localhost:3000/render
     - PORT=8888
@@ -74,9 +73,9 @@ services:
   registry-spec-renderer:
     image: ghcr.io/apigee/registry-spec-renderer:main
     environment:
-    - APG_REGISTRY_ADDRESS=registry-server:8080
+    - REGISTRY_ADDRESS=registry-server:8080
     - PORT=3000
-    - APG_REGISTRY_INSECURE=1
+    - REGISTRY_INSECURE=1
     ports:
     - "3000:3000"
     links:
@@ -86,17 +85,17 @@ services:
   registry-tools:
     image: ghcr.io/apigee/registry-tools:main
     environment:
-    - APG_REGISTRY_ADDRESS=registry-server:8080
+    - REGISTRY_ADDRESS=registry-server:8080
     - APG_ADMIN_ADDRESS=registry-server:8080
-    - APG_REGISTRY_INSECURE=1
+    - REGISTRY_INSECURE=1
     - APG_ADMIN_INSECURE=1
   registry-mock-service:
     image: ghcr.io/apigee/registry-prism-mock-server:main
     ports:
     - "4000:4000"
     environment:
-    - APG_REGISTRY_ADDRESS=registry-server:8080
-    - APG_REGISTRY_INSECURE=1
+    - REGISTRY_ADDRESS=registry-server:8080
+    - REGISTRY_INSECURE=1
     - PORT=4000
 volumes:
   registry-db-vol:

@@ -17,10 +17,10 @@ package search
 import (
 	"context"
 
+	longrunning "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	experimental_rpc "github.com/apigee/registry-experimental/rpc"
 	"github.com/apigee/registry-experimental/server/search/internal/storage"
 	registry_rpc "github.com/apigee/registry/rpc"
-	"google.golang.org/genproto/googleapis/longrunning"
 )
 
 // Config configures the Search server.

@@ -33,7 +33,7 @@ type WorkerRequest struct {
 }
 
 func getAuthToken() (string, error) {
-	serviceURL := "http://" + os.Getenv("APG_REGISTRY_ADDRESS")
+	serviceURL := "http://" + os.Getenv("REGISTRY_ADDRESS")
 	tokenURL := fmt.Sprintf("/instance/service-accounts/default/identity?audience=%s", serviceURL)
 	idToken, err := metadata.Get(tokenURL)
 	if err != nil {
@@ -68,7 +68,7 @@ func RequestHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	os.Setenv("APG_REGISTRY_TOKEN", idToken)
+	os.Setenv("REGISTRY_TOKEN", idToken)
 
 	split_cmd := strings.Split(req.Command, " ")
 	args := append(split_cmd[1:], req.Resource)

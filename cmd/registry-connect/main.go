@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover"
+	"github.com/apigee/registry-experimental/cmd/registry-connect/publish"
 	"github.com/apigee/registry/pkg/log"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
@@ -39,20 +40,15 @@ func main() {
 	cmd := &cobra.Command{
 		Use:     "registry-connect",
 		Version: Version,
-		Short:   "Exports Apigee resources to YAML files compatible with API Registry.",
-		Long: `This command exports API Registry-compatible YAML files from an Apigee
-instance into the specified DIRECTORY. (If no DIRECTORY is specified, it will print 
-to the console.)
-		
-Once this command has been successfully run, the entire exported DIRECTORY or
-individual files can be imported into an API Registry instance by running:
-
-  registry apply -f DIRECTORY|FILE
-
-See "registry apply --help" for more information.`,
+		Short:   "Provides Registry integration functions to external systems",
+		Long: `The subcommands are designed to "discover" external data and convert 
+it to a format that can be applied to Registry instance or to "publish" Registry data 
+for inclusion in other systems in a format those systems can consume. Use the "--help"
+flag on the subcommands for additional information.`,
 	}
 
 	cmd.AddCommand(discover.Command())
+	cmd.AddCommand(publish.Command())
 
 	if err := cmd.ExecuteContext(ctx); err != nil {
 		fmt.Println("----")

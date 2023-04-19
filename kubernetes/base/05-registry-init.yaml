@@ -18,9 +18,9 @@ spec:
           value: "1"
         - name: APG_ADMIN_ADDRESS
           value: $(MY_SERVICE_NAME):8080
-        - name: APG_REGISTRY_INSECURE
+        - name: REGISTRY_INSECURE
           value: "1"
-        - name: APG_REGISTRY_ADDRESS
+        - name: REGISTRY_ADDRESS
           value: $(REGISTRY_SERVICE_NAME):8080
         - name: REGISTRY_PROJECT_NAME
           valueFrom:

@@ -1,0 +1,107 @@
+{
+  "clientLibrary": {
+    "name": "github.com/apigee/registry-experimental/gapic",
+    "version": "$VERSION",
+    "language": "GO",
+    "apis": [
+      {
+        "id": "google.cloud.apigeeregistry.v1",
+        "version": "v1"
+      }
+    ]
+  },
+  "snippets": [
+    {
+      "regionTag": "apigeeregistry_v1_generated_Search_Index_sync",
+      "title": "apigeeregistry Index Sample",
+      "description": "Index add a resource to the search index.",
+      "file": "SearchClient/Index/main.go",
+      "language": "GO",
+      "clientMethod": {
+        "shortName": "Index",
+        "fullName": "google.cloud.apigeeregistry.v1.SearchClient.Index",
+        "parameters": [
+          {
+            "type": "context.Context",
+            "name": "ctx"
+          },
+          {
+            "type": "rpcpb.IndexRequest",
+            "name": "req"
+          },
+          {
+            "type": "...gax.CallOption",
+            "name": "opts"
+          }
+        ],
+        "resultType": "IndexOperation",
+        "client": {
+          "shortName": "SearchClient",
+          "fullName": "google.cloud.apigeeregistry.v1.SearchClient"
+        },
+        "method": {
+          "shortName": "Index",
+          "fullName": "google.cloud.apigeeregistry.v1.Search.Index",
+          "service": {
+            "shortName": "Search",
+            "fullName": "google.cloud.apigeeregistry.v1.Search"
+          }
+        }
+      },
+      "origin": "API_DEFINITION",
+      "segments": [
+        {
+          "start": 18,
+          "end": 58,
+          "type": "FULL"
+        }
+      ]
+    },
+    {
+      "regionTag": "apigeeregistry_v1_generated_Search_Query_sync",
+      "title": "apigeeregistry Query Sample",
+      "description": "Query query the index.",
+      "file": "SearchClient/Query/main.go",
+      "language": "GO",
+      "clientMethod": {
+        "shortName": "Query",
+        "fullName": "google.cloud.apigeeregistry.v1.SearchClient.Query",
+        "parameters": [
+          {
+            "type": "context.Context",
+            "name": "ctx"
+          },
+          {
+            "type": "rpcpb.QueryRequest",
+            "name": "req"
+          },
+          {
+            "type": "...gax.CallOption",
+            "name": "opts"
+          }
+        ],
+        "resultType": "QueryResponse_ResultIterator",
+        "client": {
+          "shortName": "SearchClient",
+          "fullName": "google.cloud.apigeeregistry.v1.SearchClient"
+        },
+        "method": {
+          "shortName": "Query",
+          "fullName": "google.cloud.apigeeregistry.v1.Search.Query",
+          "service": {
+            "shortName": "Search",
+            "fullName": "google.cloud.apigeeregistry.v1.Search"
+          }
+        }
+      },
+      "origin": "API_DEFINITION",
+      "segments": [
+        {
+          "start": 18,
+          "end": 60,
+          "type": "FULL"
+        }
+      ]
+    }
+  ]
+}

@@ -53,7 +53,7 @@ func indexCommand() *cobra.Command {
 			}
 			pattern := c.FQName(args[0])
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPool(ctx, jobs)
+			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, jobs)
 			defer wait()
 			v := &indexVisitor{
 				taskQueue:      taskQueue,
@@ -114,10 +114,11 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	data, err := visitor.GetBytesForSpec(ctx, task.client, spec)
+	err = visitor.FetchSpecContents(ctx, task.client, spec)
 	if err != nil {
 		return nil
 	}
+	data := spec.GetContents()
 	var message interface{}
 	switch {
 	case spec.GetMimeType() == "text/plain" ||

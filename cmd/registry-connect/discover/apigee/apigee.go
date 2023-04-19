@@ -26,7 +26,7 @@ import (
 func Command() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "apigee",
-		Short: "Registry commands relating to Apigee runtime",
+		Short: "Exports Apigee resources to YAML files compatible with API Registry.",
 	}
 
 	cmd.PersistentFlags().BoolVar(&client.Config.Debug, "debug", false, "debug mode")
@@ -37,6 +37,7 @@ func Command() *cobra.Command {
 	cmd.PersistentFlags().BoolVarP(&client.Config.OPDK, "opdk", "", false, "edge private cloud installation")
 	cmd.PersistentFlags().BoolVarP(&client.Config.Edge, "edge", "", false, "hosted edge installation")
 	cmd.PersistentFlags().StringVarP(&client.Config.MgmtURL, "mgmt", "", "", "management server endpoint (opdk only)")
+	cmd.PersistentFlags().StringVarP(&client.Config.Token, "token", "t", "", "Apigee OAuth or SAML token (overrides any other given credentials)")
 
 	cmd.MarkFlagsMutuallyExclusive("opdk", "edge")
 	cmd.MarkFlagsRequiredTogether("opdk", "mgmt")

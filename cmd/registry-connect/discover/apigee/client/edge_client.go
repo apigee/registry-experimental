@@ -41,10 +41,11 @@ func (c *EdgeClient) newService(ctx context.Context) (*edge.EdgeClient, error) {
 		Org:        c.org,
 		Env:        "",
 		Auth: &edge.EdgeAuth{
-			SkipAuth: false,
-			Username: Config.Username,
-			Password: Config.Password,
-			MFAToken: Config.MFAToken,
+			SkipAuth:    false,
+			Username:    Config.Username,
+			Password:    Config.Password,
+			MFAToken:    Config.MFAToken,
+			BearerToken: Config.Token,
 		},
 		InsecureSkipVerify: Config.SkipVerify,
 	}

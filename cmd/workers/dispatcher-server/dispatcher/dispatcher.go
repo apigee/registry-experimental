@@ -32,7 +32,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
-	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
+	taskspb "cloud.google.com/go/cloudtasks/apiv2/cloudtaskspb"
 )
 
 const subscriptionName = registry.TopicName + "-pull-subscriber"

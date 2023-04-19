@@ -31,6 +31,7 @@ var Config = struct {
 	MgmtURL    string
 	OPDK       bool
 	Edge       bool
+	Token      string
 }{}
 
 func NewClient() (Client, error) {

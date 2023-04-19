@@ -23,8 +23,18 @@ import (
 func Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "discover",
-		Short: "Commands to retrieve and format external data as API Registry YAML.",
-		Args:  cobra.NoArgs,
+		Short: "Exports extenal resources to YAML files compatible with API Registry.",
+		Long: `These commands export API Registry-compatible YAML files from external
+sources into the specified DIRECTORY. (If no DIRECTORY is specified, it will print 
+to the console.)
+		
+Once this command has been successfully run, the entire exported DIRECTORY or
+individual files can be imported into an API Registry instance by running:
+
+  registry apply -f DIRECTORY|FILE
+
+See "registry apply --help" for more information.`,
+		Args: cobra.NoArgs,
 	}
 	cmd.AddCommand(apigee.Command())
 	cmd.AddCommand(apigateway.Command())

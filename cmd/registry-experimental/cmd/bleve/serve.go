@@ -36,8 +36,7 @@ func serveCommand() *cobra.Command {
 			router := gin.Default()
 			router.GET("/search", search)
 			router.POST("/index", index)
-			router.Run(fmt.Sprintf("0.0.0.0:%d", port))
-			return nil
+			return router.Run(fmt.Sprintf("0.0.0.0:%d", port))
 		},
 	}
 	cmd.Flags().IntVarP(&port, "port", "p", 8888, "port for server")

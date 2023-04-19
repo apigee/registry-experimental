@@ -155,7 +155,7 @@ func (task *indexSpecTask) Run(ctx context.Context) error {
 	}
 	defer index.Close()
 	// Index the spec.
-	log.Debugf(ctx, "Indexing %s", task.name)
+	log.Infof(ctx, "Indexing %s", task.name)
 	return index.Index(task.name, message)
 }
 
@@ -212,7 +212,6 @@ func (task *indexArtifactTask) Run(ctx context.Context) error {
 	}
 	defer index.Close()
 	// Index the spec.
-	log.Debugf(ctx, "Indexing %s", task.name)
-	log.Debugf(ctx, "%+v", message)
+	log.Infof(ctx, "Indexing %s", task.name)
 	return index.Index(task.name, message)
 }

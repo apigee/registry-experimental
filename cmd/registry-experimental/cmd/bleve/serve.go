@@ -16,6 +16,7 @@ package bleve
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -34,6 +35,7 @@ func serveCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			router := gin.Default()
 			router.GET("/search", search)
+			router.POST("/index", index)
 			router.Run(fmt.Sprintf("0.0.0.0:%d", port))
 			return nil
 		},
@@ -73,4 +75,32 @@ func search(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusOK, searchResults)
+}
+
+type IndexRequestBody struct {
+	Pattern string `json:"pattern"`
+	Filter  string `json:"filter"`
+}
+
+func index(c *gin.Context) {
+	var requestBody IndexRequestBody
+	if err := c.BindJSON(&requestBody); err != nil {
+		log.Printf("%s", err)
+	} else {
+		log.Printf("pattern %+v", requestBody.Pattern)
+		log.Printf("filter %+v", requestBody.Filter)
+		cmd := indexCommand()
+		//buf := &bytes.Buffer{}
+		//cmd.SetOut(buf)
+		args := []string{requestBody.Pattern}
+		if requestBody.Filter != "" {
+			args = append(args, "--filter")
+			args = append(args, requestBody.Filter)
+		}
+		cmd.SetArgs(args)
+		if err := cmd.Execute(); err != nil {
+			log.Printf("%s", err)
+		}
+	}
+	c.IndentedJSON(http.StatusOK, []string{})
 }

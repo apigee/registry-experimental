@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -199,7 +200,7 @@ func TestServer(t *testing.T) {
 
 	buildTestRegistry(ctx, t)
 
-	// Start the server
+	// Start the server.
 	go func() {
 		cmd := Command()
 		cmd.SetArgs([]string{"serve", "--bleve", blevePath, "--port", port})
@@ -208,11 +209,14 @@ func TestServer(t *testing.T) {
 		}
 	}()
 
-	// Give it time to start.
-	time.Sleep(1 * time.Second)
+	// Wait for the server to start.
+	_, err := net.DialTimeout("tcp", "localhost:"+port, 2*time.Second)
+	if err != nil {
+		log.Fatalf("Failed to connect to test server: %s", err)
+	}
 
 	// Call the indexing API.
-	{
+	t.Run("server-indexing", func(t *testing.T) {
 		postBody, err := json.Marshal(struct {
 			Pattern string `json:"pattern"`
 			Filter  string `json:"string"`
@@ -238,10 +242,10 @@ func TestServer(t *testing.T) {
 			t.Fatalf("unexpected code from index API %d", response.StatusCode)
 		}
 		fmt.Println("response Headers:", response.Header)
-	}
+	})
 
 	// Call the search API.
-	{
+	t.Run("server-search", func(t *testing.T) {
 		request, err := http.NewRequest("GET", "http://localhost:"+port+"/search?q=pet", nil)
 		if err != nil {
 			t.Fatalf("failed to create request %s", err)
@@ -269,5 +273,5 @@ func TestServer(t *testing.T) {
 		if searchResponse.TotalHits != 1 {
 			t.Fatalf("failed to get expected number of hits (1), got %d", searchResponse.TotalHits)
 		}
-	}
+	})
 }

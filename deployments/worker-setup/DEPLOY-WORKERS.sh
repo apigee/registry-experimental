@@ -26,7 +26,7 @@ if [ -z "${registry_ingress_ip}" ]; then
 fi
 
 # TODO: Use kubernetes DNS
-export APG_REGISTRY_ADDRESS="${registry_ingress_ip}:${registry_service_port}"
+export REGISTRY_ADDRESS="${registry_ingress_ip}:${registry_service_port}"
 
 project_number=$(gcloud projects describe ${REGISTRY_PROJECT_IDENTIFIER} --format="value(projectNumber)")
 

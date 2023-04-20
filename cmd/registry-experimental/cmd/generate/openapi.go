@@ -102,10 +102,11 @@ func (task *generateOpenAPITask) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	data, err := visitor.GetBytesForSpec(ctx, task.client, spec)
+	err = visitor.FetchSpecContents(ctx, task.client, spec)
 	if err != nil {
 		return err
 	}
+	data := spec.GetContents()
 	relation := task.newSpecID
 	var openapi string
 	switch {

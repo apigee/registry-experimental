@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC. All Rights Reserved.
+// Copyright 2023 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,22 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package bleve
+package encoding
 
-import (
-	"github.com/spf13/cobra"
-)
-
-var bleveDir string
-
-func Command() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "bleve",
-		Short: "Experimental search features built using blevesearch.com",
-	}
-	cmd.AddCommand(indexCommand())
-	cmd.AddCommand(searchCommand())
-	cmd.AddCommand(serveCommand())
-	cmd.PersistentFlags().StringVar(&bleveDir, "bleve", "registry.bleve", "path to local bleve search index")
-	return cmd
+type Location struct {
+	Type     string   `yaml:"type,omitempty"`
+	Target   string   `yaml:"target,omitempty"`
+	Targets  []string `yaml:"targets,omitempty"`
+	Presence string   `yaml:"presence,omitempty"` // "required" (default) | "optional"
 }

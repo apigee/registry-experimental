@@ -89,8 +89,6 @@ func index(c *gin.Context) {
 		log.Printf("pattern %+v", requestBody.Pattern)
 		log.Printf("filter %+v", requestBody.Filter)
 		cmd := indexCommand()
-		//buf := &bytes.Buffer{}
-		//cmd.SetOut(buf)
 		args := []string{requestBody.Pattern}
 		if requestBody.Filter != "" {
 			args = append(args, "--filter")

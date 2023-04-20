@@ -27,6 +27,7 @@ func Command() *cobra.Command {
 	}
 	cmd.AddCommand(indexCommand())
 	cmd.AddCommand(searchCommand())
+	cmd.AddCommand(serveCommand())
 	cmd.PersistentFlags().StringVar(&bleveDir, "bleve", "registry.bleve", "path to local bleve search index")
 	return cmd
 }

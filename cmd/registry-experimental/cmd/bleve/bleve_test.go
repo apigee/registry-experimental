@@ -18,9 +18,15 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/apigee/registry/cmd/registry/compress"
 	"github.com/apigee/registry/pkg/connection/grpctest"
@@ -33,10 +39,7 @@ func TestMain(m *testing.M) {
 	grpctest.TestMain(m, registry.Config{})
 }
 
-func TestSearch(t *testing.T) {
-	ctx := context.Background()
-	blevePath := filepath.Join(t.TempDir(), "registry.bleve")
-
+func buildTestRegistry(ctx context.Context, t *testing.T) {
 	bookstore_protos, err := compress.ZipArchiveOfPath("testdata/examples", "testdata/", true)
 	if err != nil {
 		t.Fatalf("Failed to initialize search test: %s", err)
@@ -80,6 +83,14 @@ func TestSearch(t *testing.T) {
 				Contents: []byte("Hello, this is an http API."),
 			},
 		})
+}
+
+func TestSearch(t *testing.T) {
+	var err error
+	ctx := context.Background()
+	blevePath := filepath.Join(t.TempDir(), "registry.bleve")
+
+	buildTestRegistry(ctx, t)
 
 	cmd := Command()
 	cmd.SetArgs([]string{"index", "projects/search-test/locations/global/apis/-/versions/-/specs/-", "--bleve", blevePath})
@@ -178,6 +189,89 @@ func TestSearch(t *testing.T) {
 		}
 		if result.TotalHits != 0 {
 			t.Errorf("Expected 0 hits, got %d", result.TotalHits)
+		}
+	})
+}
+
+func TestServer(t *testing.T) {
+	ctx := context.Background()
+	blevePath := filepath.Join(t.TempDir(), "registry.bleve")
+	port := "8891"
+
+	buildTestRegistry(ctx, t)
+
+	// Start the server.
+	go func() {
+		cmd := Command()
+		cmd.SetArgs([]string{"serve", "--bleve", blevePath, "--port", port})
+		if err := cmd.Execute(); err != nil {
+			log.Fatalf("Execute() with args %+v returned error: %s", cmd.Args, err)
+		}
+	}()
+
+	// Wait for the server to start.
+	_, err := net.DialTimeout("tcp", "localhost:"+port, 2*time.Second)
+	if err != nil {
+		log.Fatalf("Failed to connect to test server: %s", err)
+	}
+
+	// Call the indexing API.
+	t.Run("server-indexing", func(t *testing.T) {
+		postBody, err := json.Marshal(struct {
+			Pattern string `json:"pattern"`
+			Filter  string `json:"string"`
+		}{
+			Pattern: "projects/search-test/locations/global/apis/-/versions/-/specs/-",
+			Filter:  "mime_type.contains('openapi')",
+		})
+		if err != nil {
+			t.Fatalf("failed to create request %s", err)
+		}
+		request, err := http.NewRequest("POST", "http://localhost:"+port+"/index", bytes.NewBuffer(postBody))
+		if err != nil {
+			t.Fatalf("failed to create request %s", err)
+		}
+		request.Header.Set("Content-Type", "application/json; charset=UTF-8")
+		client := &http.Client{}
+		response, err := client.Do(request)
+		if err != nil {
+			t.Fatalf("failed to call index API %s", err)
+		}
+		defer response.Body.Close()
+		if response.StatusCode != 200 {
+			t.Fatalf("unexpected code from index API %d", response.StatusCode)
+		}
+		fmt.Println("response Headers:", response.Header)
+	})
+
+	// Call the search API.
+	t.Run("server-search", func(t *testing.T) {
+		request, err := http.NewRequest("GET", "http://localhost:"+port+"/search?q=pet", nil)
+		if err != nil {
+			t.Fatalf("failed to create request %s", err)
+		}
+		client := &http.Client{}
+		response, error := client.Do(request)
+		if error != nil {
+			t.Fatalf("failed to call search API %s", err)
+		}
+		defer response.Body.Close()
+		if response.StatusCode != 200 {
+			t.Fatalf("unexpected code from search API %d", response.StatusCode)
+		}
+		fmt.Println("response Headers:", response.Header)
+		body, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			t.Fatalf("failed to read search API response %s", err)
+		}
+		var searchResponse struct {
+			TotalHits int `json:"total_hits"`
+		}
+		if err = json.Unmarshal(body, &searchResponse); err != nil {
+			t.Fatalf("failed to read unmarshal API response %s", err)
+		}
+		if searchResponse.TotalHits != 1 {
+			t.Fatalf("failed to get expected number of hits (1), got %d", searchResponse.TotalHits)
 		}
 	})
 }

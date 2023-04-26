@@ -21,12 +21,20 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// QueryNode accepts a node and period-delimited path of segments,
+// searches the list to get a matching node. If a segment matches
+// a list, the next seqment will be treated as an index. If a segment
+// matches a map, the next segment will be treated as the key.
 func QueryNode(node *yaml.Node, path string) *yaml.Node {
 	return query(node, strings.Split(path, "."))
 }
 
+// QueryString accepts a node and period-delimited path of segments,
+// searches the list to get a matching node's string value. If a segment
+// matches a list, the next seqment will be treated as an index. If a
+// segment matches a map, the next segment will be treated as the key.
 func QueryString(node *yaml.Node, path string) *string {
-	if n := query(node, strings.Split(path, ".")); n == nil {
+	if n := QueryNode(node, path); n == nil {
 		return nil
 	} else {
 		if n.Kind == yaml.ScalarNode {
@@ -39,6 +47,8 @@ func QueryString(node *yaml.Node, path string) *string {
 	}
 }
 
+// QueryStringArray returns the node's content as an array
+// of strings if the node is a list. Otherwise returns nil.
 func QueryStringArray(node *yaml.Node) []string {
 	if node == nil || node.Kind != yaml.SequenceNode {
 		return nil
@@ -83,6 +93,7 @@ func query(node *yaml.Node, path []string) *yaml.Node {
 	return nil
 }
 
+// Describe returns a node as a YAML string.
 func Describe(node *yaml.Node) string {
 	bytes, err := yaml.Marshal(node)
 	if err != nil {

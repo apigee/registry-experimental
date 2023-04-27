@@ -10,6 +10,8 @@ GRAPHQL_MOCK_ENDPOINT).
 
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?dir=containers/registry-spec-renderer)
 
+_This is equivalent to running `gcloud run deploy --source containers/registry-spec-renderer` from the root of this repository._
+
 ### To run this service on a GCE instance run the following command:
 
 ```

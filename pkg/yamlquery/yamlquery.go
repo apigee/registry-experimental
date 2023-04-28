@@ -76,6 +76,9 @@ func query(node *yaml.Node, path []string) *yaml.Node {
 		if err != nil {
 			return nil
 		}
+		if index >= len(node.Content) {
+			return nil
+		}
 		return query(node.Content[index], path[1:])
 	case yaml.MappingNode:
 		for i := 0; i < len(node.Content); i += 2 {
@@ -84,6 +87,9 @@ func query(node *yaml.Node, path []string) *yaml.Node {
 			}
 		}
 	case yaml.ScalarNode:
+		if len(path) > 1 {
+			return nil
+		}
 		return node
 	case yaml.AliasNode:
 		return nil

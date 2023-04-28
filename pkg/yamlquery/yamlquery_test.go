@@ -50,7 +50,7 @@ aliased: *anchor`
 	}{
 		{"sub.list.0", sp("one")},
 		{"sub.list.1", sp("two")},
-		// {"sub.list.3", nil}, // panics
+		{"sub.list.3", nil},
 		{"sub.list.not_int", nil},
 		{"sub.list", sp("- one\n- two\n")},
 		{"sub.map.foo", sp("bar")},
@@ -58,7 +58,7 @@ aliased: *anchor`
 		{"sub.map.missing", nil},
 		{"sub.map", sp("foo: bar\nbar: baz\n")},
 		{"key", sp("val")},
-		{"key.is.this.right", sp("val")},
+		{"key.is.this.right", nil},
 		{"anchored", sp("&anchor\nfoo: bar\n")},
 		{"aliased", sp("*anchor\n")},
 		{"aliased.foo", nil},

@@ -1,0 +1,78 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: registry-custom
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: registry-admin-ksa
+  namespace: registry-custom
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: registry-protoc-gen-doc-controller
+  namespace: registry-custom
+spec:
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 100
+  suspend: false
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        app: registry-protoc-gen-doc-controller
+    spec:
+      template:
+        metadata:
+          labels:
+            app: registry-protoc-gen-doc-controller
+        spec:
+          serviceAccountName: registry-admin-ksa
+          nodeSelector:
+            iam.gke.io/gke-metadata-server-enabled: "true"
+          containers:
+          - name: registry-protoc-gen-doc
+            image: ghcr.io/apigee/registry-protoc-gen-doc:main
+            imagePullPolicy: Always
+            env:
+            - name: REGISTRY_ADDRESS
+              value: "apigeeregistry.googleapis.com:443"
+            args:
+            - bin/sh
+            - -c
+            - |
+              export REGISTRY_PROJECT_NAME=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)
+              export TOKEN=$(curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token | jq .access_token -r)
+              echo $TOKEN > /tmp/registry-token
+
+              registry config configurations create default \
+                --registry.address=$REGISTRY_ADDRESS \
+                --registry.insecure=0 \
+                --registry.project=$REGISTRY_PROJECT_NAME \
+                --registry.location=global
+              registry config set token-source "cat /tmp/registry-token"
+              
+              registry resolve artifacts/registry-protoc-gen-doc
+
+              rc=$(echo $?)
+              exit $rc
+          restartPolicy: Never
+      backoffLimit: 3

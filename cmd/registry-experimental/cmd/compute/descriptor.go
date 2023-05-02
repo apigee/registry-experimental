@@ -23,11 +23,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/apigee/registry/cmd/registry/core"
-	"github.com/apigee/registry/log"
+	"github.com/apigee/registry/cmd/registry/compress"
+	"github.com/apigee/registry/cmd/registry/tasks"
 	"github.com/apigee/registry/pkg/connection"
+	"github.com/apigee/registry/pkg/log"
+	"github.com/apigee/registry/pkg/mime"
+	"github.com/apigee/registry/pkg/names"
+	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
-	"github.com/apigee/registry/server/registry/names"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/proto"
 
@@ -37,12 +40,14 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-func descriptorCommand(ctx context.Context) *cobra.Command {
+func descriptorCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "descriptor",
 		Short: "Compute descriptors of API specs",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			ctx := cmd.Context()
+
 			filter, err := cmd.Flags().GetString("filter")
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")
@@ -53,12 +58,12 @@ func descriptorCommand(ctx context.Context) *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
 			}
 			// Initialize task queue.
-			taskQueue, wait := core.WorkerPool(ctx, 1)
+			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, 1)
 			defer wait()
 			// Generate tasks.
 			name := args[0]
 			if spec, err := names.ParseSpec(name); err == nil {
-				err = core.ListSpecs(ctx, client, spec, filter, func(spec *rpc.ApiSpec) error {
+				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
 					taskQueue <- &computeDescriptorTask{
 						client:   client,
 						specName: spec.Name,
@@ -93,32 +98,33 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	name := spec.GetName()
 	relation := "descriptor"
 	log.Infof(ctx, "Computing %s/artifacts/%s", name, relation)
-	data, err := core.GetBytesForSpec(ctx, task.client, spec)
+	err = visitor.FetchSpecContents(ctx, task.client, spec)
 	if err != nil {
 		return nil
 	}
+	data := spec.GetContents()
 	subject := spec.GetName()
 	var typeURL string
 	var document proto.Message
-	if core.IsOpenAPIv2(spec.GetMimeType()) {
+	if mime.IsOpenAPIv2(spec.GetMimeType()) {
 		typeURL = "gnostic.openapiv2.Document"
 		document, err = oas2.ParseDocument(data)
 		if err != nil {
 			return err
 		}
-	} else if core.IsOpenAPIv3(spec.GetMimeType()) {
+	} else if mime.IsOpenAPIv3(spec.GetMimeType()) {
 		typeURL = "gnostic.openapiv3.Document"
 		document, err = oas3.ParseDocument(data)
 		if err != nil {
 			return err
 		}
-	} else if core.IsDiscovery(spec.GetMimeType()) {
+	} else if mime.IsDiscovery(spec.GetMimeType()) {
 		typeURL = "gnostic.discoveryv1.Document"
 		document, err = discovery.ParseDocument(data)
 		if err != nil {
 			return err
 		}
-	} else if core.IsProto(spec.GetMimeType()) && core.IsZipArchive(spec.GetMimeType()) {
+	} else if mime.IsProto(spec.GetMimeType()) && mime.IsZipArchive(spec.GetMimeType()) {
 		typeURL = "google.protobuf.FileDescriptorSet"
 		document, err = descriptorFromZippedProtos(ctx, spec.Name, data)
 		if err != nil {
@@ -135,10 +141,10 @@ func (task *computeDescriptorTask) Run(ctx context.Context) error {
 	// this will probably require some representation of compression type in the typeURL
 	artifact := &rpc.Artifact{
 		Name:     subject + "/artifacts/" + relation,
-		MimeType: core.MimeTypeForMessageType(typeURL),
+		MimeType: mime.MimeTypeForMessageType(typeURL),
 		Contents: messageData,
 	}
-	return core.SetArtifact(ctx, task.client, artifact)
+	return visitor.SetArtifact(ctx, task.client, artifact)
 }
 
 // descriptorFromZippedProtos runs protoc on a collection of protos and returns a file descriptor set.
@@ -148,7 +154,7 @@ func descriptorFromZippedProtos(ctx context.Context, name string, b []byte) (*de
 		return nil, err
 	}
 	defer os.RemoveAll(root)
-	_, err = core.UnzipArchiveToPath(b, root+"/protos")
+	_, err = compress.UnzipArchiveToPath(b, root+"/protos")
 	if err != nil {
 		return nil, err
 	}

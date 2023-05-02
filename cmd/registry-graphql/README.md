@@ -14,15 +14,18 @@ provide access to spec revisions or artifact values.
 
 ## Invocation
 
-Just run the `registry-graphql` program. It uses the `APG_*` environment
-variables to connect to a Registry API server. Because it serves static files,
-it should be run in the same directory as its source files.
+Just run the `registry-graphql` program. It uses the
+[registry](https://github.com/apigee/registry) project's
+[pkg/connection](https://github.com/apigee/registry/tree/main/pkg/connection) to
+get an authenticated connection to a Registry API server. Because it serves
+static files, it should be run in the same directory as its source files.
 
-If you're building a React or other browser-hosted client application, you
-can use the `-cors-allow-origin` flag to allow CORS requests while you are
+If you're building a React or other browser-hosted client application, you can
+use the `-cors-allow-origin` flag to allow CORS requests while you are
 developing your app. This allows you to specify a single allowed origin, which
 can include `*`, which allows all CORS requests. Take care to quote the `*` to
 avoid shell expansion:
+
 ```
 registry-graphql -cors-allow-origin '*'
 ```

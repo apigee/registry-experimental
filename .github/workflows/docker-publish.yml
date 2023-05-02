@@ -12,27 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Publish Image to ghcr.io
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+name: Publish docker images
 
 on:
   schedule:
-    - cron: '10 16 * * *'
+    - cron: '0 0 * * *' # each 12:00 UTC
   push:
     branches: [ main ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
+    tags: [ 'v*.*.*' ] # semver release
   pull_request:
     branches: [ main ]
 
 env:
-  # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
+
 jobs:
+
   build_containers:
     runs-on: ubuntu-latest
     permissions:
@@ -56,15 +51,18 @@ jobs:
         -   image: ${{github.repository_owner}}/registry-linters
             context: "."
             dockerfile: "containers/registry-linters/Dockerfile"
+        -   image: ${{github.repository_owner}}/registry-protoc-gen-doc
+            context: "containers/registry-protoc-gen-doc"
+            dockerfile: "containers/registry-protoc-gen-doc/Dockerfile"
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     # Login against a Docker registry except on PR
     # https://github.com/docker/login-action
     - name: Log into registry ${{ env.REGISTRY }}
       if: github.event_name != 'pull_request'
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
@@ -74,14 +72,14 @@ jobs:
     # https://github.com/docker/metadata-action
     - name: Extract Docker metadata
       id: meta
-      uses: docker/metadata-action@v3
+      uses: docker/metadata-action@v4
       with:
         images: ${{ env.REGISTRY }}/${{ matrix.image }}
 
     # Build and push Docker image with Buildx (don't push on PR)
     # https://github.com/docker/build-push-action
     - name: Build and push ${{ env.REGISTRY }}/${{ matrix.image }} Docker image
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v4
       with:
         context: ${{ matrix.context }}
         file: ${{ matrix.dockerfile }}

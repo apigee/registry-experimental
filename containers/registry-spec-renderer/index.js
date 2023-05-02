@@ -17,22 +17,26 @@ const express = require('express')
 const fs = require("fs");
 const handlebars = require("handlebars");
 const {RegistryClient} = require("@google-cloud/apigee-registry");
+const {Storage} = require('@google-cloud/storage');
 const {credentials} = require("@grpc/grpc-js");
 const jsYaml = require('js-yaml');
 const {parseURL} = require("whatwg-url");
 const cors = require('cors')
+const storage = new Storage();
 
 var client_options = {};
-if (process.env.APG_REGISTRY_INSECURE
-    && process.env.APG_REGISTRY_INSECURE == "1") {
+if (process.env.REGISTRY_INSECURE
+    && process.env.REGISTRY_INSECURE == "1") {
   client_options.sslCreds = credentials.createInsecure();
 }
 
 const OPENAPI_MOCK_ENDPOINT = process.env.OPENAPI_MOCK_ENDPOINT;
 const GRAPHQL_MOCK_ENDPOINT = process.env.GRAPHQL_MOCK_ENDPOINT;
+const GRPC_DOC_ARTIFACT_NAME = process.env.GRPC_DOC_ARTIFACT_NAME
+    || 'grpc-doc-url';
 
-if (process.env.APG_REGISTRY_ADDRESS) {
-  items = process.env.APG_REGISTRY_ADDRESS.split(":");
+if (process.env.REGISTRY_ADDRESS) {
+  items = process.env.REGISTRY_ADDRESS.split(":");
   client_options.apiEndpoint = items[0];
   client_options.port = items.length >= 1 ? items[1] : 443;
 }
@@ -86,20 +90,56 @@ function renderTemplate(res, apiFormat, spec_name) {
         api_endpoint = GRAPHQL_MOCK_ENDPOINT + "/" + spec_name
       }
       break;
+    case "grpc":
+      renderer_template = "grpc_markdown";
+      break
     default:
       renderer_template = "spec_file"
       break;
   }
   spec_url = "/spec/" + apiFormat + "/" + spec_name + (api_endpoint
       ? "?endpoint_uri=" + encodeURI(api_endpoint) : "");
-  if (renderer_template != "spec_file") {
+  if (renderer_template == 'grpc_markdown') {
+    /**
+     * For GRPC documentation, we expect the HTML markup file to be
+     * generated and stored in GCS. The URL to the GCS object will be
+     * stored as an artifact on the spec object.
+     */
+    client.getArtifact({
+      name: spec_name + '/artifacts/' + GRPC_DOC_ARTIFACT_NAME
+    }, (err, artifact) => {
+      client.getArtifactContents({
+        name: spec_name + '/artifacts/' + GRPC_DOC_ARTIFACT_NAME
+      }, async (err, artifact_content) => {
+        if (err) {
+          console.error("Error retrieving documentation for " + spec_name);
+          res.sendStatus(500);
+          res.end();
+        } else {
+          let artifact_url = artifact_content.data.toString().trim();
+          let parsedUrl = parseURL(artifact_url);
+          if (parsedUrl.host == 'storage.googleapis.com') {
+            let bucket = parsedUrl.path.shift();
+            let contents = await storage.bucket(bucket).file(
+                parsedUrl.path.join("/")).download();
+            res.setHeader("content-type", "text/html");
+            res.send(contents[0].toString()).end();
+          } else {
+            res.redirect(artifact_url);
+          }
+        }
+      })
+    });
+
+  } else if (renderer_template != "spec_file") {
     res.setHeader("content-type", "text/html; charset=UTF-8");
     hbstemplate = handlebars.compile(renderer_template);
     res.send(hbstemplate({specUrl: spec_url, apiEndpoint: api_endpoint}));
+    res.end();
   } else {
     res.redirect(spec_url);
+    res.end();
   }
-  res.end();
 }
 
 function getAPIFormat(text) {
@@ -110,8 +150,8 @@ function getAPIFormat(text) {
     apiFormat = 'asyncapi';
   } else if (text.includes("discovery")) {
     apiFormat = 'discovery';
-  } else if (text.includes("proto")) {
-    apiFormat = 'proto';
+  } else if (text.includes("protobuf")) {
+    apiFormat = 'grpc';
   } else if (text.includes("graphql")) {
     apiFormat = 'graphql';
   }

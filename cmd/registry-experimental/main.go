@@ -20,13 +20,19 @@ import (
 	"os"
 
 	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd"
+	"github.com/apigee/registry/pkg/log"
+	"github.com/google/uuid"
 )
 
 func main() {
-	ctx := context.Background()
-	cmd := cmd.Command(ctx)
-	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
+	// Bind a logger instance to the local context with metadata for outbound requests.
+	logger := log.NewLogger(log.DebugLevel)
+	ctx := log.NewOutboundContext(log.NewContext(context.Background(), logger), log.Metadata{
+		UID: fmt.Sprintf("%.8s", uuid.New()),
+	})
+
+	cmd := cmd.Command()
+	if err := cmd.ExecuteContext(ctx); err != nil {
 		os.Exit(1)
 	}
 }

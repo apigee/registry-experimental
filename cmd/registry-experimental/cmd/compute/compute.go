@@ -15,20 +15,18 @@
 package compute
 
 import (
-	"context"
-
+	"github.com/apigee/registry-experimental/cmd/registry-experimental/cmd/compute/summary"
 	"github.com/spf13/cobra"
 )
 
-func Command(ctx context.Context) *cobra.Command {
+func Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "compute",
 		Short: "Compute properties of resources in the API Registry",
 	}
 
-	cmd.AddCommand(descriptorCommand(ctx))
-	cmd.AddCommand(indexCommand(ctx))
-	cmd.AddCommand(searchIndexCommand(ctx))
+	cmd.AddCommand(descriptorCommand())
+	cmd.AddCommand(summary.Command())
 
 	cmd.PersistentFlags().String("filter", "", "Filter selected resources")
 	return cmd

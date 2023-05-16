@@ -32,7 +32,7 @@ import (
 func revisionsCommand() *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   "revisions",
+		Use:   "revisions [SPEC or DEPLOYMENT PATTERN]",
 		Short: "Count the number of revisions of specified resources",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {

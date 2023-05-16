@@ -32,7 +32,7 @@ import (
 func deploymentsCommand() *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   "deployments",
+		Use:   "deployments [API PATTERN]",
 		Short: "Count the number of deployments of specified APIs",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {

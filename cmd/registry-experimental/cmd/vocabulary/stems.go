@@ -20,6 +20,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/apigee/registry/cmd/registry/patch"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/mime"
@@ -31,7 +32,6 @@ import (
 	"github.com/kljensen/snowball"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/proto"
 )
 
 func stemsCommand() *cobra.Command {
@@ -74,7 +74,7 @@ func stemsCommand() *cobra.Command {
 				}
 
 				vocab := &metrics.Vocabulary{}
-				if err := proto.Unmarshal(artifact.GetContents(), vocab); err != nil {
+				if err := patch.UnmarshalContents(artifact.GetContents(), artifact.GetMimeType(), vocab); err != nil {
 					log.FromContext(ctx).WithError(err).Debug("Failed to unmarshal contents")
 					return nil
 				}

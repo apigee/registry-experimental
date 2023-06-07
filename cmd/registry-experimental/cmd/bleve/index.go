@@ -20,6 +20,7 @@ import (
 	"sync"
 
 	"github.com/apigee/registry/cmd/registry/compress"
+	"github.com/apigee/registry/cmd/registry/patch"
 	"github.com/apigee/registry/cmd/registry/tasks"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/log"
@@ -28,7 +29,6 @@ import (
 	"github.com/apigee/registry/rpc"
 	"github.com/blevesearch/bleve"
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/proto"
 )
 
 var bleveMutex sync.Mutex
@@ -194,8 +194,7 @@ func (task *indexArtifactTask) Run(ctx context.Context) error {
 	if err != nil {
 		return nil
 	}
-	err = proto.Unmarshal(artifact.GetContents(), message)
-	if err != nil {
+	if err := patch.UnmarshalContents(artifact.GetContents(), artifact.GetMimeType(), message); err != nil {
 		return nil
 	}
 	// The bleve index requires serialized updates.

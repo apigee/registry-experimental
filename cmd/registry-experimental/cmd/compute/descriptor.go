@@ -41,7 +41,8 @@ import (
 )
 
 func descriptorCommand() *cobra.Command {
-	return &cobra.Command{
+	var jobs int
+	cmd := &cobra.Command{
 		Use:   "descriptor",
 		Short: "Compute descriptors of API specs",
 		Args:  cobra.ExactArgs(1),
@@ -63,7 +64,7 @@ func descriptorCommand() *cobra.Command {
 				return err
 			}
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, 1)
+			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, jobs)
 			defer wait()
 			// Generate tasks.
 			if spec, err := names.ParseSpec(pattern); err == nil {
@@ -81,6 +82,9 @@ func descriptorCommand() *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().IntVarP(&jobs, "jobs", "j", 10, "number of actions to perform concurrently")
+	return cmd
 }
 
 type computeDescriptorTask struct {

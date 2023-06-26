@@ -256,9 +256,11 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 
 func boundProxies(prod *api.GoogleCloudApigeeV1ApiProduct) []string {
 	proxies := prod.Proxies
-	for _, oc := range prod.OperationGroup.OperationConfigs {
-		if oc.ApiSource != "" {
-			proxies = append(proxies, oc.ApiSource)
+	if prod.OperationGroup != nil {
+		for _, oc := range prod.OperationGroup.OperationConfigs {
+			if oc.ApiSource != "" {
+				proxies = append(proxies, oc.ApiSource)
+			}
 		}
 	}
 	return proxies

@@ -79,27 +79,6 @@ func exportProxies(ctx context.Context, client apigee.Client) error {
 			},
 		}
 
-		for _, r := range proxy.Revision {
-			log.FromContext(ctx).Infof("encoding revision %q", r)
-			v := &encoding.ApiVersion{
-				Header: encoding.Header{
-					ApiVersion: encoding.RegistryV1,
-					Kind:       "Version",
-					Metadata: encoding.Metadata{
-						Name: name(r),
-						Annotations: map[string]string{
-							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), proxy.Name, r),
-						},
-					},
-				},
-				Data: encoding.ApiVersionData{
-					DisplayName: r,
-					Description: r,
-				},
-			}
-			api.Data.ApiVersions = append(api.Data.ApiVersions, v)
-		}
-
 		dependencies := &apihub.ReferenceList{
 			DisplayName: "Apigee Dependencies",
 			Description: "Links to dependant Apigee resources.",
@@ -243,15 +222,6 @@ items:
           data:
             displayName: prod (helloworld.example.com)
             endpointURI: helloworld.example.com
-      versions:
-        - kind: Version
-          metadata:
-            name: 1
-            annotations:
-              apigee-proxy-revision: organizations/myorg/apis/helloworld/revisions/1
-          data:
-            displayName: 1 (My First Revision)
-            description: Hello World API proxy, the first revision.
       artifacts:
         - kind: ReferenceList
           metadata:

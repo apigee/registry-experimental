@@ -173,8 +173,8 @@ version 5.X.X
      ```
 
 ## How are lint results calculated?
-- The lint result artifacts are called as conformance reports, to represent how conformant an API is wrt the
-  specified lint rules. The calculation of Scores depends on the existence of StyleGuide
+- The lint result artifacts are called as conformance reports, to represent how conformant an API is with respect
+  to the specified lint rules. The calculation of Scores depends on the existence of StyleGuide
   artifacts. These artifacts are stored at the project level and hence are
   applied to the whole project.
 - You can see what definitions currently exist in your registry using the

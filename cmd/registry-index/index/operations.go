@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	"cloud.google.com/go/bigquery"
 	"github.com/apigee/registry-experimental/pkg/yamlquery"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/mime"
@@ -26,6 +27,7 @@ import (
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
+	"google.golang.org/api/googleapi"
 	"gopkg.in/yaml.v3"
 )
 
@@ -56,23 +58,68 @@ func operationsCommand() *cobra.Command {
 			v := &operationsVisitor{
 				registryClient: registryClient,
 			}
-			return visitor.Visit(ctx, v, visitor.VisitorOptions{
+			client, err := bigquery.NewClient(ctx, "TODO")
+			if err != nil {
+				return err
+			}
+			dataset := client.Dataset("registry")
+			if err := dataset.Create(ctx, nil); err != nil {
+				switch v := err.(type) {
+				case *googleapi.Error:
+					if v.Code != 409 { // already exists
+						return err
+					}
+				default:
+					return err
+				}
+			}
+			table := dataset.Table("operations")
+
+			schema, err := bigquery.InferSchema(operation{})
+			if err != nil {
+				return err
+			}
+			if err := table.Create(ctx, &bigquery.TableMetadata{Schema: schema}); err != nil {
+				switch v := err.(type) {
+				case *googleapi.Error:
+					if v.Code != 409 { // already exists
+						return err
+					}
+				default:
+					return err
+				}
+			}
+			err = visitor.Visit(ctx, v, visitor.VisitorOptions{
 				RegistryClient:  registryClient,
 				AdminClient:     adminClient,
 				Pattern:         pattern,
 				Filter:          filter,
 				ImplicitProject: &rpc.Project{Name: "projects/implicit"},
 			})
+			if err != nil {
+				return err
+			}
+			u := table.Inserter()
+			if err := u.Put(ctx, v.operations); err != nil {
+				return err
+			}
+			return nil
 		},
 	}
 	cmd.Flags().String("filter", "", "Filter selected resources")
-	cmd.Flags().Int("jobs", 10, "Number of actions to perform concurrently")
 	return cmd
+}
+
+type operation struct {
+	Path   string
+	Method string
+	Spec   string
 }
 
 type operationsVisitor struct {
 	visitor.Unsupported
 	registryClient connection.RegistryClient
+	operations     []*operation
 }
 
 func (v *operationsVisitor) SpecHandler() visitor.SpecHandler {
@@ -85,7 +132,7 @@ func (v *operationsVisitor) SpecHandler() visitor.SpecHandler {
 		return visitor.GetSpec(ctx, v.registryClient, specName, true,
 			func(ctx context.Context, spec *rpc.ApiSpec) error {
 				if mime.IsOpenAPIv2(spec.MimeType) || mime.IsOpenAPIv3(spec.MimeType) {
-					err := getOpenAPIOperations(spec.Contents)
+					err := v.getOpenAPIOperations(spec.Name, spec.Contents)
 					if err != nil {
 						return err
 					}
@@ -95,7 +142,7 @@ func (v *operationsVisitor) SpecHandler() visitor.SpecHandler {
 	}
 }
 
-func getOpenAPIOperations(b []byte) error {
+func (v *operationsVisitor) getOpenAPIOperations(specName string, b []byte) error {
 	var doc yaml.Node
 	err := yaml.Unmarshal(b, &doc)
 	if err != nil {
@@ -112,6 +159,12 @@ func getOpenAPIOperations(b []byte) error {
 					continue // skip OpenAPI extensions
 				}
 				fmt.Printf("%s %s\n", method, path)
+				v.operations = append(v.operations,
+					&operation{
+						Method: method,
+						Path:   path,
+						Spec:   specName,
+					})
 			}
 		}
 	}

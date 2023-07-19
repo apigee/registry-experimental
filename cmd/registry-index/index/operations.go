@@ -17,7 +17,9 @@ package index
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/bigquery"
 	"github.com/apigee/registry-experimental/pkg/yamlquery"
@@ -30,6 +32,8 @@ import (
 	"google.golang.org/api/googleapi"
 	"gopkg.in/yaml.v3"
 )
+
+var now = time.Now()
 
 func operationsCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -58,11 +62,11 @@ func operationsCommand() *cobra.Command {
 			v := &operationsVisitor{
 				registryClient: registryClient,
 			}
-			client, err := bigquery.NewClient(ctx, "TODO")
+			client, err := bigquery.NewClient(ctx, c.Project)
 			if err != nil {
 				return err
 			}
-			dataset := client.Dataset("registry")
+			dataset := client.Dataset("openapi_directory_2")
 			if err := dataset.Create(ctx, nil); err != nil {
 				switch v := err.(type) {
 				case *googleapi.Error:
@@ -100,8 +104,14 @@ func operationsCommand() *cobra.Command {
 				return err
 			}
 			u := table.Inserter()
-			if err := u.Put(ctx, v.operations); err != nil {
-				return err
+			log.Printf("uploading %d operations", len(v.operations))
+			step := 1000 // index STEP operations at a time
+			for start := 0; start < len(v.operations); start += step {
+				log.Printf("%d", start)
+				end := min(start+step, len(v.operations))
+				if err := u.Put(ctx, v.operations[start:end]); err != nil {
+					return err
+				}
 			}
 			return nil
 		},
@@ -110,10 +120,20 @@ func operationsCommand() *cobra.Command {
 	return cmd
 }
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 type operation struct {
-	Path   string
-	Method string
-	Spec   string
+	Path      string
+	Method    string
+	Api       string
+	Version   string
+	Spec      string
+	Timestamp time.Time
 }
 
 type operationsVisitor struct {
@@ -132,7 +152,7 @@ func (v *operationsVisitor) SpecHandler() visitor.SpecHandler {
 		return visitor.GetSpec(ctx, v.registryClient, specName, true,
 			func(ctx context.Context, spec *rpc.ApiSpec) error {
 				if mime.IsOpenAPIv2(spec.MimeType) || mime.IsOpenAPIv3(spec.MimeType) {
-					err := v.getOpenAPIOperations(spec.Name, spec.Contents)
+					err := v.getOpenAPIOperations(specName, spec.Contents)
 					if err != nil {
 						return err
 					}
@@ -142,7 +162,7 @@ func (v *operationsVisitor) SpecHandler() visitor.SpecHandler {
 	}
 }
 
-func (v *operationsVisitor) getOpenAPIOperations(specName string, b []byte) error {
+func (v *operationsVisitor) getOpenAPIOperations(specName names.Spec, b []byte) error {
 	var doc yaml.Node
 	err := yaml.Unmarshal(b, &doc)
 	if err != nil {
@@ -158,12 +178,14 @@ func (v *operationsVisitor) getOpenAPIOperations(specName string, b []byte) erro
 				if strings.HasPrefix(method, "X-") {
 					continue // skip OpenAPI extensions
 				}
-				fmt.Printf("%s %s\n", method, path)
 				v.operations = append(v.operations,
 					&operation{
-						Method: method,
-						Path:   path,
-						Spec:   specName,
+						Method:    method,
+						Path:      path,
+						Api:       specName.ApiID,
+						Version:   specName.VersionID,
+						Spec:      specName.SpecID,
+						Timestamp: now,
 					})
 			}
 		}

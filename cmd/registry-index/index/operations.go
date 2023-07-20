@@ -36,6 +36,10 @@ import (
 var now = time.Now()
 
 func operationsCommand() *cobra.Command {
+	var filter string
+	var project string
+	var dataset string
+	var step int
 	cmd := &cobra.Command{
 		Use:   "operations PATTERN",
 		Short: "Build a BigQuery index of API operations",
@@ -47,10 +51,6 @@ func operationsCommand() *cobra.Command {
 				return err
 			}
 			pattern := c.FQName(args[0])
-			filter, err := cmd.Flags().GetString("filter")
-			if err != nil {
-				return err
-			}
 			adminClient, err := connection.NewAdminClientWithSettings(ctx, c)
 			if err != nil {
 				return err
@@ -62,11 +62,14 @@ func operationsCommand() *cobra.Command {
 			v := &operationsVisitor{
 				registryClient: registryClient,
 			}
-			client, err := bigquery.NewClient(ctx, c.Project)
+			if project == "" {
+				project = c.Project
+			}
+			client, err := bigquery.NewClient(ctx, project)
 			if err != nil {
 				return err
 			}
-			dataset := client.Dataset("openapi_directory_2")
+			dataset := client.Dataset(dataset)
 			if err := dataset.Create(ctx, nil); err != nil {
 				switch v := err.(type) {
 				case *googleapi.Error:
@@ -105,7 +108,6 @@ func operationsCommand() *cobra.Command {
 			}
 			u := table.Inserter()
 			log.Printf("uploading %d operations", len(v.operations))
-			step := 1000 // index STEP operations at a time
 			for start := 0; start < len(v.operations); start += step {
 				log.Printf("%d", start)
 				end := min(start+step, len(v.operations))
@@ -116,7 +118,10 @@ func operationsCommand() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().String("filter", "", "Filter selected resources")
+	cmd.Flags().StringVar(&filter, "filter", "", "Filter selected resources")
+	cmd.Flags().StringVar(&project, "project", "", "Project to use for BigQuery upload (defaults to registry project)")
+	cmd.Flags().StringVar(&dataset, "dataset", "registry", "BigQuery dataset name")
+	cmd.Flags().IntVar(&step, "step", 10000, "Step size to use when uploading operations to BigQuery")
 	return cmd
 }
 
@@ -172,12 +177,19 @@ func (v *operationsVisitor) getOpenAPIOperations(specName names.Spec, b []byte) 
 	if paths != nil {
 		for i := 0; i < len(paths.Content); i += 2 {
 			path := paths.Content[i].Value
-			methods := paths.Content[i+1]
-			for j := 0; j < len(methods.Content); j += 2 {
-				method := strings.ToUpper(methods.Content[j].Value)
-				if strings.HasPrefix(method, "X-") {
-					continue // skip OpenAPI extensions
+			fields := paths.Content[i+1]
+			for j := 0; j < len(fields.Content); j += 2 {
+				fieldName := fields.Content[j].Value
+				// Skip any fields (summary, description, etc) that aren't methods.
+				if fieldName != "get" &&
+					fieldName != "put" &&
+					fieldName != "post" &&
+					fieldName != "delete" &&
+					fieldName != "options" &&
+					fieldName != "patch" {
+					continue
 				}
+				method := strings.ToUpper(fieldName)
 				v.operations = append(v.operations,
 					&operation{
 						Method:    method,
@@ -187,6 +199,7 @@ func (v *operationsVisitor) getOpenAPIOperations(specName names.Spec, b []byte) 
 						Spec:      specName.SpecID,
 						Timestamp: now,
 					})
+
 			}
 		}
 	}

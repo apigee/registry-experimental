@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	apigee "github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/client"
 	"github.com/apigee/registry/pkg/application/apihub"
@@ -231,6 +232,8 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 		return nil
 	}
 
+	metricsByEnv := map[string]*MetricsResponse{}
+
 	log.FromContext(ctx).Infof("retrieving envmap")
 	envMap, err := client.EnvMap(ctx)
 	if err != nil {
@@ -251,6 +254,16 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 			continue
 		}
 
+		mets, ok := metricsByEnv[dep.Environment]
+		if !ok {
+			m, err := metrics(ctx, client, dep.Environment)
+			if err != nil {
+				return err
+			}
+			metricsByEnv[dep.Environment] = m
+			mets = m
+		}
+
 		for _, hostname := range hostnames {
 			api, ok := apisByProxyName[dep.ApiProxy]
 			if !ok {
@@ -269,6 +282,7 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
 							"apigee-environment":    fmt.Sprintf("organizations/%s/environments/%s", client.Org(), dep.Environment),
 							"apigee-envgroup":       envgroup,
+							"message-count-7-days":  mets.Metric(dep.ApiProxy, "sum(message_count)"),
 						},
 						Labels: map[string]string{
 							"apihub-gateway": "apihub-google-cloud-apigee",
@@ -297,4 +311,39 @@ func boundProxies(prod *api.GoogleCloudApigeeV1ApiProduct) []string {
 		}
 	}
 	return proxies
+}
+
+func metrics(ctx context.Context, client apigee.Client, env string) (*MetricsResponse, error) {
+	dims := []string{"apiproxy"}
+	metrics := []string{"sum(message_count)"}
+	start := time.Now().Add(-7 * 24 * time.Hour)
+	end := time.Now()
+	m, err := client.Metrics(ctx, env, dims, metrics, start, end)
+	if err != nil {
+		return nil, err
+	}
+	return &MetricsResponse{m}, nil
+}
+
+type MetricsResponse struct {
+	*api.GoogleCloudApigeeV1Stats
+}
+
+func (m *MetricsResponse) Metric(dim, metric string) string {
+	if m == nil || len(m.Environments) < 1 {
+		return "0"
+	}
+	env := m.Environments[0]
+	for _, d := range env.Dimensions {
+		if d.Name == dim {
+			for _, m := range d.Metrics {
+				if m.Name == metric {
+					if len(m.Values) == 1 {
+						return m.Values[0].(string)
+					}
+				}
+			}
+		}
+	}
+	return "0"
 }

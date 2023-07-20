@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"google.golang.org/api/apigee/v1"
 )
@@ -174,4 +175,23 @@ func (c *GCPClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1
 	}
 
 	return products, err
+}
+
+// https://docs.apigee.com/api-platform/analytics/analytics-reference
+// https://docs.apigee.com/api-platform/analytics/use-analytics-api-measure-api-program-performance
+func (c *GCPClient) Metrics(ctx context.Context, env string, dimensions []string,
+	metrics []string, start time.Time, end time.Time) (*apigee.GoogleCloudApigeeV1Stats, error) {
+
+	apg, err := apigee.NewService(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	ds := strings.Join(dimensions, ",")
+	ms := strings.Join(metrics, ",")
+	timeFormat := "01/02/2006 15:04"
+	tr := start.Format(timeFormat) + "~" + end.Format(timeFormat)
+
+	name := fmt.Sprintf("organizations/%s/environments/%s/stats/%s", c.Org(), env, ds)
+	return apg.Organizations.Environments.Stats.Get(name).Select(ms).TimeRange(tr).Do()
 }

@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/apigee/registry-experimental/cmd/registry-index/index"
+	"github.com/apigee/registry-experimental/cmd/registry-query/index"
 	"github.com/apigee/registry/pkg/log"
 	"github.com/google/uuid"
 )

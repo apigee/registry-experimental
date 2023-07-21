@@ -25,5 +25,6 @@ func Command() *cobra.Command {
 	}
 
 	cmd.AddCommand(operationsCommand())
+	cmd.AddCommand(serversCommand())
 	return cmd
 }

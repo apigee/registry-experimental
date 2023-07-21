@@ -22,6 +22,7 @@ import (
 	"github.com/apigee/registry-experimental/cmd/registry-query/index"
 	"github.com/apigee/registry/pkg/log"
 	"github.com/google/uuid"
+	"github.com/spf13/cobra"
 )
 
 func main() {
@@ -30,7 +31,8 @@ func main() {
 		UID: fmt.Sprintf("%.8s", uuid.New()),
 	})
 
-	cmd := index.Command()
+	cmd := &cobra.Command{}
+	cmd.AddCommand(index.Command())
 	if err := cmd.ExecuteContext(ctx); err != nil {
 		os.Exit(1)
 	}

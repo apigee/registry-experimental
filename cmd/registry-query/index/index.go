@@ -24,6 +24,7 @@ func Command() *cobra.Command {
 		Short: "Index properties of resources in the API Registry",
 	}
 
+	cmd.AddCommand(infoCommand())
 	cmd.AddCommand(operationsCommand())
 	cmd.AddCommand(serversCommand())
 	return cmd

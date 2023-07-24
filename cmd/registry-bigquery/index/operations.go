@@ -32,8 +32,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var now = time.Now()
-
 func operationsCommand() *cobra.Command {
 	var filter string
 	var project string

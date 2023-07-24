@@ -98,7 +98,7 @@ func infoCommand() *cobra.Command {
 	cmd.Flags().StringVar(&filter, "filter", "", "Filter selected resources")
 	cmd.Flags().StringVar(&project, "project", "", "Project to use for BigQuery upload (defaults to registry project)")
 	cmd.Flags().StringVar(&dataset, "dataset", "registry", "BigQuery dataset name")
-	cmd.Flags().IntVar(&step, "step", 10000, "Step size to use when uploading operations to BigQuery")
+	cmd.Flags().IntVar(&step, "step", 10000, "Step size to use when uploading records to BigQuery")
 	return cmd
 }
 

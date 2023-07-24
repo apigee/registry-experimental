@@ -35,7 +35,7 @@ func infoCommand() *cobra.Command {
 	var filter string
 	var project string
 	var dataset string
-	var step int
+	var batchSize int
 	cmd := &cobra.Command{
 		Use:   "info PATTERN",
 		Short: "Build a BigQuery index of API information",
@@ -85,9 +85,9 @@ func infoCommand() *cobra.Command {
 			}
 			u := table.Inserter()
 			log.Printf("uploading %d info sets", len(v.infos))
-			for start := 0; start < len(v.infos); start += step {
+			for start := 0; start < len(v.infos); start += batchSize {
 				log.Printf("%d", start)
-				end := min(start+step, len(v.infos))
+				end := min(start+batchSize, len(v.infos))
 				if err := u.Put(ctx, v.infos[start:end]); err != nil {
 					return err
 				}
@@ -98,7 +98,7 @@ func infoCommand() *cobra.Command {
 	cmd.Flags().StringVar(&filter, "filter", "", "Filter selected resources")
 	cmd.Flags().StringVar(&project, "project", "", "Project to use for BigQuery upload (defaults to registry project)")
 	cmd.Flags().StringVar(&dataset, "dataset", "registry", "BigQuery dataset name")
-	cmd.Flags().IntVar(&step, "step", 10000, "Step size to use when uploading records to BigQuery")
+	cmd.Flags().IntVar(&batchSize, "batch-size", 10000, "Batch size to use when uploading records to BigQuery")
 	return cmd
 }
 

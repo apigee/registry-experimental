@@ -9,7 +9,8 @@ Subcommands expect users to have a Google Cloud project with BigQuery enabled.
 By default, this is assumed to be the same project as the configured registry
 project, but this can be overridden with a command-line flag.
 
-The following subcommands build indexes of information in API specs:
+The following subcommands build indexes of information in API specs. Currently
+only OpenAPI specs are processed.
 
 ```
 registry-bigquery index operations PATTERN

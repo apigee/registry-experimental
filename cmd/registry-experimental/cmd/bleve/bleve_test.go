@@ -210,6 +210,7 @@ func TestServer(t *testing.T) {
 	}()
 
 	// Wait for the server to start.
+	time.Sleep(1 * time.Second) // arbitrary pause
 	_, err := net.DialTimeout("tcp", "localhost:"+port, 2*time.Second)
 	if err != nil {
 		log.Fatalf("Failed to connect to test server: %s", err)

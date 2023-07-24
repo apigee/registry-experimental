@@ -28,7 +28,6 @@ import (
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
-	"google.golang.org/api/googleapi"
 	"gopkg.in/yaml.v3"
 )
 
@@ -66,32 +65,13 @@ func infoCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			dataset := client.Dataset(dataset)
-			if err := dataset.Create(ctx, nil); err != nil {
-				switch v := err.(type) {
-				case *googleapi.Error:
-					if v.Code != 409 { // already exists
-						return err
-					}
-				default:
-					return err
-				}
-			}
-			table := dataset.Table("info")
-
-			schema, err := bigquery.InferSchema(info{})
+			ds, err := getOrCreateDataset(ctx, client, dataset)
 			if err != nil {
 				return err
 			}
-			if err := table.Create(ctx, &bigquery.TableMetadata{Schema: schema}); err != nil {
-				switch v := err.(type) {
-				case *googleapi.Error:
-					if v.Code != 409 { // already exists
-						return err
-					}
-				default:
-					return err
-				}
+			table, err := getOrCreateTable(ctx, ds, "info", info{})
+			if err != nil {
+				return err
 			}
 			err = visitor.Visit(ctx, v, visitor.VisitorOptions{
 				RegistryClient:  registryClient,

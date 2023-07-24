@@ -55,9 +55,6 @@ func serversCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			v := &serversVisitor{
-				registryClient: registryClient,
-			}
 			if project == "" {
 				project = c.Project
 			}
@@ -72,6 +69,9 @@ func serversCommand() *cobra.Command {
 			table, err := getOrCreateTable(ctx, ds, "servers", server{})
 			if err != nil {
 				return err
+			}
+			v := &serversVisitor{
+				registryClient: registryClient,
 			}
 			err = visitor.Visit(ctx, v, visitor.VisitorOptions{
 				RegistryClient:  registryClient,

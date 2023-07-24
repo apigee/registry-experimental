@@ -55,9 +55,6 @@ func infoCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			v := &infoVisitor{
-				registryClient: registryClient,
-			}
 			if project == "" {
 				project = c.Project
 			}
@@ -72,6 +69,9 @@ func infoCommand() *cobra.Command {
 			table, err := getOrCreateTable(ctx, ds, "info", info{})
 			if err != nil {
 				return err
+			}
+			v := &infoVisitor{
+				registryClient: registryClient,
 			}
 			err = visitor.Visit(ctx, v, visitor.VisitorOptions{
 				RegistryClient:  registryClient,

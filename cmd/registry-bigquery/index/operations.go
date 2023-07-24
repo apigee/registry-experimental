@@ -58,9 +58,6 @@ func operationsCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			v := &operationsVisitor{
-				registryClient: registryClient,
-			}
 			if project == "" {
 				project = c.Project
 			}
@@ -75,6 +72,9 @@ func operationsCommand() *cobra.Command {
 			table, err := getOrCreateTable(ctx, ds, "operations", operation{})
 			if err != nil {
 				return err
+			}
+			v := &operationsVisitor{
+				registryClient: registryClient,
 			}
 			err = visitor.Visit(ctx, v, visitor.VisitorOptions{
 				RegistryClient:  registryClient,

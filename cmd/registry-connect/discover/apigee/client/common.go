@@ -17,6 +17,7 @@ package client
 import (
 	"context"
 	"strings"
+	"time"
 
 	"google.golang.org/api/apigee/v1"
 )
@@ -53,6 +54,8 @@ type Client interface {
 	Deployments(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1Deployment, error)
 	EnvMap(ctx context.Context) (*EnvMap, error)
 	Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV1ApiProduct, error)
+	Metrics(ctx context.Context, env string, dimensions []string, metrics []string,
+		start time.Time, end time.Time) (*apigee.GoogleCloudApigeeV1Stats, error)
 }
 
 type EnvMap struct {

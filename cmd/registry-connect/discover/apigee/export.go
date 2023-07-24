@@ -12,47 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package products
+package apigee
 
 import (
 	"context"
 	"fmt"
 	"os"
-	"regexp"
-	"strings"
+	"time"
 
 	apigee "github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/client"
 	"github.com/apigee/registry/pkg/application/apihub"
 	"github.com/apigee/registry/pkg/encoding"
 	"github.com/apigee/registry/pkg/log"
-	"github.com/spf13/cobra"
 	api "google.golang.org/api/apigee/v1"
 	"gopkg.in/yaml.v3"
 )
 
-var project string // TODO: remove when a relative ReferenceList_Reference.Resource works in Hub
-
-func Command() *cobra.Command {
-	var cmd = &cobra.Command{
-		Use:   "products ORGANIZATION",
-		Short: "Export Apigee Products",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			ctx := cmd.Context()
-			apigee.Config.Org = args[0]
-			client, err := apigee.NewClient()
-			if err != nil {
-				return err
-			}
-			return exportProducts(ctx, client)
-		},
-	}
-	cmd.Flags().StringVarP(&project, "project", "", "", "hub project id (temporary)")
-	_ = cmd.MarkFlagRequired("project")
-	return cmd
-}
-
-func exportProducts(ctx context.Context, client apigee.Client) error {
+func export(ctx context.Context, client apigee.Client) error {
 	log.FromContext(ctx).Infof("retrieving products")
 	products, err := client.Products(ctx)
 	if err != nil {
@@ -72,7 +48,6 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 	}
 
 	var apis []interface{}
-	apisByProxyName := map[string][]*encoding.Api{}
 	for _, product := range products {
 		log.FromContext(ctx).Infof("encoding product %q", product.Name)
 		access := ""
@@ -124,8 +99,6 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 				Description: "Links to resources in the registry.",
 			}
 			for _, proxyName := range proxyNames {
-				apisByProxyName[proxyName] = append(apisByProxyName[proxyName], api)
-
 				related.References = append(related.References, &apihub.ReferenceList_Reference{
 					Id:          fmt.Sprintf("%s-%s-proxy", client.Org(), proxyName),
 					DisplayName: fmt.Sprintf("%s proxy: %s", client.Org(), proxyName),
@@ -177,10 +150,11 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 		}
 	}
 
-	err = addDeployments(ctx, client, apisByProxyName)
+	proxyAPIs, err := addProxies(ctx, client, proxies)
 	if err != nil {
 		return err
 	}
+	apis = append(apis, proxyAPIs...)
 
 	items := &encoding.List{
 		Header: encoding.Header{ApiVersion: encoding.RegistryV1},
@@ -192,11 +166,74 @@ func exportProducts(ctx context.Context, client apigee.Client) error {
 	return err
 }
 
-// product -> proxies -> deployments
-func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName map[string][]*encoding.Api) error {
+func addProxies(ctx context.Context, client apigee.Client, proxies []*api.GoogleCloudApigeeV1ApiProxy) (apis []interface{}, err error) {
+	apisByProxyName := map[string]*encoding.Api{}
+	for _, proxy := range proxies {
+		log.FromContext(ctx).Infof("encoding proxy %q", proxy.Name)
+		api := &encoding.Api{
+			Header: encoding.Header{
+				ApiVersion: encoding.RegistryV1,
+				Kind:       "API",
+				Metadata: encoding.Metadata{
+					Name: name(fmt.Sprintf("%s-%s-proxy", client.Org(), proxy.Name)),
+					Annotations: map[string]string{
+						"apigee-proxy": fmt.Sprintf("%s/apis/%s", client.Org(), proxy.Name),
+					},
+					Labels: map[string]string{
+						"apihub-kind":          "proxy",
+						"apihub-business-unit": label(client.Org()),
+					},
+				},
+			},
+			Data: encoding.ApiData{
+				DisplayName: fmt.Sprintf("%s proxy: %s", client.Org(), proxy.Name),
+			},
+		}
+
+		dependencies := &apihub.ReferenceList{
+			DisplayName: "Apigee Dependencies",
+			Description: "Links to dependant Apigee resources.",
+			References: []*apihub.ReferenceList_Reference{{
+				Id:          proxy.Name,
+				DisplayName: proxy.Name + " (Apigee)",
+				Uri:         client.ProxyConsoleURL(ctx, proxy),
+			}},
+		}
+		node, err := encoding.NodeForMessage(dependencies)
+		if err != nil {
+			return nil, err
+		}
+
+		a := &encoding.Artifact{
+			Header: encoding.Header{
+				ApiVersion: encoding.RegistryV1,
+				Kind:       "ReferenceList",
+				Metadata: encoding.Metadata{
+					Name: "apihub-dependencies",
+				},
+			},
+			Data: *node,
+		}
+		api.Data.Artifacts = append(api.Data.Artifacts, a)
+		apis = append(apis, api)
+		apisByProxyName[proxy.Name] = api
+	}
+
+	err = addDeployments(ctx, client, apisByProxyName)
+	if err != nil {
+		return nil, err
+	}
+
+	return apis, nil
+}
+
+func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName map[string]*encoding.Api) error {
 	if len(apisByProxyName) == 0 {
 		return nil
 	}
+
+	metricsByEnv := map[string]*MetricsResponse{}
+
 	log.FromContext(ctx).Infof("retrieving envmap")
 	envMap, err := client.EnvMap(ctx)
 	if err != nil {
@@ -213,42 +250,52 @@ func addDeployments(ctx context.Context, client apigee.Client, apisByProxyName m
 	for _, dep := range deps {
 		hostnames, ok := envMap.Hostnames(dep.Environment)
 		if !ok {
-			log.Warnf(ctx, "Failed to find hostnames for environment %s", dep.Environment)
+			log.FromContext(ctx).Warnf("failed to find hostnames for environment %s", dep.Environment)
 			continue
 		}
 
+		mets, ok := metricsByEnv[dep.Environment]
+		if !ok {
+			m, err := metrics(ctx, client, dep.Environment)
+			if err != nil {
+				return err
+			}
+			metricsByEnv[dep.Environment] = m
+			mets = m
+		}
+
 		for _, hostname := range hostnames {
-			apis, ok := apisByProxyName[dep.ApiProxy]
-			if !ok || len(apis) == 0 {
-				log.Warnf(ctx, "Unknown proxy: %q for deployment: %#v", dep.ApiProxy, dep)
+			api, ok := apisByProxyName[dep.ApiProxy]
+			if !ok {
+				log.FromContext(ctx).Warnf("unknown proxy: %q for deployment: %#v", dep.ApiProxy, dep)
 				continue
 			}
 
-			for _, api := range apis {
-				envgroup, _ := envMap.Envgroup(hostname)
-				deployment := &encoding.ApiDeployment{
-					Header: encoding.Header{
-						ApiVersion: encoding.RegistryV1,
-						Kind:       "Deployment",
-						Metadata: encoding.Metadata{
-							Name: name(hostname),
-							Annotations: map[string]string{
-								"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
-								"apigee-environment":    fmt.Sprintf("organizations/%s/environments/%s", client.Org(), dep.Environment),
-								"apigee-envgroup":       envgroup,
-							},
-							Labels: map[string]string{
-								"apihub-gateway": "apihub-google-cloud-apigee",
-							},
+			envgroup, _ := envMap.Envgroup(hostname)
+			deployment := &encoding.ApiDeployment{
+				Header: encoding.Header{
+					ApiVersion: encoding.RegistryV1,
+					Kind:       "Deployment",
+					Metadata: encoding.Metadata{
+						Name: label(hostname),
+						Annotations: map[string]string{
+							"apigee-proxy-revision": fmt.Sprintf("organizations/%s/apis/%s/revisions/%s", client.Org(), dep.ApiProxy, dep.Revision),
+							"apigee-environment":    fmt.Sprintf("organizations/%s/environments/%s", client.Org(), dep.Environment),
+							"apigee-envgroup":       envgroup,
+							"message-count-7-days":  mets.Metric(dep.ApiProxy, "sum(message_count)"),
+						},
+						Labels: map[string]string{
+							"apihub-gateway": "apihub-google-cloud-apigee",
 						},
 					},
-					Data: encoding.ApiDeploymentData{
-						DisplayName: fmt.Sprintf("%s (%s)", dep.Environment, hostname),
-						EndpointURI: hostname, // TODO: full resource path?
-					},
-				}
-				api.Data.ApiDeployments = append(api.Data.ApiDeployments, deployment)
+				},
+				Data: encoding.ApiDeploymentData{
+					DisplayName: fmt.Sprintf("%s (%s)", dep.Environment, hostname),
+					EndpointURI: hostname, // TODO: full resource path?
+				},
 			}
+
+			api.Data.ApiDeployments = append(api.Data.ApiDeployments, deployment)
 		}
 	}
 	return nil
@@ -266,63 +313,37 @@ func boundProxies(prod *api.GoogleCloudApigeeV1ApiProduct) []string {
 	return proxies
 }
 
-func label(s string) string {
-	return strings.ToLower(regexp.MustCompile(`([^A-Za-z0-9-_]+)`).ReplaceAllString(s, "-"))
+func metrics(ctx context.Context, client apigee.Client, env string) (*MetricsResponse, error) {
+	dims := []string{"apiproxy"}
+	metrics := []string{"sum(message_count)"}
+	start := time.Now().Add(-7 * 24 * time.Hour)
+	end := time.Now()
+	m, err := client.Metrics(ctx, env, dims, metrics, start, end)
+	if err != nil {
+		return nil, err
+	}
+	return &MetricsResponse{m}, nil
 }
 
-func name(s string) string {
-	return strings.ToLower(regexp.MustCompile(`([^A-Za-z0-9-]+)`).ReplaceAllString(s, "-"))
+type MetricsResponse struct {
+	*api.GoogleCloudApigeeV1Stats
 }
 
-/*
-Example output:
-
-apiVersion: apigeeregistry/v1
-items:
-  - apiVersion: apigeeregistry/v1
-    kind: API
-    metadata:
-      name: myorg-helloworld-product
-      labels:
-        apihub-kind: product
-        apihub-target-users: internal
-        apihub-business-unit: myorg
-      annotations:
-        apigee-product: organizations/myorg/apiproducts/helloworld
-    data:
-      displayName: Hello World
-      description: Hello World API product for internal/admin users.
-      deployments:
-        - kind: Deployment
-          metadata:
-            name: test-helloworld-2
-            labels:
-              apihub-gateway: apihub-google-cloud-apigee
-            annotations:
-              apigee-proxy-revision: organizations/myorg/apis/helloworld/revisions/2
-              apigee-environment: organizations/myorg/environments/test
-          data:
-            displayName: test (helloworld)
-            endpointURI: helloworld-test.example.com
-      artifacts:
-        - kind: ReferenceList
-          metadata:
-            name: apihub-related
-          data:
-            references:
-              - id: myorg-helloworld-proxy
-                resource: projects/myorg/locations/global/apis/myorg-helloworld-proxy
-              - id: myorg-helloworld-admin-proxy
-                resource: projects/myorg/locations/global/apis/myorg-helloworld-admin-proxy
-        - kind: ReferenceList
-          metadata:
-            name: apihub-dependencies
-          data:
-            references:
-              - id: helloworld
-                displayName: helloworld (Apigee)
-                uri: https://console.cloud.google.com/apigee/proxies/helloworld/overview?project=myorg
-              - id: helloworld-admin
-                displayName: helloworld-admin (Apigee)
-                uri: https://console.cloud.google.com/apigee/proxies/helloworld-admin/overview?project=myorg
-*/
+func (m *MetricsResponse) Metric(dim, metric string) string {
+	if m == nil || len(m.Environments) < 1 {
+		return "0"
+	}
+	env := m.Environments[0]
+	for _, d := range env.Dimensions {
+		if d.Name == dim {
+			for _, m := range d.Metrics {
+				if m.Name == metric {
+					if len(m.Values) == 1 {
+						return m.Values[0].(string)
+					}
+				}
+			}
+		}
+	}
+	return "0"
+}

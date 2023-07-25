@@ -17,6 +17,7 @@ package match
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -120,6 +121,7 @@ func (v *matchVisitor) matchOpenAPI(ctx context.Context, specName names.Spec, b 
 	if err != nil {
 		return err
 	}
+	operations := make([]*operation, 0)
 	paths := yamlquery.QueryNode(&doc, "paths")
 	if paths != nil {
 		for i := 0; i < len(paths.Content); i += 2 {
@@ -137,29 +139,68 @@ func (v *matchVisitor) matchOpenAPI(ctx context.Context, specName names.Spec, b 
 					continue
 				}
 				method := strings.ToUpper(fieldName)
-				fmt.Printf("\n%s %s\n", method, path)
-				query := fmt.Sprintf(
-					`SELECT * FROM openapi_directory.operations WHERE path like "%s" and method = "%s"`,
-					path,
-					method)
-				q := v.bigQueryClient.Query(query)
-				it, err := q.Read(ctx)
-				if err != nil {
-					return err
-				}
-				for {
-					var values operation
-					err = it.Next(&values)
-					if err == iterator.Done {
-						break
-					}
-					if err != nil {
-						return err
-					}
-					fmt.Printf("apis/%s/versions/%s/specs/%s\n", values.Api, values.Version, values.Spec)
-				}
+				operations = append(operations,
+					&operation{
+						Method:  method,
+						Path:    path,
+						Api:     specName.ApiID,
+						Version: specName.VersionID,
+						Spec:    specName.SpecID,
+					})
 			}
 		}
+	}
+
+	counts := make(map[string]int)
+	total := len(operations)
+	fmt.Printf("%d total operations\n", total)
+	for i, op := range operations {
+		fmt.Printf("%d: %s %s\n", i, op.Method, op.Path)
+		query := fmt.Sprintf(
+			`SELECT * FROM openapi_directory.operations WHERE path like "%s" and method = "%s"`,
+			op.Path,
+			op.Method)
+		q := v.bigQueryClient.Query(query)
+		it, err := q.Read(ctx)
+		if err != nil {
+			return err
+		}
+		for {
+			var match operation
+			err = it.Next(&match)
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			name := fmt.Sprintf("apis/%s/versions/%s/specs/%s", match.Api, match.Version, match.Spec)
+			counts[name]++
+		}
+	}
+
+	apis := make([]string, 0)
+	for k := range counts {
+		apis = append(apis, k)
+	}
+	sort.Slice(apis, func(i int, j int) bool {
+		api_i := apis[i]
+		api_j := apis[j]
+		count_i := counts[api_i]
+		count_j := counts[api_j]
+		if count_i > count_j {
+			return true
+		} else if count_i < count_j {
+			return false
+		}
+		// apis with equal counts are alphabetized
+		return api_i < api_j
+	})
+	fmt.Println("")
+	// print the array backwards so the best match is last
+	for i := len(apis) - 1; i >= 0; i-- {
+		api := apis[i]
+		fmt.Printf("%0.5f\t%s\n", 1.0*float32(counts[api])/float32(total), api)
 	}
 	return nil
 }

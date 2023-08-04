@@ -12,35 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package match
+package index
 
 import (
 	"context"
 	"fmt"
-	"sort"
+	"log"
 	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/apigee/registry-experimental/cmd/registry-bigquery/common"
 	"github.com/apigee/registry-experimental/pkg/yamlquery"
+	"github.com/apigee/registry/cmd/registry/patch"
+	"github.com/apigee/registry/pkg/application/apihub"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/mime"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
-	"google.golang.org/api/iterator"
 	"gopkg.in/yaml.v3"
 )
 
-func Command() *cobra.Command {
+func linksCommand() *cobra.Command {
 	var filter string
 	var project string
 	var dataset string
 	var batchSize int
 	cmd := &cobra.Command{
-		Use:   "match PATTERN",
-		Short: "Match API specs with a BigQuery index of API information",
+		Use:   "links PATTERN",
+		Short: "Build a BigQuery index of links between resources",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
@@ -64,9 +66,16 @@ func Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			v := &matchVisitor{
+			ds, err := common.GetOrCreateDataset(ctx, client, dataset)
+			if err != nil {
+				return err
+			}
+			table, err := common.GetOrCreateTable(ctx, ds, "operations", operation{})
+			if err != nil {
+				return err
+			}
+			v := &linksVisitor{
 				registryClient: registryClient,
-				bigQueryClient: client,
 			}
 			err = visitor.Visit(ctx, v, visitor.VisitorOptions{
 				RegistryClient:  registryClient,
@@ -78,7 +87,15 @@ func Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
+			u := table.Inserter()
+			log.Printf("uploading %d links", len(v.links))
+			for start := 0; start < len(v.links); start += batchSize {
+				log.Printf("%d", start)
+				end := min(start+batchSize, len(v.links))
+				if err := u.Put(ctx, v.links[start:end]); err != nil {
+					return err
+				}
+			}
 			return nil
 		},
 	}
@@ -89,39 +106,60 @@ func Command() *cobra.Command {
 	return cmd
 }
 
-type matchVisitor struct {
-	visitor.Unsupported
-	registryClient connection.RegistryClient
-	bigQueryClient *bigquery.Client
+type link struct {
+	Path      string
+	Method    string
+	Api       string
+	Version   string
+	Spec      string
+	Timestamp time.Time
 }
 
-func (v *matchVisitor) SpecHandler() visitor.SpecHandler {
-	return func(ctx context.Context, message *rpc.ApiSpec) error {
+type linksVisitor struct {
+	visitor.Unsupported
+	registryClient connection.RegistryClient
+	links          []*link
+}
+
+func (v *linksVisitor) ArtifactHandler() visitor.ArtifactHandler {
+	return func(ctx context.Context, message *rpc.Artifact) error {
 		fmt.Printf("%s\n", message.Name)
-		specName, err := names.ParseSpec(message.Name)
+		artifactName, err := names.ParseArtifact(message.Name)
 		if err != nil {
 			return err
 		}
-		return visitor.GetSpec(ctx, v.registryClient, specName, true,
-			func(ctx context.Context, spec *rpc.ApiSpec) error {
-				if mime.IsOpenAPIv2(spec.MimeType) || mime.IsOpenAPIv3(spec.MimeType) {
-					err := v.matchOpenAPI(ctx, specName, spec.Contents)
-					if err != nil {
-						return err
-					}
+		kind := mime.KindForMimeType(message.MimeType)
+		if kind != "ReferenceList" {
+			return nil // skip it
+		}
+		m := &apihub.ReferenceList{}
+		err = visitor.FetchArtifactContents(ctx, v.registryClient, message)
+		if err != nil {
+			return err
+		}
+		if err := patch.UnmarshalContents(message.GetContents(), message.GetMimeType(), m); err != nil {
+			return err
+		}
+		fmt.Printf("  %s\n", artifactName.ApiID())
+		for _, link := range m.References {
+			if link.Resource != "" {
+				n, err := names.ParseApi(link.Resource)
+				if err != nil {
+					continue
 				}
-				return nil
-			})
+				fmt.Printf("  -->%s\n", n.ApiID)
+			}
+		}
+		return nil
 	}
 }
 
-func (v *matchVisitor) matchOpenAPI(ctx context.Context, specName names.Spec, b []byte) error {
+func (v *linksVisitor) getOpenAPIOperations(specName names.Spec, b []byte) error {
 	var doc yaml.Node
 	err := yaml.Unmarshal(b, &doc)
 	if err != nil {
 		return err
 	}
-	operations := make([]*operation, 0)
 	paths := yamlquery.QueryNode(&doc, "paths")
 	if paths != nil {
 		for i := 0; i < len(paths.Content); i += 2 {
@@ -139,78 +177,17 @@ func (v *matchVisitor) matchOpenAPI(ctx context.Context, specName names.Spec, b 
 					continue
 				}
 				method := strings.ToUpper(fieldName)
-				operations = append(operations,
-					&operation{
-						Method:  method,
-						Path:    path,
-						Api:     specName.ApiID,
-						Version: specName.VersionID,
-						Spec:    specName.SpecID,
+				v.links = append(v.links,
+					&link{
+						Method:    method,
+						Path:      path,
+						Api:       specName.ApiID,
+						Version:   specName.VersionID,
+						Spec:      specName.SpecID,
+						Timestamp: common.Now,
 					})
 			}
 		}
 	}
-
-	counts := make(map[string]int)
-	total := len(operations)
-	fmt.Printf("%d total operations\n", total)
-	for i, op := range operations {
-		fmt.Printf("%d: %s %s\n", i, op.Method, op.Path)
-		pattern := strings.ReplaceAll(op.Path, "*", "%")
-		query := fmt.Sprintf(
-			`SELECT * FROM registry.operations WHERE path like "%s" and method = "%s"`,
-			pattern,
-			op.Method)
-		q := v.bigQueryClient.Query(query)
-		it, err := q.Read(ctx)
-		if err != nil {
-			return err
-		}
-		for {
-			var match operation
-			err = it.Next(&match)
-			if err == iterator.Done {
-				break
-			}
-			if err != nil {
-				return err
-			}
-			name := fmt.Sprintf("apis/%s/versions/%s/specs/%s", match.Api, match.Version, match.Spec)
-			counts[name]++
-		}
-	}
-
-	apis := make([]string, 0)
-	for k := range counts {
-		apis = append(apis, k)
-	}
-	sort.Slice(apis, func(i int, j int) bool {
-		api_i := apis[i]
-		api_j := apis[j]
-		count_i := counts[api_i]
-		count_j := counts[api_j]
-		if count_i > count_j {
-			return true
-		} else if count_i < count_j {
-			return false
-		}
-		// apis with equal counts are alphabetized
-		return api_i < api_j
-	})
-	fmt.Println("")
-	// print the array backwards so the best match is last
-	for i := len(apis) - 1; i >= 0; i-- {
-		api := apis[i]
-		fmt.Printf("%0.5f\t%s\n", 1.0*float32(counts[api])/float32(total), api)
-	}
 	return nil
-}
-
-type operation struct {
-	Path      string
-	Method    string
-	Api       string
-	Version   string
-	Spec      string
-	Timestamp time.Time
 }

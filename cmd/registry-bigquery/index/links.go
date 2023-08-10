@@ -18,12 +18,10 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
 	"github.com/apigee/registry-experimental/cmd/registry-bigquery/common"
-	"github.com/apigee/registry-experimental/pkg/yamlquery"
 	"github.com/apigee/registry/cmd/registry/patch"
 	"github.com/apigee/registry/pkg/application/apihub"
 	"github.com/apigee/registry/pkg/connection"
@@ -32,7 +30,6 @@ import (
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
 func linksCommand() *cobra.Command {
@@ -70,7 +67,7 @@ func linksCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			table, err := common.GetOrCreateTable(ctx, ds, "operations", operation{})
+			table, err := common.GetOrCreateTable(ctx, ds, "links", link{})
 			if err != nil {
 				return err
 			}
@@ -107,11 +104,10 @@ func linksCommand() *cobra.Command {
 }
 
 type link struct {
-	Path      string
-	Method    string
-	Api       string
-	Version   string
-	Spec      string
+	Source    string
+	Target    string
+	Kind      string
+	Resource  string
 	Timestamp time.Time
 }
 
@@ -141,53 +137,25 @@ func (v *linksVisitor) ArtifactHandler() visitor.ArtifactHandler {
 			return err
 		}
 		fmt.Printf("  %s\n", artifactName.ApiID())
-		for _, link := range m.References {
-			if link.Resource != "" {
-				n, err := names.ParseApi(link.Resource)
+		for _, l := range m.References {
+			if l.Resource != "" {
+				n, err := names.ParseApi(l.Resource)
 				if err != nil {
 					continue
 				}
 				fmt.Printf("  -->%s\n", n.ApiID)
+
+				v.links = append(v.links,
+					&link{
+						Source:    artifactName.ApiID(),
+						Target:    n.ApiID,
+						Kind:      l.Category,
+						Resource:  artifactName.String(),
+						Timestamp: common.Now,
+					})
+
 			}
 		}
 		return nil
 	}
-}
-
-func (v *linksVisitor) getOpenAPIOperations(specName names.Spec, b []byte) error {
-	var doc yaml.Node
-	err := yaml.Unmarshal(b, &doc)
-	if err != nil {
-		return err
-	}
-	paths := yamlquery.QueryNode(&doc, "paths")
-	if paths != nil {
-		for i := 0; i < len(paths.Content); i += 2 {
-			path := paths.Content[i].Value
-			fields := paths.Content[i+1]
-			for j := 0; j < len(fields.Content); j += 2 {
-				fieldName := fields.Content[j].Value
-				// Skip any fields (summary, description, etc) that aren't methods.
-				if fieldName != "get" &&
-					fieldName != "put" &&
-					fieldName != "post" &&
-					fieldName != "delete" &&
-					fieldName != "options" &&
-					fieldName != "patch" {
-					continue
-				}
-				method := strings.ToUpper(fieldName)
-				v.links = append(v.links,
-					&link{
-						Method:    method,
-						Path:      path,
-						Api:       specName.ApiID,
-						Version:   specName.VersionID,
-						Spec:      specName.SpecID,
-						Timestamp: common.Now,
-					})
-			}
-		}
-	}
-	return nil
 }

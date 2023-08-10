@@ -107,7 +107,6 @@ type link struct {
 	Source    string
 	Target    string
 	Kind      string
-	Resource  string
 	Timestamp time.Time
 }
 
@@ -119,7 +118,6 @@ type linksVisitor struct {
 
 func (v *linksVisitor) ArtifactHandler() visitor.ArtifactHandler {
 	return func(ctx context.Context, message *rpc.Artifact) error {
-		fmt.Printf("%s\n", message.Name)
 		artifactName, err := names.ParseArtifact(message.Name)
 		if err != nil {
 			return err
@@ -136,24 +134,20 @@ func (v *linksVisitor) ArtifactHandler() visitor.ArtifactHandler {
 		if err := patch.UnmarshalContents(message.GetContents(), message.GetMimeType(), m); err != nil {
 			return err
 		}
-		fmt.Printf("  %s\n", artifactName.ApiID())
 		for _, l := range m.References {
 			if l.Resource != "" {
 				n, err := names.ParseApi(l.Resource)
 				if err != nil {
 					continue
 				}
-				fmt.Printf("  -->%s\n", n.ApiID)
-
+				fmt.Printf("%s -->%s (%s)\n", artifactName.ApiID(), n.ApiID, l.Category)
 				v.links = append(v.links,
 					&link{
 						Source:    artifactName.ApiID(),
 						Target:    n.ApiID,
 						Kind:      l.Category,
-						Resource:  artifactName.String(),
 						Timestamp: common.Now,
 					})
-
 			}
 		}
 		return nil

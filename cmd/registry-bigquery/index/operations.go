@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/apigee/registry-experimental/cmd/registry-bigquery/common"
 	"github.com/apigee/registry-experimental/pkg/yamlquery"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/mime"
@@ -63,11 +64,11 @@ func operationsCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ds, err := getOrCreateDataset(ctx, client, dataset)
+			ds, err := common.GetOrCreateDataset(ctx, client, dataset)
 			if err != nil {
 				return err
 			}
-			table, err := getOrCreateTable(ctx, ds, "operations", operation{})
+			table, err := common.GetOrCreateTable(ctx, ds, "operations", operation{})
 			if err != nil {
 				return err
 			}
@@ -175,7 +176,7 @@ func (v *operationsVisitor) getOpenAPIOperations(specName names.Spec, b []byte) 
 						Api:       specName.ApiID,
 						Version:   specName.VersionID,
 						Spec:      specName.SpecID,
-						Timestamp: now,
+						Timestamp: common.Now,
 					})
 
 			}

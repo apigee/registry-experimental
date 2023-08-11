@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/apigee/registry-experimental/cmd/registry-bigquery/index"
+	"github.com/apigee/registry-experimental/cmd/registry-bigquery/match"
 	"github.com/apigee/registry/pkg/log"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
@@ -33,6 +34,7 @@ func main() {
 
 	cmd := &cobra.Command{}
 	cmd.AddCommand(index.Command())
+	cmd.AddCommand(match.Command())
 	if err := cmd.ExecuteContext(ctx); err != nil {
 		os.Exit(1)
 	}

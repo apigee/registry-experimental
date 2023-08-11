@@ -22,24 +22,24 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"github.com/apigee/registry-experimental/cmd/registry-bigquery/common"
-	"github.com/apigee/registry-experimental/pkg/yamlquery"
+	"github.com/apigee/registry/cmd/registry/patch"
+	"github.com/apigee/registry/pkg/application/apihub"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/mime"
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
-func infoCommand() *cobra.Command {
+func linksCommand() *cobra.Command {
 	var filter string
 	var project string
 	var dataset string
 	var batchSize int
 	cmd := &cobra.Command{
-		Use:   "info PATTERN",
-		Short: "Build a BigQuery index of API information",
+		Use:   "links PATTERN",
+		Short: "Build a BigQuery index of links between resources",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
@@ -67,11 +67,11 @@ func infoCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			table, err := common.GetOrCreateTable(ctx, ds, "info", info{})
+			table, err := common.GetOrCreateTable(ctx, ds, "links", link{})
 			if err != nil {
 				return err
 			}
-			v := &infoVisitor{
+			v := &linksVisitor{
 				registryClient: registryClient,
 			}
 			err = visitor.Visit(ctx, v, visitor.VisitorOptions{
@@ -85,11 +85,11 @@ func infoCommand() *cobra.Command {
 				return err
 			}
 			u := table.Inserter()
-			log.Printf("uploading %d info sets", len(v.infos))
-			for start := 0; start < len(v.infos); start += batchSize {
+			log.Printf("uploading %d links", len(v.links))
+			for start := 0; start < len(v.links); start += batchSize {
 				log.Printf("%d", start)
-				end := min(start+batchSize, len(v.infos))
-				if err := u.Put(ctx, v.infos[start:end]); err != nil {
+				end := min(start+batchSize, len(v.links))
+				if err := u.Put(ctx, v.links[start:end]); err != nil {
 					return err
 				}
 			}
@@ -103,67 +103,53 @@ func infoCommand() *cobra.Command {
 	return cmd
 }
 
-type info struct {
-	Title       string
-	Description string
-	Api         string
-	Version     string
-	Spec        string
-	Timestamp   time.Time
+type link struct {
+	Source    string
+	Target    string
+	Kind      string
+	Timestamp time.Time
 }
 
-type infoVisitor struct {
+type linksVisitor struct {
 	visitor.Unsupported
 	registryClient connection.RegistryClient
-	infos          []*info
+	links          []*link
 }
 
-func (v *infoVisitor) SpecHandler() visitor.SpecHandler {
-	return func(ctx context.Context, message *rpc.ApiSpec) error {
-		fmt.Printf("%s\n", message.Name)
-		specName, err := names.ParseSpec(message.Name)
+func (v *linksVisitor) ArtifactHandler() visitor.ArtifactHandler {
+	return func(ctx context.Context, message *rpc.Artifact) error {
+		artifactName, err := names.ParseArtifact(message.Name)
 		if err != nil {
 			return err
 		}
-		return visitor.GetSpec(ctx, v.registryClient, specName, true,
-			func(ctx context.Context, spec *rpc.ApiSpec) error {
-				if mime.IsOpenAPIv2(spec.MimeType) || mime.IsOpenAPIv3(spec.MimeType) {
-					err := v.getOpenAPIInfo(specName, spec.Contents)
-					if err != nil {
-						return err
-					}
+		kind := mime.KindForMimeType(message.MimeType)
+		if kind != "ReferenceList" {
+			return nil // skip it
+		}
+		m := &apihub.ReferenceList{}
+		err = visitor.FetchArtifactContents(ctx, v.registryClient, message)
+		if err != nil {
+			return err
+		}
+		if err := patch.UnmarshalContents(message.GetContents(), message.GetMimeType(), m); err != nil {
+			return err
+		}
+		for _, l := range m.References {
+			if l.Resource != "" {
+				n, err := names.ParseApi(l.Resource)
+				if err != nil {
+					continue
 				}
-				return nil
-			})
+				fmt.Printf("%s -->%s (%s)\n", artifactName.ApiID(), n.ApiID, l.Category)
+				v.links = append(v.links,
+					&link{
+						Source:    artifactName.ApiID(),
+						Target:    n.ApiID,
+						Kind:      l.Category,
+						Timestamp: common.Now,
+					})
+			}
+		}
+		return nil
 	}
-}
-
-func (v *infoVisitor) getOpenAPIInfo(specName names.Spec, b []byte) error {
-	var doc yaml.Node
-	err := yaml.Unmarshal(b, &doc)
-	if err != nil {
-		return err
-	}
-	titlep := yamlquery.QueryString(&doc, "info.title")
-	var title string
-	if titlep != nil {
-		title = *titlep
-	}
-	descriptionp := yamlquery.QueryString(&doc, "info.description")
-	var description string
-	if descriptionp != nil {
-		description = *descriptionp
-	}
-	if title != "" || description != "" {
-		v.infos = append(v.infos,
-			&info{
-				Title:       title,
-				Description: description,
-				Api:         specName.ApiID,
-				Version:     specName.VersionID,
-				Spec:        specName.SpecID,
-				Timestamp:   common.Now,
-			})
-	}
-	return nil
 }

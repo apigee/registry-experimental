@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package index
+package match
 
 import (
 	"context"
 	"fmt"
-	"log"
+	"sort"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/apigee/registry-experimental/cmd/registry-bigquery/common"
 	"github.com/apigee/registry-experimental/pkg/yamlquery"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/mime"
@@ -29,17 +29,18 @@ import (
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
 	"github.com/spf13/cobra"
+	"google.golang.org/api/iterator"
 	"gopkg.in/yaml.v3"
 )
 
-func infoCommand() *cobra.Command {
+func Command() *cobra.Command {
 	var filter string
 	var project string
 	var dataset string
 	var batchSize int
 	cmd := &cobra.Command{
-		Use:   "info PATTERN",
-		Short: "Build a BigQuery index of API information",
+		Use:   "match PATTERN",
+		Short: "Match API specs with a BigQuery index of API information",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
@@ -63,16 +64,9 @@ func infoCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ds, err := common.GetOrCreateDataset(ctx, client, dataset)
-			if err != nil {
-				return err
-			}
-			table, err := common.GetOrCreateTable(ctx, ds, "info", info{})
-			if err != nil {
-				return err
-			}
-			v := &infoVisitor{
+			v := &matchVisitor{
 				registryClient: registryClient,
+				bigQueryClient: client,
 			}
 			err = visitor.Visit(ctx, v, visitor.VisitorOptions{
 				RegistryClient:  registryClient,
@@ -84,15 +78,7 @@ func infoCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			u := table.Inserter()
-			log.Printf("uploading %d info sets", len(v.infos))
-			for start := 0; start < len(v.infos); start += batchSize {
-				log.Printf("%d", start)
-				end := min(start+batchSize, len(v.infos))
-				if err := u.Put(ctx, v.infos[start:end]); err != nil {
-					return err
-				}
-			}
+
 			return nil
 		},
 	}
@@ -103,22 +89,13 @@ func infoCommand() *cobra.Command {
 	return cmd
 }
 
-type info struct {
-	Title       string
-	Description string
-	Api         string
-	Version     string
-	Spec        string
-	Timestamp   time.Time
-}
-
-type infoVisitor struct {
+type matchVisitor struct {
 	visitor.Unsupported
 	registryClient connection.RegistryClient
-	infos          []*info
+	bigQueryClient *bigquery.Client
 }
 
-func (v *infoVisitor) SpecHandler() visitor.SpecHandler {
+func (v *matchVisitor) SpecHandler() visitor.SpecHandler {
 	return func(ctx context.Context, message *rpc.ApiSpec) error {
 		fmt.Printf("%s\n", message.Name)
 		specName, err := names.ParseSpec(message.Name)
@@ -128,7 +105,7 @@ func (v *infoVisitor) SpecHandler() visitor.SpecHandler {
 		return visitor.GetSpec(ctx, v.registryClient, specName, true,
 			func(ctx context.Context, spec *rpc.ApiSpec) error {
 				if mime.IsOpenAPIv2(spec.MimeType) || mime.IsOpenAPIv3(spec.MimeType) {
-					err := v.getOpenAPIInfo(specName, spec.Contents)
+					err := v.matchOpenAPI(ctx, specName, spec.Contents)
 					if err != nil {
 						return err
 					}
@@ -138,32 +115,102 @@ func (v *infoVisitor) SpecHandler() visitor.SpecHandler {
 	}
 }
 
-func (v *infoVisitor) getOpenAPIInfo(specName names.Spec, b []byte) error {
+func (v *matchVisitor) matchOpenAPI(ctx context.Context, specName names.Spec, b []byte) error {
 	var doc yaml.Node
 	err := yaml.Unmarshal(b, &doc)
 	if err != nil {
 		return err
 	}
-	titlep := yamlquery.QueryString(&doc, "info.title")
-	var title string
-	if titlep != nil {
-		title = *titlep
+	operations := make([]*operation, 0)
+	paths := yamlquery.QueryNode(&doc, "paths")
+	if paths != nil {
+		for i := 0; i < len(paths.Content); i += 2 {
+			path := paths.Content[i].Value
+			fields := paths.Content[i+1]
+			for j := 0; j < len(fields.Content); j += 2 {
+				fieldName := fields.Content[j].Value
+				// Skip any fields (summary, description, etc) that aren't methods.
+				if fieldName != "get" &&
+					fieldName != "put" &&
+					fieldName != "post" &&
+					fieldName != "delete" &&
+					fieldName != "options" &&
+					fieldName != "patch" {
+					continue
+				}
+				method := strings.ToUpper(fieldName)
+				operations = append(operations,
+					&operation{
+						Method:  method,
+						Path:    path,
+						Api:     specName.ApiID,
+						Version: specName.VersionID,
+						Spec:    specName.SpecID,
+					})
+			}
+		}
 	}
-	descriptionp := yamlquery.QueryString(&doc, "info.description")
-	var description string
-	if descriptionp != nil {
-		description = *descriptionp
+
+	counts := make(map[string]int)
+	total := len(operations)
+	fmt.Printf("%d total operations\n", total)
+	for i, op := range operations {
+		fmt.Printf("%d: %s %s\n", i, op.Method, op.Path)
+		pattern := strings.ReplaceAll(op.Path, "*", "%")
+		query := fmt.Sprintf(
+			`SELECT * FROM registry.operations WHERE path like "%s" and method = "%s"`,
+			pattern,
+			op.Method)
+		q := v.bigQueryClient.Query(query)
+		it, err := q.Read(ctx)
+		if err != nil {
+			return err
+		}
+		for {
+			var match operation
+			err = it.Next(&match)
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			name := fmt.Sprintf("apis/%s/versions/%s/specs/%s", match.Api, match.Version, match.Spec)
+			counts[name]++
+		}
 	}
-	if title != "" || description != "" {
-		v.infos = append(v.infos,
-			&info{
-				Title:       title,
-				Description: description,
-				Api:         specName.ApiID,
-				Version:     specName.VersionID,
-				Spec:        specName.SpecID,
-				Timestamp:   common.Now,
-			})
+
+	apis := make([]string, 0)
+	for k := range counts {
+		apis = append(apis, k)
+	}
+	sort.Slice(apis, func(i int, j int) bool {
+		api_i := apis[i]
+		api_j := apis[j]
+		count_i := counts[api_i]
+		count_j := counts[api_j]
+		if count_i > count_j {
+			return true
+		} else if count_i < count_j {
+			return false
+		}
+		// apis with equal counts are alphabetized
+		return api_i < api_j
+	})
+	fmt.Println("")
+	// print the array backwards so the best match is last
+	for i := len(apis) - 1; i >= 0; i-- {
+		api := apis[i]
+		fmt.Printf("%0.5f\t%s\n", 1.0*float32(counts[api])/float32(total), api)
 	}
 	return nil
+}
+
+type operation struct {
+	Path      string
+	Method    string
+	Api       string
+	Version   string
+	Spec      string
+	Timestamp time.Time
 }

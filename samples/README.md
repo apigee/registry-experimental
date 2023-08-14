@@ -172,6 +172,79 @@ version 5.X.X
      }
      ```
 
+## How are lint results calculated?
+- The lint result artifacts are called as conformance reports, to represent how conformant an API is with respect
+  to the specified lint rules. The calculation of Scores depends on the existence of StyleGuide
+  artifacts. These artifacts are stored at the project level and hence are
+  applied to the whole project.
+- You can see what definitions currently exist in your registry using the
+  following command:
+  ```
+  registry list projects/$PROJECT/locations/global/artifacts/- --filter='mime_type.contains("StyleGuide")'
+  ```
+- Every time the `compute conformance` command is invoked, it will fetch all the
+  StyleGuides in the project and compute conformance artifacts based on the
+  definitions which apply to the supplied spec.
+- Here is an explanation of what each field means in a StyleGuide definition and how
+  the `compute conformance` command uses it. Let's consider the StyleGuide that
+  we are uploading as part of this sample.
+  ```
+  apiVersion: apigeeregistry/v1
+  kind: StyleGuide
+  metadata:
+    name: apihub-styleguide
+  data:
+    mime_types:
+    - application/x.openapi+gzip;version=3
+    - application/x.openapi;version=3
+    - application/x.openapi+gzip;version=2
+    - application/x.openapi;version=2
+    - application/x.openapi+gzip
+    - application/x.openapi
+    guidelines:
+    - id: operation
+      display_name: Govern properties of Operations
+      rules:
+      - id: operation-success-response
+        description: >
+          Operation must have at least one 2xx or 3xx response.
+          Any API operation (endpoint) can fail, but presumably
+          it is also meant to do something constructive at some point.
+        linter: spectral
+        linter_rulename: operation-success-response
+        severity: WARNING
+        doc_uri: https://github.com/stoplightio/spectral/blob/develop/docs/reference/openapi-rules.md#operation-success-response
+  ...
+  ```
+  - **mime_types**: this defines which types of APISpecs can this definition be applied to.
+    The above example mentions that this styleguide can be applied to all APIs of type openapi of all versions.
+    The `compute conformance` command looks for an exact match between the types mentioned here and the one that
+    is set on the APISpec itself. So make sure the mime_type on the spec resource is set correctly if you want 
+    to get the conformance report calculated for that spec.
+  - **guidelines**: This is a list of guidelines which define how a spec should be defined. Each guideline will
+    have a set of rules which represent what the guideline is checking for. For example, in this particular
+    example, we have a guideline defined for governing operation properties. The generated conformance report 
+    shows violations which are grouped into these guidelines. This helps users to set their own guidelines and give
+    a sructure to the linting rules. Note that a particular guideline can have rules coming from two different linters.
+    More on rules below:
+  - Let's see how to define a rule now:
+    - **id**: This is used by the conformance tool to identify a particular rule by it's id.
+    - **description**: a short description of the rule.
+    - **linter**: the linter name from which the rule is coming. This helps the conformance tool to decide which plugin to
+      invoke, for example here, the conformance tool will invoke the `registry-lint-spectral` plugin. This plugin is available
+      to be invoked as part of the APIHub experience. If you want to add your own / any other linter, you need to manage your
+      own controller job and either reuse this (image)[https://github.com/apigee/registry-experimental/pkgs/container/registry-linters]
+      ((Dockerfile)[https://github.com/apigee/registry-experimental/blob/main/containers/registry-linters/Dockerfile]) which includes
+      spectral, gnostic, api linter and their plugins built in. Or you can build your own linter and it's corresponding plugin.
+    - **linter_rulename**: This is the rulename with which a linter reports a violation. This helps the conformance tool to map the
+      errors reported in the linter's result to the rule ids in the structured conformance report.
+    - **severity**: This is the SEVERITY with which a violation of this rule should be reported.
+    - **doc_uri**: This is the informational field where you can link to an explanation of the rule in detail, in this particular 
+      example the link points to the spectral rule.
+- For more details on the fields, refer the
+  [proto](https://github.com/apigee/registry/blob/main/google/cloud/apigeeregistry/v1/style/style_guide.proto#L31)
+  definition.
+
 ## How are Scores calculated?
 
 - The calculation of Scores depends on the existence of ScoreDefintion

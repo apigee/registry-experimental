@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC. All Rights Reserved.
+// Copyright 2023 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/publish/backstage/encoding"
+	"github.com/apigee/registry/cmd/registry/patch"
 	"github.com/apigee/registry/pkg/application/apihub"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/log"
@@ -29,7 +30,6 @@ import (
 	"github.com/apigee/registry/pkg/names"
 	"github.com/apigee/registry/pkg/visitor"
 	"github.com/apigee/registry/rpc"
-	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )
 
@@ -138,7 +138,7 @@ func (c *catalog) createGroups(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		if err := proto.Unmarshal(a.GetContents(), message); err != nil {
+		if err := patch.UnmarshalContents(a.GetContents(), a.GetMimeType(), message); err != nil {
 			return err
 		}
 		artifactName, _ := names.ParseArtifact(a.Name)

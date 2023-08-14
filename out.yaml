@@ -1,0 +1,125 @@
+apiVersion: apigeeregistry/v1
+items:
+    - apiVersion: apigeeregistry/v1
+      kind: API
+      metadata:
+        name: apigee-apihub-demo-petstore-product
+        labels:
+            apihub-business-unit: apigee-apihub-demo
+            apihub-kind: product
+            apihub-target-users: public
+        annotations:
+            apigee-product: organizations/apigee-apihub-demo/apiproducts/petstore
+      data:
+        displayName: 'apigee-apihub-demo product: petstore'
+        description: petstore API Product for internal/admin users.
+        artifacts:
+            - apiVersion: apigeeregistry/v1
+              kind: ReferenceList
+              metadata:
+                name: apihub-related
+              data:
+                displayName: Related resources
+                description: Links to resources in the registry.
+                references:
+                    - id: apigee-apihub-demo-petstore-proxy
+                      displayName: 'apigee-apihub-demo proxy: petstore'
+                      category: ""
+                      resource: projects/apigee-apihub-demo/locations/global/apis/apigee-apihub-demo-petstore-proxy
+                      uri: ""
+            - apiVersion: apigeeregistry/v1
+              kind: ReferenceList
+              metadata:
+                name: apihub-dependencies
+              data:
+                displayName: Apigee Dependencies
+                description: Links to dependant Apigee resources.
+                references:
+                    - id: petstore
+                      displayName: petstore (Apigee)
+                      category: ""
+                      resource: ""
+                      uri: https://console.cloud.google.com/apigee/apiproducts/product/petstore/overview?project=apigee-apihub-demo
+                    - id: petstore
+                      displayName: petstore (Apigee)
+                      category: ""
+                      resource: ""
+                      uri: https://console.cloud.google.com/apigee/proxies/petstore/overview?project=apigee-apihub-demo
+    - apiVersion: apigeeregistry/v1
+      kind: API
+      metadata:
+        name: apigee-apihub-demo-petstore-proxy
+        labels:
+            apihub-business-unit: apigee-apihub-demo
+            apihub-kind: proxy
+        annotations:
+            apigee-proxy: apigee-apihub-demo/apis/petstore
+      data:
+        displayName: 'apigee-apihub-demo proxy: petstore'
+        deployments:
+            - apiVersion: apigeeregistry/v1
+              kind: Deployment
+              metadata:
+                name: bar-org
+                labels:
+                    apihub-gateway: apihub-google-cloud-apigee
+                annotations:
+                    apigee-envgroup: organizations/apigee-apihub-demo/envgroups/bar
+                    apigee-environment: organizations/apigee-apihub-demo/environments/test-env
+                    apigee-proxy-revision: organizations/apigee-apihub-demo/apis/petstore/revisions/1
+              data:
+                displayName: test-env (bar.org)
+                endpointURI: bar.org
+            - apiVersion: apigeeregistry/v1
+              kind: Deployment
+              metadata:
+                name: bar-com
+                labels:
+                    apihub-gateway: apihub-google-cloud-apigee
+                annotations:
+                    apigee-envgroup: organizations/apigee-apihub-demo/envgroups/bar
+                    apigee-environment: organizations/apigee-apihub-demo/environments/test-env
+                    apigee-proxy-revision: organizations/apigee-apihub-demo/apis/petstore/revisions/1
+              data:
+                displayName: test-env (bar.com)
+                endpointURI: bar.com
+            - apiVersion: apigeeregistry/v1
+              kind: Deployment
+              metadata:
+                name: foo-com
+                labels:
+                    apihub-gateway: apihub-google-cloud-apigee
+                annotations:
+                    apigee-envgroup: organizations/apigee-apihub-demo/envgroups/foo
+                    apigee-environment: organizations/apigee-apihub-demo/environments/test-env
+                    apigee-proxy-revision: organizations/apigee-apihub-demo/apis/petstore/revisions/1
+              data:
+                displayName: test-env (foo.com)
+                endpointURI: foo.com
+            - apiVersion: apigeeregistry/v1
+              kind: Deployment
+              metadata:
+                name: 34-120-31-59-nip-io
+                labels:
+                    apihub-gateway: apihub-google-cloud-apigee
+                annotations:
+                    apigee-envgroup: organizations/apigee-apihub-demo/envgroups/test-env-group
+                    apigee-environment: organizations/apigee-apihub-demo/environments/test-env
+                    apigee-proxy-revision: organizations/apigee-apihub-demo/apis/petstore/revisions/1
+              data:
+                displayName: test-env (34.120.31.59.nip.io)
+                endpointURI: 34.120.31.59.nip.io
+        artifacts:
+            - apiVersion: apigeeregistry/v1
+              kind: ReferenceList
+              metadata:
+                name: apihub-dependencies
+              data:
+                displayName: Apigee Dependencies
+                description: Links to dependant Apigee resources.
+                references:
+                    - id: petstore
+                      displayName: petstore (Apigee)
+                      category: ""
+                      resource: ""
+                      uri: https://console.cloud.google.com/apigee/proxies/petstore/overview?project=apigee-apihub-demo

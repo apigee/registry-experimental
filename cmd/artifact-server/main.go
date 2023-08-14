@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC. All Rights Reserved.
+// Copyright 2022 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/apigee/registry/cmd/registry/patch"
 	"github.com/apigee/registry/pkg/application/apihub"
 	"github.com/apigee/registry/pkg/application/controller"
 	"github.com/apigee/registry/pkg/application/scoring"
@@ -91,7 +92,7 @@ func handleRequest(w http.ResponseWriter, req *http.Request) {
 		writeError(w, err, http.StatusInternalServerError)
 		return
 	}
-	if err := proto.Unmarshal(contents.GetData(), message); err != nil {
+	if err := patch.UnmarshalContents(contents.GetData(), contents.GetContentType(), message); err != nil {
 		writeError(w, err, http.StatusInternalServerError)
 		return
 	}

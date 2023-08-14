@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC. All Rights Reserved.
+// Copyright 2023 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import (
 
 func openapiCommand() *cobra.Command {
 	var specID string
+	var jobs int
 	cmd := &cobra.Command{
 		Use:   "openapi",
 		Short: "Generate an OpenAPI spec from another specification format",
@@ -53,7 +54,7 @@ func openapiCommand() *cobra.Command {
 				return fmt.Errorf("failed to get client: %s", err)
 			}
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, 1)
+			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, jobs)
 			defer wait()
 
 			// Generate tasks.
@@ -79,6 +80,7 @@ func openapiCommand() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&specID, "spec-id", "generated", "ID to use for generated spec")
+	cmd.Flags().IntVarP(&jobs, "jobs", "j", 10, "number of actions to perform concurrently")
 	return cmd
 }
 

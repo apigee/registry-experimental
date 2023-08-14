@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC. All Rights Reserved.
+// Copyright 2020 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/apigee/registry/cmd/registry/compress"
+	"github.com/apigee/registry/cmd/registry/patch"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/mime"
@@ -72,7 +73,7 @@ func collectInputVocabularies(ctx context.Context, client connection.RegistryCli
 			}
 
 			vocab := &metrics.Vocabulary{}
-			if err := proto.Unmarshal(artifact.GetContents(), vocab); err != nil {
+			if err := patch.UnmarshalContents(artifact.GetContents(), artifact.GetMimeType(), vocab); err != nil {
 				log.FromContext(ctx).WithError(err).Debug("Failed to unmarshal contents")
 				return nil
 			}

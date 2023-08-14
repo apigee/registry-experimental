@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC. All Rights Reserved.
+// Copyright 2023 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/apigee/registry/cmd/registry/patch"
 	"github.com/apigee/registry/pkg/connection"
 	"github.com/apigee/registry/pkg/log"
 	"github.com/apigee/registry/pkg/mime"
@@ -26,7 +27,6 @@ import (
 	"github.com/apigee/registry/rpc"
 	metrics "github.com/google/gnostic/metrics"
 	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/proto"
 )
 
 var filter string
@@ -76,7 +76,7 @@ func similarityCommand() *cobra.Command {
 			fmt.Fprintf(cmd.OutOrStdout(), "\n")
 			for i := 0; i < len(vocabularyArtifacts); i++ {
 				vi := &metrics.Vocabulary{}
-				if err := proto.Unmarshal(vocabularyArtifacts[i].GetContents(), vi); err != nil {
+				if err := patch.UnmarshalContents(vocabularyArtifacts[i].GetContents(), vocabularyArtifacts[i].GetMimeType(), vi); err != nil {
 					log.FromContext(ctx).WithError(err).Debug("Failed to unmarshal contents")
 					return nil
 				}
@@ -86,7 +86,7 @@ func similarityCommand() *cobra.Command {
 				}
 				for j := i; j < len(vocabularyArtifacts); j++ {
 					vj := &metrics.Vocabulary{}
-					if err := proto.Unmarshal(vocabularyArtifacts[j].GetContents(), vj); err != nil {
+					if err := patch.UnmarshalContents(vocabularyArtifacts[j].GetContents(), vocabularyArtifacts[j].GetMimeType(), vi); err != nil {
 						log.FromContext(ctx).WithError(err).Debug("Failed to unmarshal contents")
 						return nil
 					}

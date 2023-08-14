@@ -1,4 +1,4 @@
-// Copyright 2023 Google LLC. All Rights Reserved.
+// Copyright 2023 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/apigee/registry-experimental/cmd/registry-connect/discover/apigee/edge"
 	"google.golang.org/api/apigee/v1"
@@ -189,4 +190,10 @@ func (c *EdgeClient) Products(ctx context.Context) ([]*apigee.GoogleCloudApigeeV
 	}
 
 	return products, nil
+}
+
+func (c *EdgeClient) Metrics(ctx context.Context, env string, dimensions []string,
+	metrics []string, start time.Time, end time.Time) (*apigee.GoogleCloudApigeeV1Stats, error) {
+	stats, _, err := c.service.Metrics.Metrics(ctx, env, dimensions, metrics, start, end)
+	return stats, err
 }

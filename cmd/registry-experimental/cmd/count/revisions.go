@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC. All Rights Reserved.
+// Copyright 2022 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import (
 func revisionsCommand() *cobra.Command {
 	var filter string
 	cmd := &cobra.Command{
-		Use:   "revisions",
+		Use:   "revisions [SPEC or DEPLOYMENT PATTERN]",
 		Short: "Count the number of revisions of specified resources",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {

@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC. All Rights Reserved.
+// Copyright 2020 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,28 +41,33 @@ import (
 )
 
 func descriptorCommand() *cobra.Command {
-	return &cobra.Command{
+	var jobs int
+	cmd := &cobra.Command{
 		Use:   "descriptor",
 		Short: "Compute descriptors of API specs",
 		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+			c, err := connection.ActiveConfig()
+			if err != nil {
+				return err
+			}
+			pattern := c.FQName(args[0])
 
 			filter, err := cmd.Flags().GetString("filter")
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Fatal("Failed to get filter from flags")
+				return err
 			}
 
 			client, err := connection.NewRegistryClient(ctx)
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Fatal("Failed to get client")
+				return err
 			}
 			// Initialize task queue.
-			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, 1)
+			taskQueue, wait := tasks.WorkerPoolIgnoreError(ctx, jobs)
 			defer wait()
 			// Generate tasks.
-			name := args[0]
-			if spec, err := names.ParseSpec(name); err == nil {
+			if spec, err := names.ParseSpec(pattern); err == nil {
 				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
 					taskQueue <- &computeDescriptorTask{
 						client:   client,
@@ -71,11 +76,15 @@ func descriptorCommand() *cobra.Command {
 					return nil
 				})
 				if err != nil {
-					log.FromContext(ctx).WithError(err).Fatal("Failed to list specs")
+					return err
 				}
 			}
+			return nil
 		},
 	}
+
+	cmd.Flags().IntVarP(&jobs, "jobs", "j", 10, "number of actions to perform concurrently")
+	return cmd
 }
 
 type computeDescriptorTask struct {
@@ -180,6 +189,7 @@ func generateDescriptorForDirectory(ctx context.Context, name string, root strin
 	args := []string{}
 	args = append(args, protos...)
 	args = append(args, "--proto_path=protos")
+	args = append(args, "--include_imports")
 	args = append(args, "--descriptor_set_out=proto.pb")
 	cmd := exec.Command("protoc", args...)
 	cmd.Dir = root

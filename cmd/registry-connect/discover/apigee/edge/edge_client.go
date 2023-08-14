@@ -67,6 +67,7 @@ type EdgeClient struct {
 	Deployments  DeploymentsService
 	Environments EnvironmentsService
 	Products     ProductsService
+	Metrics      MetricsService
 
 	IsGCPManaged bool
 
@@ -236,6 +237,7 @@ func NewEdgeClient(o *EdgeClientOptions) (*EdgeClient, error) {
 	c.Environments = &EnvironmentsServiceOp{client: c}
 	c.Deployments = &DeploymentsServiceOp{client: c}
 	c.Products = &ProductsServiceOp{client: c}
+	c.Metrics = &MetricsServiceOp{client: c}
 
 	if !o.Auth.SkipAuth {
 		var e error

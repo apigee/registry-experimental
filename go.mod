@@ -10,7 +10,7 @@ require (
 	cloud.google.com/go/pubsub v1.30.0
 	github.com/GoogleCloudPlatform/cloudsql-proxy v1.32.0
 	github.com/apex/log v1.9.0
-	github.com/apigee/registry v0.6.13
+	github.com/apigee/registry v0.6.14-0.20230814170855-82fd89e64a50
 	github.com/blevesearch/bleve v1.0.14
 	github.com/envoyproxy/go-control-plane v0.10.3
 	github.com/fatih/camelcase v1.0.0

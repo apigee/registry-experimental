@@ -68,7 +68,7 @@ func csvCommand() *cobra.Command {
 					return
 				}
 
-				err = visitor.ListSpecs(ctx, client, version.Spec(""), filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
+				err = visitor.ListSpecs(ctx, client, version.Spec(""), 0, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
 					name, err := names.ParseSpec(spec.GetName())
 					if err != nil {
 						log.Debugf(ctx, "Failed to parse spec name %q: skipping spec row", spec.GetName())

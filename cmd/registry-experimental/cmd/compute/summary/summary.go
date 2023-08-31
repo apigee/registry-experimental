@@ -89,7 +89,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 		}
 		apiCount := 0
 		if err := visitor.ListAPIs(ctx, v.registryClient,
-			projectName.Api("-"), "",
+			projectName.Api("-"), 0, "",
 			func(ctx context.Context, api *rpc.Api) error {
 				apiCount++
 				return nil
@@ -98,7 +98,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 		}
 		versionCount := 0
 		if err := visitor.ListVersions(ctx, v.registryClient,
-			projectName.Api("-").Version("-"), "",
+			projectName.Api("-").Version("-"), 0, "",
 			func(ctx context.Context, message *rpc.ApiVersion) error {
 				versionCount++
 				return nil
@@ -108,7 +108,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 		specCount := 0
 		mimeTypes := make(map[string]int)
 		if err := visitor.ListSpecs(ctx, v.registryClient,
-			projectName.Api("-").Version("-").Spec("-"), "", false,
+			projectName.Api("-").Version("-").Spec("-"), 0, "", false,
 			func(ctx context.Context, message *rpc.ApiSpec) error {
 				specCount++
 				mimeTypes[message.MimeType]++
@@ -118,7 +118,7 @@ func (v *summaryVisitor) ProjectHandler() visitor.ProjectHandler {
 		}
 		deploymentCount := 0
 		if err := visitor.ListDeployments(ctx, v.registryClient,
-			projectName.Api("-").Deployment("-"), "",
+			projectName.Api("-").Deployment("-"), 0, "",
 			func(ctx context.Context, message *rpc.ApiDeployment) error {
 				deploymentCount++
 				return nil
@@ -154,7 +154,7 @@ func (v *summaryVisitor) ApiHandler() visitor.ApiHandler {
 		}
 		versionCount := 0
 		if err := visitor.ListVersions(ctx, v.registryClient,
-			apiName.Version("-"), "",
+			apiName.Version("-"), 0, "",
 			func(ctx context.Context, message *rpc.ApiVersion) error {
 				versionCount++
 				return nil
@@ -164,7 +164,7 @@ func (v *summaryVisitor) ApiHandler() visitor.ApiHandler {
 		specCount := 0
 		mimeTypes := make(map[string]int)
 		if err := visitor.ListSpecs(ctx, v.registryClient,
-			apiName.Version("-").Spec("-"), "", false,
+			apiName.Version("-").Spec("-"), 0, "", false,
 			func(ctx context.Context, message *rpc.ApiSpec) error {
 				specCount++
 				mimeTypes[message.MimeType]++
@@ -174,7 +174,7 @@ func (v *summaryVisitor) ApiHandler() visitor.ApiHandler {
 		}
 		deploymentCount := 0
 		if err := visitor.ListDeployments(ctx, v.registryClient,
-			apiName.Deployment("-"), "",
+			apiName.Deployment("-"), 0, "",
 			func(ctx context.Context, message *rpc.ApiDeployment) error {
 				deploymentCount++
 				return nil

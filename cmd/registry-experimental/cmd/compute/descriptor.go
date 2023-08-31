@@ -68,7 +68,7 @@ func descriptorCommand() *cobra.Command {
 			defer wait()
 			// Generate tasks.
 			if spec, err := names.ParseSpec(pattern); err == nil {
-				err = visitor.ListSpecs(ctx, client, spec, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
+				err = visitor.ListSpecs(ctx, client, spec, 0, filter, false, func(ctx context.Context, spec *rpc.ApiSpec) error {
 					taskQueue <- &computeDescriptorTask{
 						client:   client,
 						specName: spec.Name,

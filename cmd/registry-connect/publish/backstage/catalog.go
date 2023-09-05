@@ -181,7 +181,7 @@ func (c *catalog) createAPIs(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	return visitor.ListAPIs(ctx, c.client, project.Api("-"), c.filter, func(ctx context.Context, a *rpc.Api) error {
+	return visitor.ListAPIs(ctx, c.client, project.Api("-"), 0, c.filter, func(ctx context.Context, a *rpc.Api) error {
 		log.FromContext(ctx).Infof("publishing %s", a.Name)
 
 		var specContents string
@@ -212,7 +212,7 @@ func (c *catalog) createAPIs(ctx context.Context) error {
 
 			var specs []*rpc.ApiSpec
 			vName, _ := names.ParseVersion(av.Name)
-			err = visitor.ListSpecs(ctx, c.client, vName.Spec("-"), "", true, func(ctx context.Context, as *rpc.ApiSpec) error {
+			err = visitor.ListSpecs(ctx, c.client, vName.Spec("-"), 0, "", true, func(ctx context.Context, as *rpc.ApiSpec) error {
 				specs = append(specs, as)
 				return nil
 			})
@@ -268,7 +268,7 @@ func (c *catalog) createAPIs(ctx context.Context) error {
 				return err
 			}
 
-			err = visitor.ListDeployments(ctx, c.client, apiName.Deployment("-"), "", func(ctx context.Context, d *rpc.ApiDeployment) error {
+			err = visitor.ListDeployments(ctx, c.client, apiName.Deployment("-"), 0, "", func(ctx context.Context, d *rpc.ApiDeployment) error {
 				env, err := c.createDeployment(d)
 				dep := env.Spec.(*encoding.Component)
 				dep.ProvidesApis = append(dep.ProvidesApis, api.Reference())
@@ -386,7 +386,7 @@ func recommendedOrLatestVersion(ctx context.Context, client connection.RegistryC
 	}
 
 	var version *rpc.ApiVersion
-	err := visitor.ListVersions(ctx, client, versionName, "", func(ctx context.Context, av *rpc.ApiVersion) error {
+	err := visitor.ListVersions(ctx, client, versionName, 0, "", func(ctx context.Context, av *rpc.ApiVersion) error {
 		version = av
 		return nil
 	})

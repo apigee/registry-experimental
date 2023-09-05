@@ -53,10 +53,8 @@ func similarityCommand() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				if err = visitor.ListArtifacts(ctx, client,
-					name,
-					filter,
-					true, func(ctx context.Context, message *rpc.Artifact) error {
+				if err = visitor.ListArtifacts(ctx, client, name, 0, filter, true,
+					func(ctx context.Context, message *rpc.Artifact) error {
 						messageType, err := mime.MessageTypeForMimeType(message.GetMimeType())
 						if err != nil || messageType != "gnostic.metrics.Vocabulary" {
 							log.Debugf(ctx, "Skipping, not a vocabulary: %s", message.Name)

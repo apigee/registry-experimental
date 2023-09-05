@@ -61,7 +61,7 @@ func versionsCommand() *cobra.Command {
 			}
 
 			// Iterate through a collection of APIs and count the number of versions of each.
-			err = visitor.ListAPIs(ctx, client, api, filter, func(ctx context.Context, api *rpc.Api) error {
+			err = visitor.ListAPIs(ctx, client, api, 0, filter, func(ctx context.Context, api *rpc.Api) error {
 				taskQueue <- &countApiVersionsTask{
 					client: client,
 					api:    api,

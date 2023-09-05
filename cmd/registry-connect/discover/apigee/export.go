@@ -69,6 +69,8 @@ func export(ctx context.Context, client apigee.Client) error {
 					},
 					Labels: map[string]string{
 						"apihub-kind":          "product",
+						"apihub-source":        "registry-connect",
+						"apihub-provider":      "apigee",
 						"apihub-business-unit": label(client.Org()),
 						"apihub-target-users":  access,
 					},
@@ -181,6 +183,8 @@ func addProxies(ctx context.Context, client apigee.Client, proxies []*api.Google
 					},
 					Labels: map[string]string{
 						"apihub-kind":          "proxy",
+						"apihub-source":        "registry-connect",
+						"apihub-provider":      "apigee",
 						"apihub-business-unit": label(client.Org()),
 					},
 				},

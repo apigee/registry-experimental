@@ -66,7 +66,7 @@ func stemsCommand() *cobra.Command {
 				log.FromContext(ctx).WithError(err).Fatal("Invalid pattern")
 			}
 
-			err = visitor.ListArtifacts(ctx, client, patternName, filter, true, func(ctx context.Context, artifact *rpc.Artifact) error {
+			err = visitor.ListArtifacts(ctx, client, patternName, 0, filter, true, func(ctx context.Context, artifact *rpc.Artifact) error {
 				messageType, err := mime.MessageTypeForMimeType(artifact.GetMimeType())
 				if err != nil || messageType != "gnostic.metrics.Vocabulary" {
 					log.Debugf(ctx, "Skipping, not a vocabulary: %s", artifact.Name)

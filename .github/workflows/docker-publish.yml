@@ -45,9 +45,6 @@ jobs:
         -   image: ${{github.repository_owner}}/registry-prism-mock-server
             context: "containers/registry-mock-server/openapi"
             dockerfile: containers/registry-mock-server/openapi/Dockerfile
-        -   image: ${{github.repository_owner}}/registry-graphql-mock-server
-            context: "containers/registry-mock-server/graphql"
-            dockerfile: containers/registry-mock-server/graphql/Dockerfile
         -   image: ${{github.repository_owner}}/registry-linters
             context: "."
             dockerfile: "containers/registry-linters/Dockerfile"

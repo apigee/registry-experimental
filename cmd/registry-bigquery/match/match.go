@@ -17,6 +17,7 @@ package match
 import (
 	"context"
 	"fmt"
+	"log"
 	"sort"
 	"strings"
 	"time"
@@ -97,7 +98,7 @@ type matchVisitor struct {
 
 func (v *matchVisitor) SpecHandler() visitor.SpecHandler {
 	return func(ctx context.Context, message *rpc.ApiSpec) error {
-		fmt.Printf("%s\n", message.Name)
+		fmt.Printf("MATCHING %s\n", message.Name)
 		specName, err := names.ParseSpec(message.Name)
 		if err != nil {
 			return err
@@ -203,6 +204,20 @@ func (v *matchVisitor) matchOpenAPI(ctx context.Context, specName names.Spec, b 
 		api := apis[i]
 		fmt.Printf("%0.5f\t%s\n", 1.0*float32(counts[api])/float32(total), api)
 	}
+	// if we didn't match anything, we are finished
+	if len(apis) == 0 {
+		return nil
+	}
+	// assume the last match is the one we want to save
+	// create a link to from the traffic signal to the reference
+	// the traffic is the api of the starting specName
+	trafficApi := specName.Api()
+	// the reference is the last match
+	lastApi := apis[len(apis)-1]
+	enrolledApi := specName.Project().Api(lastApi)
+
+	log.Printf("LINKING %s to %s", trafficApi, enrolledApi)
+
 	return nil
 }
 

@@ -7,7 +7,7 @@ google-api-core==2.8.2
 google-auth==2.9.1
 google-cloud-apigeeregistry==0.0.0
 googleapis-common-protos==1.56.4
-grpcio==1.53.0
+grpcio==1.53.2
 grpcio-status==1.47.0
 grpcio-tools==1.47.0
 idna==3.3
@@ -35,4 +35,4 @@ strsimpy==0.2.1
 threadpoolctl==3.1.0
 tomli==2.0.1
 typing-extensions==4.3.0
-urllib3==1.26.10
+urllib3==1.26.18

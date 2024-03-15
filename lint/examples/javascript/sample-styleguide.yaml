@@ -1,0 +1,41 @@
+apiVersion: apigeeregistry/v1
+kind: StyleGuide
+metadata:
+  name: sample-styleguide
+data:
+  displayName: sample styleguide
+  mimeTypes:
+    - application/x.openapi+gzip;version=3.0.0
+    - application/x.openapi+gzip;version=3.0.1
+    - application/x.openapi+gzip;version=3.0.2
+    - application/x.openapi+gzip;version=3.0.3
+    - application/x.openapi+gzip;version=3.1.0
+    - application/x.openapi;version=3
+    - application/x.openapi+gzip;version=2.0
+    - application/x.openapi+gzip;version=2
+    - application/x.openapi;version=2
+    - application/x.openapi+gzip
+    - application/x.openapi
+  guidelines:
+    - id: active
+      displayName: Active checks
+      description: Checks that are ACTIVE.
+      rules:
+        - id: description-less-than-1000-chars
+          displayName: Description Maximum Length
+          description: Descriptions should not be too long.
+          linter: js
+          linterRulename: description-less-than-1000-chars
+          severity: ERROR
+          docUri: https://github.com/apigee/registry
+        - id: description-contains-no-tags
+          displayName: Description Tags
+          description: Descriptions should not contain HTML tags.
+          linter: js
+          linterRulename: description-contains-no-tags
+          severity: ERROR
+          docUri: https://github.com/apigee/registry
+      state: ACTIVE
+  linters:
+    - name: js
+      uri: https://github.com/apigee/registry

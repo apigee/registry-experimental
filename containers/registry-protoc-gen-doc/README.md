@@ -89,5 +89,5 @@ We will be running the registry controller with a custom manifest which can :
   #Delete grpc-doc-url artifact for all specs in registry 
   #Delete the files from the GCS bucket
   registry delete apis/-/versions/-/specs/-/artifacts/grpc-doc-url
-  gsutil rm -rf gs://grpc-docs/*
+  gcloud storage rm --recursive --continue-on-error gs://grpc-docs/*
 ```

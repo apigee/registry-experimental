@@ -1,6 +1,6 @@
 module github.com/apigee/registry-experimental
 
-go 1.18
+go 1.25
 
 require (
 	cloud.google.com/go/bigquery v1.50.0
@@ -67,7 +67,7 @@ require (
 	cloud.google.com/go/iam v0.13.0 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/apache/arrow/go/v11 v11.0.0 // indirect
-	github.com/apache/thrift v0.16.0 // indirect
+	github.com/apache/thrift v0.23.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/swag v0.22.3 // indirect
